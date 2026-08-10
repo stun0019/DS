@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": null,
+  "tradeDate": null,
+  "status": {
+    "stocks": false,
+    "index": false,
+    "indexOHLC": false,
+    "market": false
+  },
+  "sources": {
+    "stocks": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
+    "index": "https://openapi.twse.com.tw/v1/exchangeReport/MI_INDEX",
+    "indexOHLC": "https://openapi.twse.com.tw/v1/indicesReport/MI_5MINS_HIST",
+    "market": "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK"
+  },
+  "stocks": [],
+  "index": [],
+  "indexOHLC": [],
+  "market": []
+}
