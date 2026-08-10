@@ -1,1 +1,765 @@
+name: Update TWSE Market Data
 
+on:
+  # 每次你修改網站程式並 push，
+  # 如果不是只有 stocks.json 被修改，
+  # 就會執行一次。
+  push:
+    branches:
+      - main
+
+    paths-ignore:
+      - "stocks.json"
+
+  # 手動執行
+  workflow_dispatch:
+
+  # 自動更新
+  #
+  # GitHub Actions cron 使用 UTC
+  #
+  # 09:30 UTC
+  # =
+  # 台灣時間 17:30
+  #
+  # 週一～週五
+  schedule:
+    - cron: "30 9 * * 1-5"
+
+
+permissions:
+  contents: write
+
+
+concurrency:
+  group: twse-market-data
+  cancel-in-progress: true
+
+
+jobs:
+
+  update-market-data:
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10
+
+
+    steps:
+
+      # ========================================
+      # Checkout
+      # ========================================
+
+      - name: Checkout repository
+
+        uses: actions/checkout@v4
+
+        with:
+          fetch-depth: 0
+
+
+      # ========================================
+      # Python
+      # ========================================
+
+      - name: Setup Python
+
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.12"
+
+
+      # ========================================
+      # Fetch TWSE APIs
+      # ========================================
+
+      - name: Fetch TWSE market data
+
+        shell: bash
+
+        run: |
+
+          python <<'PY'
+
+          import json
+          import os
+          import sys
+          import time
+          import urllib.request
+          import urllib.error
+
+          from datetime import (
+              datetime,
+              timezone,
+          )
+
+
+          # ====================================
+          # CONFIG
+          # ====================================
+
+          OUTPUT_FILE = "stocks.json"
+
+          ENDPOINTS = {
+
+              "stocks":
+                  "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
+
+              "index":
+                  "https://openapi.twse.com.tw/v1/exchangeReport/MI_INDEX",
+
+              "indexOHLC":
+                  "https://openapi.twse.com.tw/v1/indicesReport/MI_5MINS_HIST",
+
+              "market":
+                  "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK",
+          }
+
+
+          # ====================================
+          # LOAD OLD FILE
+          # ====================================
+
+          def load_old_file():
+
+              if not os.path.exists(
+                  OUTPUT_FILE
+              ):
+                  return {}
+
+              try:
+
+                  with open(
+                      OUTPUT_FILE,
+                      "r",
+                      encoding="utf-8"
+                  ) as file:
+
+                      data = json.load(
+                          file
+                      )
+
+                      if isinstance(
+                          data,
+                          dict
+                      ):
+                          return data
+
+              except Exception as error:
+
+                  print(
+                      "Unable to read old stocks.json:",
+                      error
+                  )
+
+              return {}
+
+
+          old_data = load_old_file()
+
+
+          # ====================================
+          # FETCH JSON
+          # ====================================
+
+          def fetch_json(
+              url,
+              retries=4,
+              timeout=30
+          ):
+
+              last_error = None
+
+              for attempt in range(
+                  1,
+                  retries + 1
+              ):
+
+                  try:
+
+                      request = (
+                          urllib.request.Request(
+                              url,
+                              headers={
+                                  "Accept":
+                                      "application/json",
+
+                                  "User-Agent":
+                                      "Mozilla/5.0 "
+                                      "(GitHub Actions TWSE Dashboard)",
+
+                                  "Cache-Control":
+                                      "no-cache",
+                              }
+                          )
+                      )
+
+                      with urllib.request.urlopen(
+                          request,
+                          timeout=timeout
+                      ) as response:
+
+                          status = (
+                              response.status
+                          )
+
+                          if status != 200:
+
+                              raise RuntimeError(
+                                  f"HTTP {status}"
+                              )
+
+                          raw = (
+                              response
+                              .read()
+                              .decode(
+                                  "utf-8-sig"
+                              )
+                          )
+
+                          data = json.loads(
+                              raw
+                          )
+
+                          if not isinstance(
+                              data,
+                              list
+                          ):
+
+                              raise ValueError(
+                                  "API response "
+                                  "is not a JSON list"
+                              )
+
+                          print(
+                              f"OK: {url}"
+                          )
+
+                          print(
+                              f"Rows: {len(data)}"
+                          )
+
+                          return data
+
+                  except Exception as error:
+
+                      last_error = error
+
+                      print(
+                          f"Attempt "
+                          f"{attempt}/"
+                          f"{retries} failed:"
+                      )
+
+                      print(error)
+
+                      if attempt < retries:
+
+                          time.sleep(
+                              attempt * 3
+                          )
+
+              raise RuntimeError(
+                  f"Failed to fetch "
+                  f"{url}: "
+                  f"{last_error}"
+              )
+
+
+          # ====================================
+          # FETCH ALL
+          # ====================================
+
+          result = {}
+
+          status = {}
+
+          errors = {}
+
+
+          for name, url in (
+              ENDPOINTS.items()
+          ):
+
+              print()
+              print("=" * 60)
+              print(
+                  f"Fetching {name}"
+              )
+              print(url)
+              print("=" * 60)
+
+              try:
+
+                  result[name] = (
+                      fetch_json(url)
+                  )
+
+                  status[name] = True
+
+              except Exception as error:
+
+                  print(
+                      f"ERROR fetching "
+                      f"{name}:"
+                  )
+
+                  print(error)
+
+                  status[name] = False
+
+                  errors[name] = str(
+                      error
+                  )
+
+                  # ----------------------------
+                  # stocks 是核心資料
+                  # 抓不到就不更新整份檔案
+                  # ----------------------------
+
+                  if name == "stocks":
+
+                      print(
+                          "STOCK_DAY_ALL "
+                          "is required."
+                      )
+
+                      print(
+                          "Abort update to "
+                          "avoid overwriting "
+                          "existing valid data."
+                      )
+
+                      sys.exit(1)
+
+                  # ----------------------------
+                  # 其他資料若暫時失敗，
+                  # 本次使用空陣列，
+                  # UI 會以 -- 顯示。
+                  # ----------------------------
+
+                  result[name] = []
+
+
+          # ====================================
+          # VALIDATE STOCK DATA
+          # ====================================
+
+          stocks = result[
+              "stocks"
+          ]
+
+          if len(stocks) < 100:
+
+              raise RuntimeError(
+                  "STOCK_DAY_ALL returned "
+                  "too few rows. "
+                  "Abort update."
+              )
+
+
+          # ====================================
+          # TRADE DATE
+          # ====================================
+
+          trade_date = None
+
+
+          for row in stocks:
+
+              if not isinstance(
+                  row,
+                  dict
+              ):
+                  continue
+
+              candidate = (
+                  row.get("Date")
+                  or
+                  row.get("日期")
+              )
+
+              if candidate:
+
+                  trade_date = (
+                      str(candidate)
+                  )
+
+                  break
+
+
+          # fallback:
+          # MI_INDEX
+          if not trade_date:
+
+              for row in result[
+                  "index"
+              ]:
+
+                  if not isinstance(
+                      row,
+                      dict
+                  ):
+                      continue
+
+                  candidate = (
+                      row.get("日期")
+                      or
+                      row.get("Date")
+                  )
+
+                  if candidate:
+
+                      trade_date = (
+                          str(candidate)
+                      )
+
+                      break
+
+
+          # ====================================
+          # BUILD DATA
+          # ====================================
+
+          generated_at = (
+              datetime.now(
+                  timezone.utc
+              )
+              .isoformat()
+              .replace(
+                  "+00:00",
+                  "Z"
+              )
+          )
+
+
+          new_data = {
+
+              "schemaVersion":
+                  1,
+
+              "generatedAt":
+                  generated_at,
+
+              "tradeDate":
+                  trade_date,
+
+              "status":
+                  status,
+
+              "errors":
+                  errors,
+
+              "sources":
+                  ENDPOINTS,
+
+              "stocks":
+                  result["stocks"],
+
+              "index":
+                  result["index"],
+
+              "indexOHLC":
+                  result["indexOHLC"],
+
+              "market":
+                  result["market"],
+          }
+
+
+          # ====================================
+          # DON'T COMMIT IDENTICAL MARKET DATA
+          # ====================================
+
+          compare_keys = [
+
+              "tradeDate",
+
+              "status",
+
+              "stocks",
+
+              "index",
+
+              "indexOHLC",
+
+              "market",
+          ]
+
+
+          unchanged = True
+
+
+          if not old_data:
+
+              unchanged = False
+
+          else:
+
+              for key in compare_keys:
+
+                  if (
+                      old_data.get(key)
+                      !=
+                      new_data.get(key)
+                  ):
+
+                      unchanged = False
+
+                      break
+
+
+          # ------------------------------------
+          # 市場資料完全沒變
+          # 保留原本 generatedAt
+          # 讓 Git 不會每天製造無意義 commit
+          # ------------------------------------
+
+          if unchanged:
+
+              print()
+              print(
+                  "Market data has not "
+                  "changed."
+              )
+
+              if old_data.get(
+                  "generatedAt"
+              ):
+
+                  new_data[
+                      "generatedAt"
+                  ] = old_data[
+                      "generatedAt"
+                  ]
+
+
+          # ====================================
+          # WRITE
+          # ====================================
+
+          temp_file = (
+              OUTPUT_FILE +
+              ".tmp"
+          )
+
+
+          with open(
+              temp_file,
+              "w",
+              encoding="utf-8"
+          ) as file:
+
+              json.dump(
+                  new_data,
+                  file,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+              file.write("\n")
+
+
+          os.replace(
+              temp_file,
+              OUTPUT_FILE
+          )
+
+
+          # ====================================
+          # SUMMARY
+          # ====================================
+
+          print()
+          print("=" * 60)
+
+          print(
+              "TWSE DATA UPDATE COMPLETE"
+          )
+
+          print(
+              f"Trade date: "
+              f"{trade_date}"
+          )
+
+          print(
+              f"Stocks: "
+              f"{len(result['stocks'])}"
+          )
+
+          print(
+              f"Index rows: "
+              f"{len(result['index'])}"
+          )
+
+          print(
+              f"OHLC rows: "
+              f"{len(result['indexOHLC'])}"
+          )
+
+          print(
+              f"Market rows: "
+              f"{len(result['market'])}"
+          )
+
+          print(
+              f"Generated at: "
+              f"{new_data['generatedAt']}"
+          )
+
+          print("=" * 60)
+
+          PY
+
+
+      # ========================================
+      # Validate output
+      # ========================================
+
+      - name: Validate stocks.json
+
+        shell: bash
+
+        run: |
+
+          python <<'PY'
+
+          import json
+          import sys
+
+
+          with open(
+              "stocks.json",
+              "r",
+              encoding="utf-8"
+          ) as file:
+
+              data = json.load(file)
+
+
+          if not isinstance(
+              data,
+              dict
+          ):
+
+              raise ValueError(
+                  "stocks.json root "
+                  "must be an object"
+              )
+
+
+          stocks = data.get(
+              "stocks",
+              []
+          )
+
+
+          if not isinstance(
+              stocks,
+              list
+          ):
+
+              raise ValueError(
+                  "stocks must be a list"
+              )
+
+
+          if len(stocks) < 100:
+
+              raise ValueError(
+                  "stocks.json contains "
+                  "too few stocks"
+              )
+
+
+          print(
+              "Validation successful."
+          )
+
+          print(
+              "Trade date:",
+              data.get(
+                  "tradeDate"
+              )
+          )
+
+          print(
+              "Stock rows:",
+              len(stocks)
+          )
+
+          PY
+
+
+      # ========================================
+      # Git commit
+      # ========================================
+
+      - name: Commit updated market data
+
+        shell: bash
+
+        run: |
+
+          git config \
+            user.name \
+            "github-actions[bot]"
+
+          git config \
+            user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+
+          git add stocks.json
+
+
+          # 沒有變化就不 commit
+          if git diff \
+            --cached \
+            --quiet
+          then
+
+            echo \
+              "No market data changes."
+
+            exit 0
+
+          fi
+
+
+          TRADE_DATE=$(
+            python - <<'PY'
+
+          import json
+
+          with open(
+              "stocks.json",
+              "r",
+              encoding="utf-8"
+          ) as file:
+
+              data = json.load(
+                  file
+              )
+
+          print(
+              data.get(
+                  "tradeDate",
+                  "unknown"
+              )
+          )
+
+          PY
+          )
+
+
+          git commit \
+            -m \
+            "Update TWSE market data ${TRADE_DATE}"
+
+
+          git push \
+            origin \
+            HEAD:${{ github.event.repository.default_branch }}
