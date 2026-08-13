@@ -34,7 +34,6 @@
 
       --radius-lg: 16px;
       --radius-md: 12px;
-      --radius-sm: 8px;
 
       --shadow:
         0 10px 28px rgba(0, 0, 0, 0.2);
@@ -94,9 +93,9 @@
     }
 
 
-    /* =========================
+    /* =========================================
        Header
-    ========================= */
+    ========================================= */
 
     .header {
       display: flex;
@@ -168,9 +167,9 @@
     }
 
 
-    /* =========================
+    /* =========================================
        Summary
-    ========================= */
+    ========================================= */
 
     .summary {
       display: grid;
@@ -220,9 +219,9 @@
     }
 
 
-    /* =========================
+    /* =========================================
        Controls
-    ========================= */
+    ========================================= */
 
     .controls {
       display: flex;
@@ -281,9 +280,9 @@
     }
 
 
-    /* =========================
+    /* =========================================
        Desktop Table
-    ========================= */
+    ========================================= */
 
     .desktop-table {
       overflow: hidden;
@@ -442,9 +441,9 @@
     }
 
 
-    /* =========================
+    /* =========================================
        Mobile
-    ========================= */
+    ========================================= */
 
     .mobile-list {
       display: none;
@@ -482,16 +481,15 @@
     }
 
 
-    /* =========================
-       Collapsed Area
-    ========================= */
+    /* =========================================
+       Mobile Collapsed
+    ========================================= */
 
     .mobile-card-summary {
       padding:
         13px
-        38px
-        13px
-        14px;
+        14px
+        12px;
     }
 
 
@@ -501,18 +499,15 @@
       align-items: center;
 
       min-width: 0;
-
-      line-height: 1.45;
     }
 
 
-    .mobile-line + .mobile-line {
-      margin-top: 7px;
-    }
-
+    /* 第一行：名稱 / 代號 / 漲跌幅 */
 
     .mobile-line-primary {
       gap: 7px;
+
+      line-height: 1.35;
     }
 
 
@@ -532,14 +527,14 @@
       color: var(--text-muted);
 
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 650;
     }
 
 
     .mobile-divider {
       flex-shrink: 0;
 
-      color: #3e4552;
+      color: #414854;
 
       font-size: 11px;
     }
@@ -556,28 +551,18 @@
     }
 
 
-    .mobile-ohlc-inline {
-      min-width: 0;
-
-      margin-left: auto;
-
-      color: var(--text-secondary);
-
-      font-size: 10px;
-
-      font-variant-numeric:
-        tabular-nums;
-
-      white-space: nowrap;
-    }
-
+    /* 第二行：產業 / 成交量 / 成交金額 */
 
     .mobile-line-secondary {
-      gap: 7px;
+      gap: 6px;
+
+      margin-top: 8px;
 
       color: var(--text-secondary);
 
       font-size: 11px;
+
+      line-height: 1.4;
     }
 
 
@@ -588,7 +573,7 @@
 
       overflow: hidden;
 
-      max-width: 105px;
+      max-width: 110px;
 
       color: #aeb5c0;
 
@@ -607,13 +592,44 @@
     }
 
 
-    /* Arrow */
+    /* 第三行：OHLC */
+
+    .mobile-ohlc-row {
+      position: relative;
+
+      margin-top: 9px;
+
+      padding-right: 30px;
+
+      color: var(--text-secondary);
+
+      font-size: 10.5px;
+
+      line-height: 1.4;
+
+      font-variant-numeric:
+        tabular-nums;
+
+      white-space: nowrap;
+    }
+
+
+    .mobile-ohlc-separator {
+      color: #4a515d;
+
+      margin: 0 2px;
+    }
+
+
+    /* =========================================
+       Arrow
+    ========================================= */
 
     .mobile-arrow {
       position: absolute;
 
-      top: 50%;
-      right: 14px;
+      right: 16px;
+      bottom: 17px;
 
       width: 10px;
       height: 10px;
@@ -625,7 +641,6 @@
         2px solid var(--text-muted);
 
       transform:
-        translateY(-65%)
         rotate(45deg);
 
       transition:
@@ -636,14 +651,13 @@
     .mobile-stock-card.expanded
     .mobile-arrow {
       transform:
-        translateY(-30%)
         rotate(225deg);
     }
 
 
-    /* =========================
-       Expanded Area
-    ========================= */
+    /* =========================================
+       Mobile Expanded
+    ========================================= */
 
     .mobile-card-details {
       max-height: 0;
@@ -665,7 +679,7 @@
 
     .mobile-stock-card.expanded
     .mobile-card-details {
-      max-height: 300px;
+      max-height: 320px;
 
       padding:
         12px
@@ -676,6 +690,13 @@
 
       border-top:
         1px solid var(--border);
+    }
+
+
+    .mobile-stock-card.expanded
+    .mobile-arrow {
+      bottom: auto;
+      top: 64px;
     }
 
 
@@ -729,9 +750,9 @@
     }
 
 
-    /* =========================
+    /* =========================================
        Loading
-    ========================= */
+    ========================================= */
 
     .loading {
       padding: 50px 20px;
@@ -742,9 +763,9 @@
     }
 
 
-    /* =========================
+    /* =========================================
        Mobile 9:16
-    ========================= */
+    ========================================= */
 
     @media (
       max-width: 720px
@@ -878,7 +899,7 @@
 
       .mobile-card-summary {
         padding-left: 12px;
-        padding-right: 32px;
+        padding-right: 12px;
       }
 
 
@@ -892,11 +913,6 @@
       }
 
 
-      .mobile-ohlc-inline {
-        font-size: 9px;
-      }
-
-
       .mobile-line-secondary {
         gap: 5px;
 
@@ -905,19 +921,29 @@
 
 
       .mobile-industry-inline {
-        max-width: 90px;
+        max-width: 86px;
+      }
+
+
+      .mobile-ohlc-row {
+        padding-right: 28px;
+
+        font-size: 9.5px;
       }
 
     }
 
   </style>
-
 </head>
 
 
 <body>
 
   <main class="app">
+
+    <!-- ======================================
+         Header
+    ======================================= -->
 
     <header class="header">
 
@@ -948,6 +974,9 @@
     </header>
 
 
+    <!-- ======================================
+         Summary
+    ======================================= -->
 
     <section class="summary">
 
@@ -1001,6 +1030,9 @@
     </section>
 
 
+    <!-- ======================================
+         Controls
+    ======================================= -->
 
     <section class="controls">
 
@@ -1079,6 +1111,9 @@
     </section>
 
 
+    <!-- ======================================
+         Desktop Table
+    ======================================= -->
 
     <section class="desktop-table">
 
@@ -1202,7 +1237,6 @@
 
           </thead>
 
-
           <tbody id="stockTableBody">
           </tbody>
 
@@ -1213,6 +1247,9 @@
     </section>
 
 
+    <!-- ======================================
+         Mobile List
+    ======================================= -->
 
     <section
       id="mobileStockList"
@@ -1228,7 +1265,6 @@
   </main>
 
 
-
   <script>
 
     const DATA_URL =
@@ -1241,11 +1277,8 @@
 
 
     let sortState = {
-
       key: null,
-
       direction: null
-
     };
 
 
@@ -1291,6 +1324,9 @@
       );
 
 
+    /* =========================================
+       Number
+    ========================================= */
 
     function toNumber(
       value
@@ -1338,6 +1374,9 @@
     }
 
 
+    /* =========================================
+       Escape
+    ========================================= */
 
     function escapeHtml(
       value
@@ -1375,6 +1414,9 @@
     }
 
 
+    /* =========================================
+       Formatting
+    ========================================= */
 
     function formatNumber(
       value
@@ -1411,16 +1453,12 @@
       return number.toLocaleString(
         "zh-TW",
         {
-
           minimumFractionDigits: 0,
-
           maximumFractionDigits: 2
-
         }
       );
 
     }
-
 
 
     function formatCompactNumber(
@@ -1504,6 +1542,9 @@
     }
 
 
+    /* =========================================
+       Trade Date
+    ========================================= */
 
     function formatTradeDate(
       value
@@ -1565,6 +1606,9 @@
     }
 
 
+    /* =========================================
+       Change
+    ========================================= */
 
     function getChangeClass(
       value
@@ -1599,7 +1643,6 @@
     }
 
 
-
     function calculatePreviousClose(
       stock
     ) {
@@ -1623,7 +1666,6 @@
       );
 
     }
-
 
 
     function calculateChangePercent(
@@ -1662,7 +1704,6 @@
     }
 
 
-
     function formatChangePercent(
       stock
     ) {
@@ -1692,7 +1733,6 @@
     }
 
 
-
     function formatPriceChange(
       stock
     ) {
@@ -1718,6 +1758,9 @@
     }
 
 
+    /* =========================================
+       Amplitude
+    ========================================= */
 
     function calculateAmplitude(
       stock
@@ -1765,6 +1808,9 @@
     }
 
 
+    /* =========================================
+       Desktop Render
+    ========================================= */
 
     function renderDesktopTable(
       data
@@ -1900,6 +1946,9 @@
     }
 
 
+    /* =========================================
+       Mobile Render
+    ========================================= */
 
     function renderMobileCards(
       data
@@ -1959,6 +2008,8 @@
 
             <div class="mobile-card-summary">
 
+              <!-- 第一行 -->
+
               <div
                 class="
                   mobile-line
@@ -1993,19 +2044,10 @@
                   )}
                 </span>
 
-                <span class="mobile-divider">
-                  |
-                </span>
-
-                <span class="mobile-ohlc-inline">
-                  開 ${formatPrice(stock.OpeningPrice)}
-                  ｜高 ${formatPrice(stock.HighestPrice)}
-                  ｜低 ${formatPrice(stock.LowestPrice)}
-                  ｜收 ${formatPrice(stock.ClosingPrice)}
-                </span>
-
               </div>
 
+
+              <!-- 第二行 -->
 
               <div
                 class="
@@ -2056,12 +2098,57 @@
 
               </div>
 
+
+              <!-- 第三行：開高低收 -->
+
+              <div class="mobile-ohlc-row">
+
+                <span>
+                  開 ${formatPrice(
+                    stock.OpeningPrice
+                  )}
+                </span>
+
+                <span class="mobile-ohlc-separator">
+                  ｜
+                </span>
+
+                <span>
+                  高 ${formatPrice(
+                    stock.HighestPrice
+                  )}
+                </span>
+
+                <span class="mobile-ohlc-separator">
+                  ｜
+                </span>
+
+                <span>
+                  低 ${formatPrice(
+                    stock.LowestPrice
+                  )}
+                </span>
+
+                <span class="mobile-ohlc-separator">
+                  ｜
+                </span>
+
+                <span>
+                  收 ${formatPrice(
+                    stock.ClosingPrice
+                  )}
+                </span>
+
+              </div>
+
             </div>
 
 
             <span class="mobile-arrow">
             </span>
 
+
+            <!-- 展開資訊 -->
 
             <div class="mobile-card-details">
 
@@ -2137,7 +2224,7 @@
                 <div class="detail-item">
 
                   <div class="detail-label">
-                    成交量
+                    完整成交量
                   </div>
 
                   <div class="detail-value">
@@ -2152,7 +2239,7 @@
                 <div class="detail-item">
 
                   <div class="detail-label">
-                    成交金額
+                    完整成交金額
                   </div>
 
                   <div class="detail-value">
@@ -2219,6 +2306,9 @@
     }
 
 
+    /* =========================================
+       Render All
+    ========================================= */
 
     function renderAll() {
 
@@ -2234,6 +2324,9 @@
     }
 
 
+    /* =========================================
+       Sorting
+    ========================================= */
 
     function getSortValue(
       stock,
@@ -2287,7 +2380,6 @@
     }
 
 
-
     function applySort(
       key,
       direction,
@@ -2295,11 +2387,8 @@
     ) {
 
       sortState = {
-
         key,
-
         direction
-
       };
 
 
@@ -2371,6 +2460,9 @@
     }
 
 
+    /* =========================================
+       Desktop Sort
+    ========================================= */
 
     function sortFromHeader(
       th
@@ -2418,7 +2510,6 @@
       );
 
     }
-
 
 
     function updateDesktopSortIcons() {
@@ -2470,6 +2561,9 @@
     }
 
 
+    /* =========================================
+       Load Data
+    ========================================= */
 
     async function loadStocks() {
 
@@ -2567,11 +2661,8 @@
 
 
         sortState = {
-
           key: null,
-
           direction: null
-
         };
 
 
@@ -2677,6 +2768,9 @@
     }
 
 
+    /* =========================================
+       Events
+    ========================================= */
 
     document
       .querySelectorAll(
@@ -2700,7 +2794,6 @@
       );
 
 
-
     mobileSortSelect
       .addEventListener(
         "change",
@@ -2719,11 +2812,8 @@
 
 
             sortState = {
-
               key: null,
-
               direction: null
-
             };
 
 
@@ -2771,7 +2861,6 @@
       );
 
 
-
     document
       .getElementById(
         "reloadBtn"
@@ -2781,6 +2870,10 @@
         loadStocks
       );
 
+
+    /* =========================================
+       Init
+    ========================================= */
 
     loadStocks();
 
