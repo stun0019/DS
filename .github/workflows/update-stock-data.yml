@@ -4,39 +4,73 @@ on:
   workflow_dispatch:
 
   # 台灣時間週一～週五 15:10
-  # GitHub Actions cron 使用 UTC，07:10 UTC = 台灣 15:10
+  # GitHub Actions cron 使用 UTC
+  # 07:10 UTC = 台灣 15:10
   schedule:
     - cron: "10 7 * * 1-5"
 
 permissions:
   contents: write
 
+
 jobs:
+
   update-stock-data:
+
     runs-on: ubuntu-latest
 
+
     steps:
+
+      # =======================================
+      # 1. Checkout
+      # =======================================
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
+
+      # =======================================
+      # 2. Setup Python
+      # =======================================
+
       - name: Setup Python
         uses: actions/setup-python@v5
+
         with:
           python-version: "3.x"
 
+
+      # =======================================
+      # 3. Download TWSE Data
+      # =======================================
+
       - name: Download and build TWSE stock data
         run: |
+
           python <<'PY'
+
           import json
           import re
           import urllib.parse
           import urllib.request
+
           from datetime import datetime
           from zoneinfo import ZoneInfo
 
 
-          OPENAPI_BASE = "https://openapi.twse.com.tw/v1"
-          TWSE_BASE = "https://www.twse.com.tw"
+          # ===================================
+          # API
+          # ===================================
+
+          OPENAPI_BASE = (
+              "https://openapi.twse.com.tw/v1"
+          )
+
+
+          TWSE_BASE = (
+              "https://www.twse.com.tw"
+          )
 
 
           MARKET_API = (
@@ -50,6 +84,10 @@ jobs:
               + "/opendata/t187ap03_L"
           )
 
+
+          # ===================================
+          # 產業別
+          # ===================================
 
           INDUSTRY_MAP = {
 
@@ -95,7 +133,7 @@ jobs:
 
 
           # ===================================
-          # API
+          # Fetch JSON
           # ===================================
 
           def fetch_json(url):
@@ -140,7 +178,7 @@ jobs:
 
 
           # ===================================
-          # Text
+          # Clean Text
           # ===================================
 
           def clean_text(value):
@@ -236,7 +274,7 @@ jobs:
 
 
           # ===================================
-          # Code
+          # Stock Code
           # ===================================
 
           def normalize_code(value):
@@ -271,7 +309,7 @@ jobs:
 
 
           # ===================================
-          # Industry
+          # Industry Code
           # ===================================
 
           def normalize_industry_code(
@@ -299,7 +337,7 @@ jobs:
 
 
           # ===================================
-          # ROC → Gregorian
+          # ROC Date → Gregorian
           #
           # 1150812
           # →
@@ -357,6 +395,8 @@ jobs:
                   return
 
 
+              # fields / data
+
               fields = payload.get(
                   "fields"
               )
@@ -385,18 +425,20 @@ jobs:
                   )
 
 
-              for i in range(
+              # fields1 / data1 ...
+
+              for index in range(
                   1,
                   40
               ):
 
                   fields = payload.get(
-                      f"fields{i}"
+                      f"fields{index}"
                   )
 
 
                   data = payload.get(
-                      f"data{i}"
+                      f"data{index}"
                   )
 
 
@@ -417,6 +459,8 @@ jobs:
                           data
                       )
 
+
+              # tables[]
 
               tables = payload.get(
                   "tables"
@@ -467,7 +511,7 @@ jobs:
 
 
           # ===================================
-          # Find Field
+          # Find Field Index
           # ===================================
 
           def find_field_index(
@@ -495,14 +539,16 @@ jobs:
 
                   for candidate in candidates:
 
-                      if (
+                      candidate_text = (
                           candidate
                           .replace(
                               " ",
                               ""
                           )
-                          in field
-                      ):
+                      )
+
+
+                      if candidate_text in field:
 
                           return index
 
@@ -511,7 +557,7 @@ jobs:
 
 
           # ===================================
-          # Volume Map
+          # Extract Volume Map
           # ===================================
 
           def extract_volume_map(
@@ -527,31 +573,33 @@ jobs:
                   payload
               ):
 
-                  code_index = find_field_index(
+                  code_index = (
+                      find_field_index(
 
-                      fields,
+                          fields,
 
-                      [
-                          "證券代號",
-                          "股票代號",
-                          "公司代號",
-                          "Code"
-                      ]
+                          [
+                              "證券代號",
+                              "股票代號",
+                              "公司代號",
+                              "Code"
+                          ]
+                      )
                   )
 
 
-                  volume_index = find_field_index(
-                      fields,
-                      volume_fields
+                  volume_index = (
+                      find_field_index(
+                          fields,
+                          volume_fields
+                      )
                   )
 
 
                   if (
-                      code_index
-                      is None
+                      code_index is None
                       or
-                      volume_index
-                      is None
+                      volume_index is None
                   ):
 
                       continue
@@ -616,7 +664,7 @@ jobs:
 
 
           # ===================================
-          # Report Downloader
+          # Fetch Report
           # ===================================
 
           def fetch_report_map(
@@ -662,15 +710,17 @@ jobs:
                               )
 
 
-                      result = extract_volume_map(
+                      result = (
+                          extract_volume_map(
 
-                          payload,
+                              payload,
 
-                          volume_fields=
-                              volume_fields,
+                              volume_fields=
+                                  volume_fields,
 
-                          multiplier=
-                              multiplier
+                              multiplier=
+                                  multiplier
+                          )
                       )
 
 
@@ -694,8 +744,7 @@ jobs:
 
                       raise RuntimeError(
                           "Parsed only "
-                          f"{len(result)} "
-                          "records; "
+                          f"{len(result)} records; "
                           "expected >= "
                           f"{minimum_records}"
                       )
@@ -717,9 +766,7 @@ jobs:
 
 
               raise RuntimeError(
-
-                  "All TWSE report "
-                  "URLs failed:\n"
+                  "All TWSE report URLs failed:\n"
                   +
                   "\n".join(
                       errors
@@ -728,7 +775,7 @@ jobs:
 
 
           # ===================================
-          # 1. STOCK_DAY_ALL
+          # 4. STOCK_DAY_ALL
           #
           # 保留：
           # OHLC
@@ -758,8 +805,16 @@ jobs:
               )
 
 
+          print(
+              "STOCK_DAY_ALL records:",
+              len(
+                  market_data
+              )
+          )
+
+
           # ===================================
-          # 2. 公司基本資料
+          # 5. 上市公司基本資料
           # ===================================
 
           company_data = fetch_json(
@@ -859,8 +914,16 @@ jobs:
               )
 
 
+          print(
+              "Listed company codes:",
+              len(
+                  company_info
+              )
+          )
+
+
           # ===================================
-          # 3. 純上市個股
+          # 6. 純上市公司
           # ===================================
 
           stock_data = []
@@ -911,12 +974,12 @@ jobs:
                   continue
 
 
-              enriched = dict(
+              enriched_stock = dict(
                   stock
               )
 
 
-              enriched.update(
+              enriched_stock.update(
                   company_info[
                       code
                   ]
@@ -924,7 +987,7 @@ jobs:
 
 
               stock_data.append(
-                  enriched
+                  enriched_stock
               )
 
 
@@ -938,8 +1001,16 @@ jobs:
               )
 
 
+          print(
+              "Pure listed stocks:",
+              len(
+                  stock_data
+              )
+          )
+
+
           # ===================================
-          # 4. Trade Date
+          # 7. Trade Date
           # ===================================
 
           trade_date = str(
@@ -974,16 +1045,9 @@ jobs:
 
 
           # ===================================
-          # 5. MI_INDEX
+          # 8. MI_INDEX
           #
-          # 此成交量口徑：
-          #
-          # 一般交易
-          # + 盤中零股
-          # + 盤後零股
-          # + 盤後定價
-          #
-          # 不含鉅額交易
+          # 成交量基底
           # ===================================
 
           mi_params = (
@@ -1001,43 +1065,42 @@ jobs:
           )
 
 
-          mi_volume_map, mi_source = (
-              fetch_report_map(
+          (
+              mi_volume_map,
+              mi_source
+          ) = fetch_report_map(
 
-                  [
+              [
 
-                      (
-                          f"{TWSE_BASE}"
-                          "/rwd/zh/"
-                          "afterTrading/"
-                          "MI_INDEX?"
-                          f"{mi_params}"
-                      ),
+                  (
+                      f"{TWSE_BASE}"
+                      "/rwd/zh/"
+                      "afterTrading/"
+                      "MI_INDEX?"
+                      f"{mi_params}"
+                  ),
 
-                      (
-                          f"{TWSE_BASE}"
-                          "/exchangeReport/"
-                          "MI_INDEX?"
-                          f"{mi_params}"
-                      )
+                  (
+                      f"{TWSE_BASE}"
+                      "/exchangeReport/"
+                      "MI_INDEX?"
+                      f"{mi_params}"
+                  )
 
-                  ],
+              ],
 
-                  volume_fields=[
-                      "成交股數"
-                  ],
+              volume_fields=[
+                  "成交股數"
+              ],
 
-                  multiplier=1,
+              multiplier=1,
 
-                  minimum_records=500
-              )
+              minimum_records=500
           )
 
 
           # ===================================
-          # 6. 盤中零股
-          #
-          # 單位：股
+          # 9. 零股共用參數
           # ===================================
 
           odd_params = (
@@ -1054,6 +1117,13 @@ jobs:
               })
           )
 
+
+          # ===================================
+          # 10. 盤中零股
+          #
+          # TWTC7U
+          # 單位：股
+          # ===================================
 
           (
               intraday_odd_map,
@@ -1090,8 +1160,9 @@ jobs:
 
 
           # ===================================
-          # 7. 盤後零股
+          # 11. 盤後零股
           #
+          # TWT53U
           # 單位：股
           # ===================================
 
@@ -1130,13 +1201,14 @@ jobs:
 
 
           # ===================================
-          # 8. 盤後定價
+          # 12. 盤後定價
           #
           # BFT41U
           #
-          # 上市股票「成交數量」
-          # 單位為千股
+          # 保留資料供觀察
+          # 不再從 RegularTradeVolume 扣除
           #
+          # 成交數量單位：千股
           # 所以 × 1000
           # ===================================
 
@@ -1175,11 +1247,9 @@ jobs:
 
 
           # ===================================
-          # 9. 一般交易成交量
+          # 13. 計算成交量
           #
-          # MI_INDEX 已排除鉅額
-          #
-          # 所以：
+          # 重要：
           #
           # RegularTradeVolume
           #
@@ -1188,7 +1258,18 @@ jobs:
           # MI_INDEX
           # - 盤中零股
           # - 盤後零股
-          # - 盤後定價
+          #
+          # 不扣盤後定價
+          #
+          # 力積電驗證：
+          #
+          # 428,615,022
+          # - 2,762,875
+          # -    44,147
+          # =
+          # 425,808,000 股
+          # =
+          # 425,808 張
           # ===================================
 
           missing_mi_codes = []
@@ -1252,49 +1333,71 @@ jobs:
               )
 
 
+              # --------------------------------
+              # 核心修改
+              #
+              # 不再扣 fixed_volume
+              # --------------------------------
+
               regular_volume = max(
 
                   0,
 
-                  (
-                      market_volume
-                      -
-                      odd_total
-                      -
-                      fixed_volume
-                  )
+                  market_volume
+                  -
+                  odd_total
+
               )
 
 
               stock[
                   "MarketVolumeExBlock"
-              ] = market_volume
+              ] = (
+                  market_volume
+              )
 
 
               stock[
                   "IntradayOddLotVolume"
-              ] = intraday_odd
+              ] = (
+                  intraday_odd
+              )
 
 
               stock[
                   "AfterHoursOddLotVolume"
-              ] = after_odd
+              ] = (
+                  after_odd
+              )
 
 
               stock[
                   "OddLotVolume"
-              ] = odd_total
+              ] = (
+                  odd_total
+              )
 
+
+              # 保留盤後定價資料
+              # 但不參與成交量扣除
 
               stock[
                   "AfterHoursFixedVolume"
-              ] = fixed_volume
+              ] = (
+                  fixed_volume
+              )
 
 
               stock[
                   "RegularTradeVolume"
-              ] = regular_volume
+              ] = (
+                  regular_volume
+              )
 
+
+          # ===================================
+          # MI_INDEX 防呆
+          # ===================================
 
           if missing_mi_codes:
 
@@ -1320,7 +1423,7 @@ jobs:
 
 
           # ===================================
-          # 10. Output
+          # 14. 更新時間
           # ===================================
 
           taipei_now = datetime.now(
@@ -1329,6 +1432,10 @@ jobs:
               )
           )
 
+
+          # ===================================
+          # 15. Output
+          # ===================================
 
           output = {
 
@@ -1353,6 +1460,7 @@ jobs:
               "type":
                   "TWSE_LISTED_STOCK_ONLY",
 
+              # 保持 index.html 相容
               "volumeMode":
                   "REGULAR_TRADING_ONLY",
 
@@ -1360,8 +1468,7 @@ jobs:
                   (
                       "MI_INDEX "
                       "- IntradayOddLotVolume "
-                      "- AfterHoursOddLotVolume "
-                      "- AfterHoursFixedVolume"
+                      "- AfterHoursOddLotVolume"
                   ),
 
               "count":
@@ -1389,10 +1496,13 @@ jobs:
 
 
           # ===================================
-          # 11. Debug
+          # 16. 驗證
           #
-          # 2344 / 6770 只是 Log 驗證
-          # 不會寫死任何成交量
+          # 2344 華邦電
+          # 6770 力積電
+          #
+          # 只是 Actions Log
+          # 不會寫死成交量
           # ===================================
 
           verify_codes = {
@@ -1403,12 +1513,15 @@ jobs:
 
           for stock in stock_data:
 
-              if str(
+              code = str(
                   stock.get(
                       "Code",
                       ""
                   )
-              ) not in verify_codes:
+              )
+
+
+              if code not in verify_codes:
 
                   continue
 
@@ -1438,7 +1551,7 @@ jobs:
 
 
               print(
-                  "MI_INDEX no block:",
+                  "MI_INDEX:",
                   stock.get(
                       "MarketVolumeExBlock"
                   )
@@ -1462,7 +1575,16 @@ jobs:
 
 
               print(
-                  "After-hours fixed:",
+                  "Odd total:",
+                  stock.get(
+                      "OddLotVolume"
+                  )
+              )
+
+
+              print(
+                  "After-hours fixed "
+                  "(observation only):",
                   stock.get(
                       "AfterHoursFixedVolume"
                   )
@@ -1496,9 +1618,19 @@ jobs:
               )
 
 
+          # ===================================
+          # 17. Log
+          # ===================================
+
           print("")
           print(
+              "-----------------------------"
+          )
+          print(
               "stocks.json updated"
+          )
+          print(
+              "-----------------------------"
           )
 
 
@@ -1513,6 +1645,18 @@ jobs:
               len(
                   stock_data
               )
+          )
+
+
+          print(
+              "Volume formula:"
+          )
+
+
+          print(
+              "MI_INDEX "
+              "- IntradayOddLotVolume "
+              "- AfterHoursOddLotVolume"
           )
 
 
@@ -1542,26 +1686,35 @@ jobs:
           PY
 
 
+      # =======================================
+      # 18. 檢查 stocks.json
+      # =======================================
+
       - name: Show stocks.json info
         run: |
 
+          echo "stocks.json:"
           ls -lh stocks.json
 
           echo ""
 
+          echo "Header:"
           head -n 25 stocks.json
 
           echo ""
 
-          echo "2344 / 6770 sample:"
-
+          echo "華邦電 / 力積電:"
           grep \
-            -A 24 \
+            -A 26 \
             -B 3 \
             '"Code": "2344"\|"Code": "6770"' \
             stocks.json \
             || true
 
+
+      # =======================================
+      # 19. Commit
+      # =======================================
 
       - name: Commit stock data
         run: |
@@ -1588,7 +1741,7 @@ jobs:
           else
 
             git commit \
-              -m "chore: update regular-session TWSE stock volume"
+              -m "chore: update TWSE volume excluding odd lots"
 
             git push
 
