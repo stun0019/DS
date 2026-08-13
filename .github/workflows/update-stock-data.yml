@@ -3,11 +3,19 @@ name: Update Taiwan Stock Data
 on:
   workflow_dispatch:
 
-  # 台灣時間週一～週五 17:40
-  # GitHub Actions 使用 UTC
-  # 09:40 UTC = 台灣 17:40
+  # GitHub Actions cron 使用 UTC
+  #
+  # 台灣時間：
+  # 17:40 = 09:40 UTC
+  # 18:00 = 10:00 UTC
+  # 18:20 = 10:20 UTC
+  #
+  # GitHub schedule 可能延遲，
+  # 因此一天安排三次補抓。
   schedule:
     - cron: "40 9 * * 1-5"
+    - cron: "0 10 * * 1-5"
+    - cron: "20 10 * * 1-5"
 
 permissions:
   contents: write
@@ -85,14 +93,6 @@ jobs:
           # TPEx
           # --------------------------------------------------
 
-          # 上櫃股票「收盤行情」
-          #
-          # 這個 TradingShares 對應等價成交系統成交量。
-          #
-          # 寶雅 5904：
-          #
-          # mainboard_quotes = 84,375 張
-          #
           TPEX_MARKET_API = (
               TPEX_OPENAPI
               + "/tpex_mainboard_quotes"
@@ -103,29 +103,20 @@ jobs:
               + "/mopsfin_t187ap03_O"
           )
 
-          # 零股
-          # 只保留稽核資料
-          # 不參與 TPEx BrokerComparableVolume
+          # 零股：稽核用
           TPEX_ODD_API = (
               TPEX_OPENAPI
               + "/tpex_odd_stock"
           )
 
-          # 盤後定價
-          #
-          # 重要：
-          # 此成交量需要加回 mainboard_quotes
-          #
-          # 一般股票交易單位 = 1 張 = 1000 股
-          #
+          # 盤後定價：
+          # 加入 TPEx 券商比較成交量
           TPEX_FIXED_API = (
               TPEX_OPENAPI
               + "/tpex_off_market"
           )
 
-          # 鉅額
-          # 只保留稽核資料
-          # 不參與 TPEx BrokerComparableVolume
+          # 鉅額：稽核用
           TPEX_BLOCK_API = (
               TPEX_OPENAPI
               + "/tpex_daily_qutoes_block"
@@ -576,16 +567,12 @@ jobs:
                   )
               )
 
-              # ROC
-              # 1150812
               if len(
                   raw
               ) == 7:
 
                   return raw
 
-              # Gregorian
-              # 20260812
               if len(
                   raw
               ) == 8:
@@ -765,8 +752,6 @@ jobs:
                   ""
               )
 
-              # 即時／當日 OpenAPI
-              # 有些資料沒有 Date 欄位
               if not raw_date:
 
                   return True
@@ -1257,14 +1242,7 @@ jobs:
 
 
           # ==================================================
-          # TPEx盤後定價 parser
-          #
-          # tpex_off_market 的數量依交易單位
-          #
-          # 一般股票：
-          # 1 單位 = 1張 = 1000股
-          #
-          # 這裡直接轉成「股」
+          # TPEx盤後定價
           # ==================================================
 
           def extract_tpex_fixed_map(
@@ -1308,18 +1286,7 @@ jobs:
 
                       row,
 
-                      [
-                          "TradingShares",
-                          "TradingVolume",
-                          "TransactionShares",
-                          "TradeVolume",
-                          "Volume",
-
-                          "成交股數",
-                          "成交量",
-                          "成交數量",
-                          "成交張數"
-                      ],
+                      TPEX_VOLUME_KEYS,
 
                       ""
                   )
@@ -1360,20 +1327,10 @@ jobs:
           # ==================================================
 
           print("")
-          print(
-              "=============================="
-          )
-          print(
-              "TWSE"
-          )
-          print(
-              "=============================="
-          )
+          print("==============================")
+          print("TWSE")
+          print("==============================")
 
-
-          # ==================================================
-          # 1. Market
-          # ==================================================
 
           twse_market_data = fetch_json(
               TWSE_MARKET_API
@@ -1400,14 +1357,12 @@ jobs:
 
 
           # ==================================================
-          # 2. Company whitelist
+          # TWSE Company whitelist
           # ==================================================
 
           twse_company_info = {}
 
-          for company in (
-              twse_company_data
-          ):
+          for company in twse_company_data:
 
               if not isinstance(
                   company,
@@ -1450,7 +1405,7 @@ jobs:
 
 
           # ==================================================
-          # 3. Listed stocks only
+          # TWSE stocks
           # ==================================================
 
           twse_stocks = []
@@ -1527,7 +1482,7 @@ jobs:
 
 
           # ==================================================
-          # 4. Trade Date
+          # Trade Date
           # ==================================================
 
           trade_date = normalize_trade_date(
@@ -1559,7 +1514,7 @@ jobs:
 
 
           # ==================================================
-          # 5. TWSE Intraday Odd Lot
+          # TWSE Odd lot
           # ==================================================
 
           common_params = (
@@ -1582,14 +1537,12 @@ jobs:
           ) = fetch_twse_report(
 
               [
-
                   (
                       TWSE_WEB
                       + "/rwd/zh/afterTrading/"
                       + "TWTC7U?"
                       + common_params
                   ),
-
                   (
                       TWSE_WEB
                       + "/exchangeReport/"
@@ -1603,10 +1556,6 @@ jobs:
               ]
           )
 
-
-          # ==================================================
-          # 6. TWSE After-hours Odd Lot
-          # ==================================================
 
           (
               twse_after_odd,
@@ -1614,14 +1563,12 @@ jobs:
           ) = fetch_twse_report(
 
               [
-
                   (
                       TWSE_WEB
                       + "/rwd/zh/afterTrading/"
                       + "TWT53U?"
                       + common_params
                   ),
-
                   (
                       TWSE_WEB
                       + "/exchangeReport/"
@@ -1637,12 +1584,7 @@ jobs:
 
 
           # ==================================================
-          # 7. TWSE After-hours Fixed
-          #
-          # 僅保留觀察
-          # 不扣除
-          #
-          # BFT41U = 千股
+          # TWSE Fixed
           # ==================================================
 
           (
@@ -1651,14 +1593,12 @@ jobs:
           ) = fetch_twse_report(
 
               [
-
                   (
                       TWSE_WEB
                       + "/rwd/zh/afterTrading/"
                       + "BFT41U?"
                       + common_params
                   ),
-
                   (
                       TWSE_WEB
                       + "/exchangeReport/"
@@ -1676,7 +1616,7 @@ jobs:
 
 
           # ==================================================
-          # 8. TWSE Block
+          # TWSE Block
           # ==================================================
 
           block_params = (
@@ -1699,7 +1639,6 @@ jobs:
           ) = fetch_twse_report(
 
               [
-
                   (
                       TWSE_WEB
                       + "/block/BFIAUU?"
@@ -1716,10 +1655,9 @@ jobs:
 
 
           # ==================================================
-          # 9. TWSE Broker Comparable Volume
+          # TWSE Broker Comparable Volume
           #
           # Total - Odd - Block
-          #
           # Fixed 不扣
           # ==================================================
 
@@ -1775,10 +1713,8 @@ jobs:
                   0,
 
                   total_volume
-
                   -
                   odd_total
-
                   -
                   block_volume
               )
@@ -1815,7 +1751,6 @@ jobs:
                   "BrokerDisplayVolume"
               ] = broker_volume
 
-              # index.html 相容
               stock[
                   "RegularSessionVolume"
               ] = broker_volume
@@ -1834,20 +1769,10 @@ jobs:
           # ==================================================
 
           print("")
-          print(
-              "=============================="
-          )
-          print(
-              "TPEx"
-          )
-          print(
-              "=============================="
-          )
+          print("==============================")
+          print("TPEx")
+          print("==============================")
 
-
-          # ==================================================
-          # 10. TPEx Mainboard Quotes
-          # ==================================================
 
           tpex_market_payload = fetch_json(
               TPEX_MARKET_API
@@ -1885,23 +1810,14 @@ jobs:
                   "TPEx company data too small"
               )
 
-          print(
-              "TPEx market records:",
-              len(
-                  tpex_market_data
-              )
-          )
-
 
           # ==================================================
-          # 11. TPEx Company whitelist
+          # TPEx Company whitelist
           # ==================================================
 
           tpex_company_info = {}
 
-          for company in (
-              tpex_company_data
-          ):
+          for company in tpex_company_data:
 
               if not isinstance(
                   company,
@@ -1958,23 +1874,19 @@ jobs:
 
 
           # ==================================================
-          # 12. TPEx components
+          # TPEx Components
           # ==================================================
 
-          # 零股只觀察
           tpex_odd_payload = fetch_json(
               TPEX_ODD_API,
               required=False
           )
 
-          # 盤後定價會參與券商成交量
-          # 因此抓不到時 Action 必須 fail
           tpex_fixed_payload = fetch_json(
               TPEX_FIXED_API,
               required=True
           )
 
-          # 鉅額只觀察
           tpex_block_payload = fetch_json(
               TPEX_BLOCK_API,
               required=False
@@ -1985,7 +1897,6 @@ jobs:
               trade_date
           )
 
-          # 已轉為「股」
           tpex_fixed = extract_tpex_fixed_map(
               tpex_fixed_payload,
               trade_date
@@ -2019,25 +1930,9 @@ jobs:
 
 
           # ==================================================
-          # 13. TPEx Normalize
+          # TPEx Normalize
           #
-          # BrokerComparableVolume
-          #
-          # =
-          #
-          # mainboard_quotes TradingShares
-          # +
-          # tpex_off_market 盤後定價
-          #
-          #
-          # 寶雅驗證：
-          #
-          # 84,375,000
-          # +
-          #     82,000
-          # =
-          # 84,457,000
-          #
+          # Mainboard + After-hours Fixed
           # ==================================================
 
           tpex_stocks = []
@@ -2110,7 +2005,6 @@ jobs:
 
                   continue
 
-              # 等價成交系統成交股數
               mainboard_volume = to_int(
                   pick_value(
                       row,
@@ -2119,8 +2013,6 @@ jobs:
                   )
               )
 
-              # 盤後定價
-              # 已轉成股
               fixed_volume = (
                   tpex_fixed.get(
                       code,
@@ -2128,7 +2020,6 @@ jobs:
                   )
               )
 
-              # 只保留觀察
               odd_volume = (
                   tpex_odd.get(
                       code,
@@ -2136,7 +2027,6 @@ jobs:
                   )
               )
 
-              # 只保留觀察
               block_volume = (
                   tpex_block.get(
                       code,
@@ -2161,7 +2051,6 @@ jobs:
                   "Name":
                       name,
 
-                  # 原始等價成交量
                   "TradeVolume":
                       str(
                           mainboard_volume
@@ -2297,15 +2186,12 @@ jobs:
                   "MarketName":
                       "上櫃",
 
-                  # TPEx 等價成交量
                   "MainboardTradeVolume":
                       mainboard_volume,
 
-                  # TPEx 券商比較口徑總量
                   "TotalTradeVolume":
                       broker_volume,
 
-                  # 稽核欄位
                   "IntradayOddLotVolume":
                       0,
 
@@ -2315,25 +2201,22 @@ jobs:
                   "OddLotVolume":
                       odd_volume,
 
-                  # 已統一為「股」
                   "AfterHoursFixedVolume":
                       fixed_volume,
 
-                  # 額外提供張數方便 debug
                   "AfterHoursFixedLots":
                       (
                           fixed_volume
-                          // 1000
+                          //
+                          1000
                       ),
 
                   "BlockTradeVolume":
                       block_volume,
 
-                  # 正式欄位
                   "BrokerComparableVolume":
                       broker_volume,
 
-                  # 舊欄位／前端相容
                   "BrokerDisplayVolume":
                       broker_volume,
 
@@ -2368,7 +2251,7 @@ jobs:
 
 
           # ==================================================
-          # 14. Merge
+          # Merge
           # ==================================================
 
           all_stocks = (
@@ -2409,7 +2292,7 @@ jobs:
 
 
           # ==================================================
-          # 15. TOP 10 Preview
+          # Preview
           # ==================================================
 
           candidate_preview = sorted(
@@ -2429,15 +2312,9 @@ jobs:
           )[:10]
 
           print("")
-          print(
-              "=============================="
-          )
-          print(
-              "Broker Comparable Volume TOP 10"
-          )
-          print(
-              "=============================="
-          )
+          print("==============================")
+          print("Broker Comparable Volume TOP 10")
+          print("==============================")
 
           for index, stock in enumerate(
               candidate_preview,
@@ -2445,21 +2322,16 @@ jobs:
           ):
 
               print(
-
                   index,
-
                   stock.get(
                       "MarketName"
                   ),
-
                   stock.get(
                       "Code"
                   ),
-
                   stock.get(
                       "Name"
                   ),
-
                   round(
                       to_int(
                           stock.get(
@@ -2470,36 +2342,24 @@ jobs:
                       /
                       1000
                   ),
-
                   "張"
               )
 
 
           # ==================================================
-          # 16. Verification
-          #
-          # 2344 華邦電
-          # 6770 力積電
-          # 5904 寶雅
+          # Verification
           # ==================================================
 
           verify_codes = {
-
               "2344",
               "6770",
               "5904"
           }
 
           print("")
-          print(
-              "=============================="
-          )
-          print(
-              "Volume Verification"
-          )
-          print(
-              "=============================="
-          )
+          print("==============================")
+          print("Volume Verification")
+          print("==============================")
 
           for stock in all_stocks:
 
@@ -2513,7 +2373,6 @@ jobs:
                   continue
 
               print("")
-
               print(
                   stock.get(
                       "MarketName"
@@ -2623,7 +2482,7 @@ jobs:
 
 
           # ==================================================
-          # 17. Output
+          # Output
           # ==================================================
 
           taipei_now = datetime.now(
@@ -2634,13 +2493,16 @@ jobs:
 
           output = {
 
+              # API 實際交易日期
+              "tradeDate":
+                  trade_date,
+
+              # stocks.json 實際產生時間
+              # 使用台灣時區
               "updatedAt":
                   taipei_now.strftime(
                       "%Y-%m-%d %H:%M:%S"
                   ),
-
-              "tradeDate":
-                  trade_date,
 
               "source":
                   "TWSE + TPEx official data",
@@ -2726,23 +2588,24 @@ jobs:
 
 
           # ==================================================
-          # 18. Final Log
+          # Final Log
           # ==================================================
 
           print("")
-          print(
-              "=============================="
-          )
-          print(
-              "stocks.json updated"
-          )
-          print(
-              "=============================="
-          )
+          print("==============================")
+          print("stocks.json updated")
+          print("==============================")
 
           print(
               "Trade Date:",
               trade_date
+          )
+
+          print(
+              "Generated At:",
+              output[
+                  "updatedAt"
+              ]
           )
 
           print(
@@ -2784,42 +2647,6 @@ jobs:
               "Mainboard + After-hours Fixed"
           )
 
-          print("")
-          print(
-              "TWSE sources:"
-          )
-
-          print(
-              "Intraday odd:",
-              twse_intraday_source
-          )
-
-          print(
-              "After-hours odd:",
-              twse_after_odd_source
-          )
-
-          print(
-              "Fixed:",
-              twse_fixed_source
-          )
-
-          print(
-              "Block:",
-              twse_block_source
-          )
-
-          print("")
-          print(
-              "TPEx market source:",
-              TPEX_MARKET_API
-          )
-
-          print(
-              "TPEx fixed source:",
-              TPEX_FIXED_API
-          )
-
           PY
 
 
@@ -2859,12 +2686,25 @@ jobs:
 
 
           print(
+              "Trade Date:",
+              payload.get(
+                  "tradeDate"
+              )
+          )
+
+          print(
+              "Updated At:",
+              payload.get(
+                  "updatedAt"
+              )
+          )
+
+          print(
               "Total:",
               payload.get(
                   "count"
               )
           )
-
 
           print(
               "Markets:",
@@ -2873,19 +2713,10 @@ jobs:
               )
           )
 
-
           print(
               "Mode:",
               payload.get(
                   "volumeMode"
-              )
-          )
-
-
-          print(
-              "Formula:",
-              payload.get(
-                  "volumeFormula"
               )
           )
 
@@ -3027,10 +2858,6 @@ jobs:
           )
 
 
-          # ===================================
-          # Debug target stocks
-          # ===================================
-
           verify_codes = {
               "2344",
               "6770",
@@ -3055,7 +2882,6 @@ jobs:
 
                   continue
 
-
               print("")
               print(
                   stock.get(
@@ -3068,7 +2894,6 @@ jobs:
                       "Name"
                   )
               )
-
 
               if (
                   stock.get(
@@ -3103,7 +2928,6 @@ jobs:
                       )
                   )
 
-
               print(
                   "Broker lots:",
                   round(
@@ -3121,10 +2945,6 @@ jobs:
                   )
               )
 
-
-          # ===================================
-          # TOP 10
-          # ===================================
 
           top10 = sorted(
 
@@ -3234,7 +3054,7 @@ jobs:
           else
 
             git commit \
-              -m "chore: fix TPEx broker comparable volume"
+              -m "chore: update Taiwan stock data"
 
             git push
 
