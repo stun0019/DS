@@ -7,7 +7,12 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0f1115"
   >
 
   <title>台股隔日當沖候選系統</title>
@@ -15,24 +20,74 @@
 
   <style>
 
+    :root {
+      --bg: #0f1115;
+      --surface: #171a20;
+      --surface-2: #1d2129;
+      --surface-3: #242933;
+
+      --border: #2b313d;
+
+      --text: #f3f5f7;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+
+      --up: #ff5a67;
+      --down: #35c98b;
+
+      --accent: #7c8cff;
+
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+
+      --shadow:
+        0 12px 30px rgba(0, 0, 0, 0.22);
+    }
+
+
     * {
       box-sizing: border-box;
     }
 
 
-    body {
-      margin: 0;
-      font-family:
-        Arial,
-        "Microsoft JhengHei",
-        sans-serif;
-
-      background: #f5f6f8;
-      color: #222;
+    html {
+      background: var(--bg);
     }
 
 
-    .container {
+    body {
+      margin: 0;
+
+      min-height: 100vh;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Microsoft JhengHei",
+        sans-serif;
+
+      background:
+        linear-gradient(
+          180deg,
+          #11141a 0%,
+          var(--bg) 220px
+        );
+
+      color: var(--text);
+
+      -webkit-font-smoothing: antialiased;
+    }
+
+
+    button,
+    select {
+      font: inherit;
+    }
+
+
+    .app {
       width: min(
         1500px,
         96%
@@ -40,92 +95,291 @@
 
       margin: 0 auto;
 
-      padding: 30px 0;
+      padding:
+        28px
+        0
+        50px;
     }
 
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
-    }
+    /* =========================================
+       Header
+    ========================================= */
 
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
 
-    .subtitle {
-      color: #666;
+      gap: 18px;
+
       margin-bottom: 22px;
     }
 
 
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      margin-bottom: 18px;
+    .title-area {
+      min-width: 0;
     }
 
 
-    button {
-      border: none;
-      border-radius: 6px;
+    .eyebrow {
+      margin-bottom: 7px;
 
-      padding: 10px 18px;
+      color: var(--accent);
 
-      background: #222;
-      color: white;
+      font-size: 12px;
+      font-weight: 700;
 
-      font-size: 15px;
+      letter-spacing: 0.08em;
+    }
+
+
+    h1 {
+      margin: 0;
+
+      font-size: 28px;
+      line-height: 1.25;
+
+      letter-spacing: -0.02em;
+    }
+
+
+    .subtitle {
+      margin-top: 8px;
+
+      color: var(--text-secondary);
+
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+
+    .reload-btn {
+      flex-shrink: 0;
+
+      border: 1px solid var(--border);
+
+      border-radius: 10px;
+
+      padding: 10px 15px;
+
+      background: var(--surface-2);
+
+      color: var(--text);
 
       cursor: pointer;
+
+      transition:
+        border-color 0.15s,
+        background 0.15s,
+        transform 0.15s;
     }
 
 
-    button:hover {
-      opacity: 0.85;
+    .reload-btn:hover {
+      background: var(--surface-3);
+
+      border-color: #414958;
     }
 
 
-    .status {
-      background: white;
+    .reload-btn:active {
+      transform: scale(0.97);
+    }
 
-      border: 1px solid #ddd;
-      border-radius: 8px;
 
-      padding: 12px 16px;
+    /* =========================================
+       Summary
+    ========================================= */
+
+    .summary {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+      gap: 12px;
 
       margin-bottom: 20px;
     }
 
 
-    .error {
-      color: #d93025;
+    .summary-card {
+      padding: 15px 17px;
+
+      background:
+        linear-gradient(
+          145deg,
+          var(--surface-2),
+          var(--surface)
+        );
+
+      border:
+        1px solid var(--border);
+
+      border-radius: var(--radius-md);
     }
 
 
-    .table-wrap {
-      overflow-x: auto;
+    .summary-label {
+      margin-bottom: 7px;
 
-      background: white;
+      color: var(--text-secondary);
 
-      border: 1px solid #ddd;
+      font-size: 12px;
+    }
+
+
+    .summary-value {
+      overflow: hidden;
+
+      font-size: 18px;
+      font-weight: 700;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+
+    /* =========================================
+       Controls
+    ========================================= */
+
+    .controls {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-bottom: 16px;
+    }
+
+
+    .status {
+      color: var(--text-secondary);
+
+      font-size: 13px;
+    }
+
+
+    .status.error {
+      color: var(--up);
+    }
+
+
+    .desktop-hint {
+      color: var(--text-muted);
+
+      font-size: 12px;
+    }
+
+
+    .mobile-sort {
+      display: none;
+    }
+
+
+    .sort-select {
+      width: 100%;
+
+      border:
+        1px solid var(--border);
+
       border-radius: 10px;
+
+      padding:
+        11px
+        38px
+        11px
+        13px;
+
+      background: var(--surface-2);
+
+      color: var(--text);
+
+      outline: none;
+    }
+
+
+    /* =========================================
+       Desktop Table
+    ========================================= */
+
+    .desktop-table {
+      overflow: hidden;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: var(--radius-lg);
+
+      background: var(--surface);
+
+      box-shadow: var(--shadow);
+    }
+
+
+    .table-scroll {
+      overflow-x: auto;
     }
 
 
     table {
       width: 100%;
-      min-width: 1250px;
+
+      min-width: 1260px;
 
       border-collapse: collapse;
     }
 
 
-    th,
-    td {
-      padding: 12px 10px;
+    thead {
+      background: #1b1f27;
+    }
+
+
+    th {
+      position: sticky;
+
+      top: 0;
+
+      z-index: 2;
+
+      padding:
+        13px
+        12px;
 
       border-bottom:
-        1px solid #eee;
+        1px solid var(--border);
+
+      color: var(--text-secondary);
+
+      background: #1b1f27;
+
+      font-size: 12px;
+      font-weight: 600;
+
+      text-align: right;
+
+      white-space: nowrap;
+
+      user-select: none;
+    }
+
+
+    td {
+      padding:
+        13px
+        12px;
+
+      border-bottom:
+        1px solid rgba(43, 49, 61, 0.75);
+
+      color: #d9dde3;
+
+      font-size: 13px;
 
       text-align: right;
 
@@ -133,29 +387,49 @@
     }
 
 
-    th {
-      background: #fafafa;
-
-      font-weight: 600;
-
-      user-select: none;
-    }
-
-
-    th:first-child,
-    th:nth-child(2),
-    th:nth-child(3),
-
-    td:first-child,
-    td:nth-child(2),
-    td:nth-child(3) {
-
-      text-align: left;
+    tbody tr {
+      transition:
+        background 0.12s;
     }
 
 
     tbody tr:hover {
-      background: #f8f9fa;
+      background: #1c2027;
+    }
+
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+
+    th:nth-child(1),
+    th:nth-child(2),
+    th:nth-child(3),
+
+    td:nth-child(1),
+    td:nth-child(2),
+    td:nth-child(3) {
+      text-align: left;
+    }
+
+
+    .code {
+      color: var(--text-secondary);
+
+      font-variant-numeric: tabular-nums;
+    }
+
+
+    .stock-name {
+      color: var(--text);
+
+      font-weight: 650;
+    }
+
+
+    .industry {
+      color: #aeb5c0;
     }
 
 
@@ -163,12 +437,22 @@
       cursor: pointer;
 
       transition:
+        color 0.15s,
         background 0.15s;
     }
 
 
     .sortable:hover {
-      background: #eeeeee;
+      color: var(--text);
+
+      background: #242932;
+    }
+
+
+    .sortable.active {
+      color: var(--text);
+
+      background: #232832;
     }
 
 
@@ -179,60 +463,392 @@
 
       margin-left: 3px;
 
-      color: #777;
+      color: var(--accent);
     }
 
 
-    .sort-active {
-      background: #eeeeee;
+    /* =========================================
+       Mobile Cards
+    ========================================= */
+
+    .mobile-list {
+      display: none;
     }
 
+
+    .stock-card {
+      margin-bottom: 12px;
+
+      padding: 16px;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: var(--radius-lg);
+
+      background:
+        linear-gradient(
+          145deg,
+          #1b1f26,
+          #16191f
+        );
+
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+
+    .stock-card-header {
+      display: flex;
+
+      align-items: flex-start;
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-bottom: 14px;
+    }
+
+
+    .stock-identity {
+      min-width: 0;
+    }
+
+
+    .stock-title-row {
+      display: flex;
+
+      align-items: baseline;
+
+      gap: 8px;
+
+      min-width: 0;
+    }
+
+
+    .mobile-stock-name {
+      overflow: hidden;
+
+      max-width: 180px;
+
+      color: var(--text);
+
+      font-size: 17px;
+      font-weight: 700;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+
+    .mobile-stock-code {
+      color: var(--text-muted);
+
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+
+    .mobile-industry {
+      margin-top: 5px;
+
+      color: var(--text-secondary);
+
+      font-size: 12px;
+    }
+
+
+    .change-box {
+      flex-shrink: 0;
+
+      text-align: right;
+    }
+
+
+    .change-value {
+      font-size: 17px;
+      font-weight: 750;
+
+      font-variant-numeric: tabular-nums;
+    }
+
+
+    .amplitude-value {
+      margin-top: 4px;
+
+      color: var(--text-secondary);
+
+      font-size: 11px;
+    }
+
+
+    .metrics {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 8px;
+
+      margin-bottom: 10px;
+    }
+
+
+    .metric {
+      min-width: 0;
+
+      padding: 11px 12px;
+
+      border:
+        1px solid rgba(43, 49, 61, 0.8);
+
+      border-radius: 11px;
+
+      background:
+        rgba(255, 255, 255, 0.025);
+    }
+
+
+    .metric-label {
+      margin-bottom: 5px;
+
+      color: var(--text-muted);
+
+      font-size: 10px;
+
+      letter-spacing: 0.03em;
+    }
+
+
+    .metric-value {
+      overflow: hidden;
+
+      color: #e9ecf0;
+
+      font-size: 14px;
+      font-weight: 650;
+
+      font-variant-numeric: tabular-nums;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+
+    .ohlc {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+      gap: 6px;
+
+      padding-top: 11px;
+
+      border-top:
+        1px solid rgba(43, 49, 61, 0.85);
+    }
+
+
+    .ohlc-item {
+      text-align: center;
+    }
+
+
+    .ohlc-label {
+      display: block;
+
+      margin-bottom: 4px;
+
+      color: var(--text-muted);
+
+      font-size: 10px;
+    }
+
+
+    .ohlc-value {
+      color: #cfd4db;
+
+      font-size: 12px;
+
+      font-variant-numeric: tabular-nums;
+    }
+
+
+    /* =========================================
+       Up / Down
+    ========================================= */
 
     .up {
-      color: #d93025;
+      color: var(--up);
     }
 
 
     .down {
-      color: #188038;
+      color: var(--down);
     }
 
 
     .neutral {
-      color: #666;
+      color: var(--text-secondary);
     }
 
 
-    .industry {
-      color: #444;
+    /* =========================================
+       Loading
+    ========================================= */
+
+    .loading {
+      padding: 50px 20px;
+
+      color: var(--text-secondary);
+
+      font-size: 14px;
+
+      text-align: center;
     }
 
 
-    .hint {
-      margin-left: auto;
-
-      color: #777;
-      font-size: 13px;
-    }
-
+    /* =========================================
+       Mobile 9:16
+    ========================================= */
 
     @media (
-      max-width: 700px
+      max-width: 720px
     ) {
 
-      .container {
-        width: 96%;
-        padding: 18px 0;
+      body {
+        background: var(--bg);
+      }
+
+
+      .app {
+        width: 100%;
+
+        padding:
+          max(
+            18px,
+            env(safe-area-inset-top)
+          )
+          14px
+          calc(
+            30px
+            +
+            env(safe-area-inset-bottom)
+          );
+      }
+
+
+      .header {
+        align-items: center;
+
+        margin-bottom: 17px;
+      }
+
+
+      .eyebrow {
+        margin-bottom: 5px;
+
+        font-size: 10px;
       }
 
 
       h1 {
-        font-size: 22px;
+        font-size: 21px;
       }
 
 
-      .hint {
+      .subtitle {
         display: none;
+      }
+
+
+      .reload-btn {
+        padding:
+          9px
+          12px;
+
+        font-size: 12px;
+      }
+
+
+      .summary {
+        grid-template-columns:
+          1fr 1fr;
+
+        gap: 8px;
+
+        margin-bottom: 14px;
+      }
+
+
+      .summary-card {
+        padding:
+          12px
+          13px;
+      }
+
+
+      .summary-card:last-child {
+        grid-column:
+          1 / -1;
+      }
+
+
+      .summary-label {
+        margin-bottom: 5px;
+
+        font-size: 10px;
+      }
+
+
+      .summary-value {
+        font-size: 15px;
+      }
+
+
+      .controls {
+        display: block;
+
+        margin-bottom: 12px;
+      }
+
+
+      .status {
+        margin-bottom: 9px;
+
+        font-size: 11px;
+      }
+
+
+      .desktop-hint {
+        display: none;
+      }
+
+
+      .mobile-sort {
+        display: block;
+      }
+
+
+      .desktop-table {
+        display: none;
+      }
+
+
+      .mobile-list {
+        display: block;
+      }
+
+    }
+
+
+    @media (
+      min-width: 721px
+    ) {
+
+      .mobile-list {
+        display: none !important;
       }
 
     }
@@ -245,186 +861,335 @@
 <body>
 
 
-  <main class="container">
+  <main class="app">
 
 
-    <h1>
-      台股隔日當沖候選系統
-    </h1>
+    <!-- ======================================
+         Header
+    ======================================= -->
+
+    <header class="header">
+
+      <div class="title-area">
+
+        <div class="eyebrow">
+          TWSE MARKET WATCH
+        </div>
+
+        <h1>
+          台股隔日當沖候選
+        </h1>
+
+        <div class="subtitle">
+          使用前一交易日上市個股行情，觀察成交、價格與產業分布。
+        </div>
+
+      </div>
 
 
-    <div class="subtitle">
-      使用前一交易日上市個股資料建立隔日觀察清單
-    </div>
-
-
-    <div class="toolbar">
-
-      <button id="reloadBtn">
+      <button
+        id="reloadBtn"
+        class="reload-btn"
+      >
         重新讀取
       </button>
 
+    </header>
 
-      <div class="hint">
-        點擊表格標題可切換升冪 / 降冪排序
+
+
+    <!-- ======================================
+         Summary
+    ======================================= -->
+
+    <section class="summary">
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          交易日期
+        </div>
+
+        <div
+          id="tradeDateValue"
+          class="summary-value"
+        >
+          -
+        </div>
+
       </div>
 
-    </div>
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          有效個股
+        </div>
+
+        <div
+          id="countValue"
+          class="summary-value"
+        >
+          -
+        </div>
+
+      </div>
 
 
-    <div
-      id="status"
-      class="status"
+      <div class="summary-card">
+
+        <div class="summary-label">
+          資料更新
+        </div>
+
+        <div
+          id="updatedAtValue"
+          class="summary-value"
+        >
+          -
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ======================================
+         Controls
+    ======================================= -->
+
+    <section class="controls">
+
+      <div
+        id="status"
+        class="status"
+      >
+        載入資料中...
+      </div>
+
+
+      <div class="desktop-hint">
+        點擊欄位名稱切換升冪 / 降冪
+      </div>
+
+
+      <div class="mobile-sort">
+
+        <select
+          id="mobileSortSelect"
+          class="sort-select"
+        >
+
+          <option value="">
+            排序方式
+          </option>
+
+          <option value="TradeVolume:desc">
+            成交量｜大 → 小
+          </option>
+
+          <option value="TradeVolume:asc">
+            成交量｜小 → 大
+          </option>
+
+          <option value="TradeValue:desc">
+            成交金額｜大 → 小
+          </option>
+
+          <option value="TradeValue:asc">
+            成交金額｜小 → 大
+          </option>
+
+          <option value="Transaction:desc">
+            成交筆數｜大 → 小
+          </option>
+
+          <option value="Change:desc">
+            漲跌｜高 → 低
+          </option>
+
+          <option value="Change:asc">
+            漲跌｜低 → 高
+          </option>
+
+          <option value="Amplitude:desc">
+            振幅｜大 → 小
+          </option>
+
+          <option value="Amplitude:asc">
+            振幅｜小 → 大
+          </option>
+
+          <option value="Industry:asc">
+            產業別｜A → Z
+          </option>
+
+        </select>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ======================================
+         Desktop Table
+    ======================================= -->
+
+    <section class="desktop-table">
+
+      <div class="table-scroll">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th
+                class="sortable"
+                data-key="Code"
+                data-type="text"
+              >
+                代號
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="Name"
+                data-type="text"
+              >
+                名稱
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="Industry"
+                data-type="text"
+              >
+                產業別
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="TradeVolume"
+                data-type="number"
+              >
+                成交量
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="Transaction"
+                data-type="number"
+              >
+                成交筆數
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="TradeValue"
+                data-type="number"
+              >
+                成交金額
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="OpeningPrice"
+                data-type="number"
+              >
+                開盤
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="HighestPrice"
+                data-type="number"
+              >
+                最高
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="LowestPrice"
+                data-type="number"
+              >
+                最低
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="ClosingPrice"
+                data-type="number"
+              >
+                收盤
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="Change"
+                data-type="number"
+              >
+                漲跌
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="Amplitude"
+                data-type="number"
+              >
+                振幅
+                <span class="sort-icon"></span>
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="stockTableBody">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ======================================
+         Mobile List
+    ======================================= -->
+
+    <section
+      id="mobileStockList"
+      class="mobile-list"
     >
-      資料載入中...
-    </div>
 
+      <div class="loading">
+        載入資料中...
+      </div>
 
-    <div class="table-wrap">
-
-
-      <table>
-
-
-        <thead>
-
-          <tr>
-
-            <th
-              class="sortable"
-              data-key="Code"
-              data-type="text"
-            >
-              代號
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="Name"
-              data-type="text"
-            >
-              名稱
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="Industry"
-              data-type="text"
-            >
-              產業別
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="TradeVolume"
-              data-type="number"
-            >
-              成交量
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="Transaction"
-              data-type="number"
-            >
-              成交筆數
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="TradeValue"
-              data-type="number"
-            >
-              成交金額
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="OpeningPrice"
-              data-type="number"
-            >
-              開盤
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="HighestPrice"
-              data-type="number"
-            >
-              最高
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="LowestPrice"
-              data-type="number"
-            >
-              最低
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="ClosingPrice"
-              data-type="number"
-            >
-              收盤
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="Change"
-              data-type="number"
-            >
-              漲跌
-              <span class="sort-icon"></span>
-            </th>
-
-
-            <th
-              class="sortable"
-              data-key="Amplitude"
-              data-type="number"
-            >
-              振幅
-              <span class="sort-icon"></span>
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody id="stockTableBody">
-        </tbody>
-
-
-      </table>
-
-
-    </div>
+    </section>
 
 
   </main>
+
 
 
   <script>
@@ -434,7 +1199,6 @@
 
 
     let stocks = [];
-
 
     let currentView = [];
 
@@ -460,9 +1224,40 @@
       );
 
 
-    // -----------------------------------------
-    // String → Number
-    // -----------------------------------------
+    const mobileStockList =
+      document.getElementById(
+        "mobileStockList"
+      );
+
+
+    const tradeDateValue =
+      document.getElementById(
+        "tradeDateValue"
+      );
+
+
+    const countValue =
+      document.getElementById(
+        "countValue"
+      );
+
+
+    const updatedAtValue =
+      document.getElementById(
+        "updatedAtValue"
+      );
+
+
+    const mobileSortSelect =
+      document.getElementById(
+        "mobileSortSelect"
+      );
+
+
+
+    /* =========================================
+       Number
+    ========================================= */
 
     function toNumber(
       value
@@ -510,9 +1305,10 @@
     }
 
 
-    // -----------------------------------------
-    // 安全顯示文字
-    // -----------------------------------------
+
+    /* =========================================
+       Escape
+    ========================================= */
 
     function escapeHtml(
       value
@@ -550,9 +1346,10 @@
     }
 
 
-    // -----------------------------------------
-    // 整數格式
-    // -----------------------------------------
+
+    /* =========================================
+       Formatting
+    ========================================= */
 
     function formatNumber(
       value
@@ -567,9 +1364,60 @@
     }
 
 
-    // -----------------------------------------
-    // 價格格式
-    // -----------------------------------------
+    function formatCompactNumber(
+      value
+    ) {
+
+      const number =
+        toNumber(
+          value
+        );
+
+
+      if (
+        number >= 100000000
+      ) {
+
+        return (
+          number
+          /
+          100000000
+        ).toFixed(
+          number >= 1000000000
+            ? 1
+            : 2
+        )
+        +
+        " 億";
+
+      }
+
+
+      if (
+        number >= 10000
+      ) {
+
+        return (
+          number
+          /
+          10000
+        ).toFixed(
+          number >= 1000000
+            ? 0
+            : 1
+        )
+        +
+        " 萬";
+
+      }
+
+
+      return formatNumber(
+        number
+      );
+
+    }
+
 
     function formatPrice(
       value
@@ -604,9 +1452,81 @@
     }
 
 
-    // -----------------------------------------
-    // 漲跌 CSS
-    // -----------------------------------------
+
+    /* =========================================
+       ROC Date
+    ========================================= */
+
+    function formatTradeDate(
+      value
+    ) {
+
+      const raw =
+        String(
+          value || ""
+        ).trim();
+
+
+      if (
+        raw.length !== 7
+      ) {
+
+        return raw || "-";
+
+      }
+
+
+      const rocYear =
+        Number(
+          raw.slice(
+            0,
+            3
+          )
+        );
+
+
+      const month =
+        raw.slice(
+          3,
+          5
+        );
+
+
+      const day =
+        raw.slice(
+          5,
+          7
+        );
+
+
+      if (
+        !Number.isFinite(
+          rocYear
+        )
+      ) {
+
+        return raw;
+
+      }
+
+
+      const year =
+        rocYear
+        +
+        1911;
+
+
+      return (
+        `${year}/${month}/${day}`
+      );
+
+    }
+
+
+
+    /* =========================================
+       Change
+    ========================================= */
 
     function getChangeClass(
       value
@@ -641,17 +1561,40 @@
     }
 
 
-    // -----------------------------------------
-    // 振幅
-    //
-    // 目前仍維持：
-    //
-    // (最高 - 最低)
-    // ÷ 開盤
-    // × 100
-    //
-    // 尚未把它當成正式選股規則
-    // -----------------------------------------
+    function formatChange(
+      value
+    ) {
+
+      const change =
+        toNumber(
+          value
+        );
+
+
+      if (
+        change > 0
+      ) {
+
+        return (
+          "+"
+          +
+          change
+        );
+
+      }
+
+
+      return String(
+        change
+      );
+
+    }
+
+
+
+    /* =========================================
+       Amplitude
+    ========================================= */
 
     function calculateAmplitude(
       stock
@@ -699,56 +1642,12 @@
     }
 
 
-    // -----------------------------------------
-    // 取得排序數值
-    // -----------------------------------------
 
-    function getSortValue(
-      stock,
-      key,
-      type
-    ) {
+    /* =========================================
+       Desktop Render
+    ========================================= */
 
-      if (
-        key === "Amplitude"
-      ) {
-
-        return calculateAmplitude(
-          stock
-        );
-
-      }
-
-
-      const value =
-        stock[
-          key
-        ];
-
-
-      if (
-        type === "number"
-      ) {
-
-        return toNumber(
-          value
-        );
-
-      }
-
-
-      return String(
-        value || ""
-      );
-
-    }
-
-
-    // -----------------------------------------
-    // 表格 Rendering
-    // -----------------------------------------
-
-    function renderTable(
+    function renderDesktopTable(
       data
     ) {
 
@@ -782,61 +1681,45 @@
             );
 
 
-          const industry =
-            stock.Industry
-            ||
-            "未分類";
-
-
           tr.innerHTML = `
 
-            <td>
+            <td class="code">
               ${escapeHtml(
                 stock.Code || ""
               )}
             </td>
 
-
-            <td>
+            <td class="stock-name">
               ${escapeHtml(
                 stock.Name || ""
               )}
             </td>
 
-
             <td class="industry">
               ${escapeHtml(
-                industry
+                stock.Industry
+                ||
+                "未分類"
               )}
             </td>
-
 
             <td>
               ${formatNumber(
-                toNumber(
-                  stock.TradeVolume
-                )
+                stock.TradeVolume
               )}
             </td>
-
 
             <td>
               ${formatNumber(
-                toNumber(
-                  stock.Transaction
-                )
+                stock.Transaction
               )}
             </td>
-
 
             <td>
               ${formatNumber(
-                toNumber(
-                  stock.TradeValue
-                )
+                stock.TradeValue
               )}
             </td>
-
 
             <td>
               ${formatPrice(
@@ -844,13 +1727,11 @@
               )}
             </td>
 
-
             <td>
               ${formatPrice(
                 stock.HighestPrice
               )}
             </td>
-
 
             <td>
               ${formatPrice(
@@ -858,13 +1739,11 @@
               )}
             </td>
 
-
             <td>
               ${formatPrice(
                 stock.ClosingPrice
               )}
             </td>
-
 
             <td
               class="
@@ -873,15 +1752,10 @@
                 )}
               "
             >
-
-              ${
-                change > 0
-                  ? "+"
-                  : ""
-              }${change}
-
+              ${formatChange(
+                change
+              )}
             </td>
-
 
             <td>
               ${amplitude.toFixed(
@@ -907,109 +1781,348 @@
     }
 
 
-    // -----------------------------------------
-    // 更新排序箭頭
-    // -----------------------------------------
 
-    function updateSortIndicators() {
+    /* =========================================
+       Mobile Render
+    ========================================= */
 
-      document
-        .querySelectorAll(
-          "th.sortable"
-        )
-        .forEach(
-          th => {
+    function renderMobileCards(
+      data
+    ) {
 
-            const icon =
-              th.querySelector(
-                ".sort-icon"
-              );
+      mobileStockList.innerHTML =
+        "";
 
 
-            th.classList.remove(
-              "sort-active"
+      const fragment =
+        document
+          .createDocumentFragment();
+
+
+      data.forEach(
+        stock => {
+
+          const card =
+            document.createElement(
+              "article"
             );
 
 
-            icon.textContent =
-              "";
+          card.className =
+            "stock-card";
 
 
-            if (
-              th.dataset.key
-              ===
-              sortState.key
-            ) {
-
-              th.classList.add(
-                "sort-active"
-              );
+          const amplitude =
+            calculateAmplitude(
+              stock
+            );
 
 
-              icon.textContent =
-                sortState.direction
-                === "desc"
-                  ? "↓"
-                  : "↑";
+          const change =
+            toNumber(
+              stock.Change
+            );
 
-            }
 
-          }
-        );
+          const changeClass =
+            getChangeClass(
+              change
+            );
+
+
+          card.innerHTML = `
+
+            <div class="stock-card-header">
+
+              <div class="stock-identity">
+
+                <div class="stock-title-row">
+
+                  <div class="mobile-stock-name">
+                    ${escapeHtml(
+                      stock.Name || ""
+                    )}
+                  </div>
+
+                  <div class="mobile-stock-code">
+                    ${escapeHtml(
+                      stock.Code || ""
+                    )}
+                  </div>
+
+                </div>
+
+
+                <div class="mobile-industry">
+
+                  ${escapeHtml(
+                    stock.Industry
+                    ||
+                    "未分類"
+                  )}
+
+                </div>
+
+              </div>
+
+
+              <div class="change-box">
+
+                <div
+                  class="
+                    change-value
+                    ${changeClass}
+                  "
+                >
+                  ${formatChange(
+                    change
+                  )}
+                </div>
+
+                <div class="amplitude-value">
+                  振幅
+                  ${amplitude.toFixed(
+                    2
+                  )}%
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="metrics">
+
+              <div class="metric">
+
+                <div class="metric-label">
+                  成交量
+                </div>
+
+                <div class="metric-value">
+                  ${formatCompactNumber(
+                    stock.TradeVolume
+                  )}
+                </div>
+
+              </div>
+
+
+              <div class="metric">
+
+                <div class="metric-label">
+                  成交金額
+                </div>
+
+                <div class="metric-value">
+                  ${formatCompactNumber(
+                    stock.TradeValue
+                  )}
+                </div>
+
+              </div>
+
+
+              <div class="metric">
+
+                <div class="metric-label">
+                  成交筆數
+                </div>
+
+                <div class="metric-value">
+                  ${formatNumber(
+                    stock.Transaction
+                  )}
+                </div>
+
+              </div>
+
+
+              <div class="metric">
+
+                <div class="metric-label">
+                  收盤
+                </div>
+
+                <div class="metric-value">
+                  ${formatPrice(
+                    stock.ClosingPrice
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="ohlc">
+
+              <div class="ohlc-item">
+
+                <span class="ohlc-label">
+                  開
+                </span>
+
+                <span class="ohlc-value">
+                  ${formatPrice(
+                    stock.OpeningPrice
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="ohlc-item">
+
+                <span class="ohlc-label">
+                  高
+                </span>
+
+                <span class="ohlc-value">
+                  ${formatPrice(
+                    stock.HighestPrice
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="ohlc-item">
+
+                <span class="ohlc-label">
+                  低
+                </span>
+
+                <span class="ohlc-value">
+                  ${formatPrice(
+                    stock.LowestPrice
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="ohlc-item">
+
+                <span class="ohlc-label">
+                  收
+                </span>
+
+                <span class="ohlc-value">
+                  ${formatPrice(
+                    stock.ClosingPrice
+                  )}
+                </span>
+
+              </div>
+
+            </div>
+
+          `;
+
+
+          fragment.appendChild(
+            card
+          );
+
+        }
+      );
+
+
+      mobileStockList.appendChild(
+        fragment
+      );
 
     }
 
 
-    // -----------------------------------------
-    // 排序
-    // -----------------------------------------
 
-    function sortStocks(
+    /* =========================================
+       Render All
+    ========================================= */
+
+    function renderAll() {
+
+      renderDesktopTable(
+        currentView
+      );
+
+
+      renderMobileCards(
+        currentView
+      );
+
+    }
+
+
+
+    /* =========================================
+       Sorting
+    ========================================= */
+
+    function getSortValue(
+      stock,
       key,
       type
     ) {
 
-      // 同一欄再點一次
-      // → 反轉排序
-
       if (
-        sortState.key
-        ===
-        key
+        key === "Amplitude"
       ) {
 
-        sortState.direction =
-          sortState.direction
-          === "desc"
-            ? "asc"
-            : "desc";
+        return calculateAmplitude(
+          stock
+        );
 
       }
 
-      else {
 
-        sortState.key =
-          key;
+      if (
+        type === "number"
+      ) {
 
-
-        // 數值欄位第一次：
-        // 大 → 小
-        //
-        // 文字第一次：
-        // 小 → 大 / A → Z
-
-        sortState.direction =
-          type === "number"
-            ? "desc"
-            : "asc";
+        return toNumber(
+          stock[
+            key
+          ]
+        );
 
       }
+
+
+      return String(
+        stock[
+          key
+        ]
+        ||
+        ""
+      );
+
+    }
+
+
+    function applySort(
+      key,
+      direction,
+      type
+    ) {
+
+      sortState = {
+
+        key,
+
+        direction
+
+      };
 
 
       currentView =
         [...stocks]
           .sort(
-            (a, b) => {
+            (
+              a,
+              b
+            ) => {
 
               const aValue =
                 getSortValue(
@@ -1054,7 +2167,7 @@
 
 
               return (
-                sortState.direction
+                direction
                 === "asc"
               )
                 ? result
@@ -1064,19 +2177,119 @@
           );
 
 
-      renderTable(
-        currentView
-      );
+      renderAll();
 
-
-      updateSortIndicators();
+      updateDesktopSortIcons();
 
     }
 
 
-    // -----------------------------------------
-    // 載入 stocks.json
-    // -----------------------------------------
+
+    /* =========================================
+       Desktop Sort
+    ========================================= */
+
+    function sortFromHeader(
+      th
+    ) {
+
+      const key =
+        th.dataset.key;
+
+
+      const type =
+        th.dataset.type;
+
+
+      let direction;
+
+
+      if (
+        sortState.key
+        ===
+        key
+      ) {
+
+        direction =
+          sortState.direction
+          === "desc"
+            ? "asc"
+            : "desc";
+
+      }
+
+      else {
+
+        direction =
+          type === "number"
+            ? "desc"
+            : "asc";
+
+      }
+
+
+      applySort(
+        key,
+        direction,
+        type
+      );
+
+    }
+
+
+    function updateDesktopSortIcons() {
+
+      document
+        .querySelectorAll(
+          "th.sortable"
+        )
+        .forEach(
+          th => {
+
+            th.classList.remove(
+              "active"
+            );
+
+
+            const icon =
+              th.querySelector(
+                ".sort-icon"
+              );
+
+
+            icon.textContent =
+              "";
+
+
+            if (
+              th.dataset.key
+              ===
+              sortState.key
+            ) {
+
+              th.classList.add(
+                "active"
+              );
+
+
+              icon.textContent =
+                sortState.direction
+                === "desc"
+                  ? "↓"
+                  : "↑";
+
+            }
+
+          }
+        );
+
+    }
+
+
+
+    /* =========================================
+       Load Data
+    ========================================= */
 
     async function loadStocks() {
 
@@ -1087,6 +2300,14 @@
 
       statusEl.textContent =
         "讀取 stocks.json 中...";
+
+
+      mobileStockList.innerHTML =
+        `
+          <div class="loading">
+            載入資料中...
+          </div>
+        `;
 
 
       try {
@@ -1133,17 +2354,15 @@
         }
 
 
-        // -------------------------------------
-        // 有正常成交價的上市個股
-        // -------------------------------------
-
         stocks =
           data.filter(
             stock => {
 
               const code =
                 String(
-                  stock.Code || ""
+                  stock.Code
+                  ||
+                  ""
                 ).trim();
 
 
@@ -1176,12 +2395,21 @@
         };
 
 
-        renderTable(
-          currentView
-        );
+        mobileSortSelect.value =
+          "";
 
 
-        updateSortIndicators();
+        renderAll();
+
+        updateDesktopSortIcons();
+
+
+        const tradeDate =
+          Array.isArray(
+            json
+          )
+            ? ""
+            : json.tradeDate;
 
 
         const updatedAt =
@@ -1189,22 +2417,27 @@
             json
           )
             ? ""
-            : (
-                json.updatedAt
-                ||
-                ""
-              );
+            : json.updatedAt;
+
+
+        tradeDateValue.textContent =
+          formatTradeDate(
+            tradeDate
+          );
+
+
+        countValue.textContent =
+          `${stocks.length} 檔`;
+
+
+        updatedAtValue.textContent =
+          updatedAt
+          ||
+          "-";
 
 
         statusEl.textContent =
-          `共載入 ${stocks.length} 筆資料`
-          +
-          (
-            updatedAt
-              ? ` ｜ 更新：${updatedAt}`
-              : ""
-          );
-
+          `已載入 ${stocks.length} 檔有效上市個股`;
 
       }
 
@@ -1229,6 +2462,26 @@
           "";
 
 
+        mobileStockList.innerHTML =
+          `
+            <div class="loading">
+              資料讀取失敗
+            </div>
+          `;
+
+
+        tradeDateValue.textContent =
+          "-";
+
+
+        countValue.textContent =
+          "-";
+
+
+        updatedAtValue.textContent =
+          "-";
+
+
         statusEl.classList.add(
           "error"
         );
@@ -1244,9 +2497,10 @@
     }
 
 
-    // -----------------------------------------
-    // 表頭點擊
-    // -----------------------------------------
+
+    /* =========================================
+       Events
+    ========================================= */
 
     document
       .querySelectorAll(
@@ -1259,9 +2513,8 @@
             "click",
             () => {
 
-              sortStocks(
-                th.dataset.key,
-                th.dataset.type
+              sortFromHeader(
+                th
               );
 
             }
@@ -1271,9 +2524,75 @@
       );
 
 
-    // -----------------------------------------
-    // Reload
-    // -----------------------------------------
+    mobileSortSelect
+      .addEventListener(
+        "change",
+        () => {
+
+          const value =
+            mobileSortSelect.value;
+
+
+          if (
+            !value
+          ) {
+
+            currentView =
+              [...stocks];
+
+
+            sortState = {
+
+              key: null,
+
+              direction: null
+
+            };
+
+
+            renderAll();
+
+            updateDesktopSortIcons();
+
+            return;
+
+          }
+
+
+          const [
+            key,
+            direction
+          ] =
+            value.split(
+              ":"
+            );
+
+
+          const textKeys =
+            [
+              "Code",
+              "Name",
+              "Industry"
+            ];
+
+
+          const type =
+            textKeys.includes(
+              key
+            )
+              ? "text"
+              : "number";
+
+
+          applySort(
+            key,
+            direction,
+            type
+          );
+
+        }
+      );
+
 
     document
       .getElementById(
@@ -1285,14 +2604,14 @@
       );
 
 
-    // -----------------------------------------
-    // 初始載入
-    // -----------------------------------------
+
+    /* =========================================
+       Init
+    ========================================= */
 
     loadStocks();
 
   </script>
-
 
 </body>
 
