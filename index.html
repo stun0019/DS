@@ -2,1884 +2,260 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
-
-  <meta
-    name="theme-color"
-    content="#080b10"
-  />
-
-  <title>台股盤後速覽</title>
+  <title>台股隔日當沖候選系統</title>
 
   <style>
-    :root {
-      --bg: #080b10;
-      --panel: #10151d;
-      --panel-2: #151b24;
-      --panel-3: #1a212c;
-
-      --border: #283241;
-      --border-soft: rgba(40, 50, 65, 0.7);
-
-      --text: #f3f5f7;
-      --muted: #8d98a8;
-      --muted-2: #626d7d;
-
-      /* 台股：紅漲綠跌 */
-      --up: #ff6474;
-      --down: #43d69b;
-      --flat: #9ca6b5;
-
-      --accent: #67d7ab;
-      --warning: #f4bf62;
-
-      --radius: 18px;
-      --radius-small: 12px;
-
-      --shadow:
-        0 12px 32px rgba(0, 0, 0, 0.18);
-    }
-
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      background: var(--bg);
     }
 
     body {
-      min-height: 100vh;
-
-      font-family:
-        Inter,
-        "Noto Sans TC",
-        "Microsoft JhengHei",
-        Arial,
-        sans-serif;
-
-      background:
-        radial-gradient(
-          circle at top right,
-          rgba(103, 215, 171, 0.04),
-          transparent 25%
-        ),
-        var(--bg);
-
-      color: var(--text);
+      margin: 0;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      background: #f5f6f8;
+      color: #222;
     }
 
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      color: inherit;
-    }
-
-    .app {
-      width: min(1500px, calc(100% - 40px));
+    .container {
+      width: min(1400px, 94%);
       margin: 0 auto;
-
-      padding:
-        30px
-        0
-        calc(60px + env(safe-area-inset-bottom));
-    }
-
-    /* ========================================
-       HEADER
-    ======================================== */
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-
-      gap: 24px;
-
-      margin-bottom: 28px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-
-      margin-bottom: 12px;
-    }
-
-    .brand-dot {
-      width: 10px;
-      height: 10px;
-
-      flex: 0 0 auto;
-
-      border-radius: 50%;
-
-      background: var(--accent);
-
-      box-shadow:
-        0 0 16px rgba(103, 215, 171, 0.8);
-    }
-
-    .brand-name {
-      color: var(--muted);
-
-      font-size: 13px;
-      font-weight: 750;
-
-      letter-spacing: 0.18em;
+      padding: 30px 0;
     }
 
     h1 {
-      font-size: clamp(30px, 3.5vw, 43px);
-      font-weight: 780;
-
-      letter-spacing: -0.04em;
-      line-height: 1.1;
+      margin: 0 0 8px;
+      font-size: 28px;
     }
 
     .subtitle {
-      color: var(--muted);
-
-      margin-top: 10px;
-
-      font-size: 14px;
-      line-height: 1.6;
+      margin-bottom: 24px;
+      color: #666;
     }
 
-    .header-actions {
+    .toolbar {
       display: flex;
-      align-items: stretch;
-
       gap: 12px;
-    }
-
-    .date-card {
-      min-width: 190px;
-
-      padding: 13px 16px;
-
-      background: var(--panel);
-
-      border: 1px solid var(--border);
-      border-radius: 13px;
-    }
-
-    .date-label {
-      color: var(--muted);
-
-      font-size: 11px;
-
-      margin-bottom: 5px;
-    }
-
-    .date-value {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .update-time {
-      color: var(--muted-2);
-
-      font-size: 10px;
-
-      margin-top: 4px;
-    }
-
-    .refresh-btn {
-      min-width: 120px;
-
-      padding: 0 18px;
-
-      background: var(--panel);
-
-      border: 1px solid var(--border);
-      border-radius: 13px;
-
-      cursor: pointer;
-
-      transition:
-        background 0.15s,
-        border 0.15s;
-    }
-
-    .refresh-btn:hover {
-      background: var(--panel-2);
-      border-color: #3c495d;
-    }
-
-    .refresh-btn:disabled {
-      opacity: 0.5;
-      cursor: wait;
-    }
-
-    /* ========================================
-       ERROR
-    ======================================== */
-
-    .error-banner {
-      display: none;
-
-      margin-bottom: 16px;
-
-      padding: 14px 16px;
-
-      background: rgba(255, 100, 116, 0.08);
-
-      border:
-        1px solid
-        rgba(255, 100, 116, 0.35);
-
-      border-radius: 12px;
-
-      color: #ff8995;
-
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .error-banner.show {
-      display: block;
-    }
-
-    /* ========================================
-       COMMON
-    ======================================== */
-
-    .card {
-      background:
-        linear-gradient(
-          180deg,
-          rgba(17, 22, 30, 0.98),
-          rgba(14, 19, 26, 0.98)
-        );
-
-      border: 1px solid var(--border);
-
-      border-radius: var(--radius);
-
-      box-shadow: var(--shadow);
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      gap: 15px;
-
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .section-title {
-      font-size: 14px;
-      font-weight: 720;
-    }
-
-    .section-subtitle {
-      color: var(--muted);
-
-      font-size: 11px;
-
-      margin-top: 5px;
-    }
-
-    .up {
-      color: var(--up) !important;
-    }
-
-    .down {
-      color: var(--down) !important;
-    }
-
-    .flat {
-      color: var(--flat) !important;
-    }
-
-    /* ========================================
-       KPI
-    ======================================== */
-
-    .market-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-
-      gap: 14px;
-
-      margin-bottom: 14px;
-    }
-
-    .market-card {
-      position: relative;
-
-      min-width: 0;
-
-      padding: 21px;
-
-      overflow: hidden;
-    }
-
-    .market-card::after {
-      content: "";
-
-      position: absolute;
-
-      right: -45px;
-      top: -45px;
-
-      width: 125px;
-      height: 125px;
-
-      border-radius: 50%;
-
-      background:
-        rgba(255, 255, 255, 0.018);
-    }
-
-    .metric-label {
-      color: var(--muted);
-
-      font-size: 12px;
-
-      margin-bottom: 13px;
-    }
-
-    .metric-value {
-      position: relative;
-      z-index: 1;
-
-      font-size: clamp(24px, 2.2vw, 30px);
-      font-weight: 760;
-
-      letter-spacing: -0.035em;
-
-      font-variant-numeric: tabular-nums;
-
-      white-space: nowrap;
-    }
-
-    .metric-bottom {
-      color: var(--muted);
-
-      margin-top: 9px;
-
-      font-size: 11px;
-    }
-
-    /* ========================================
-       MARKET OVERVIEW
-    ======================================== */
-
-    .overview-grid {
-      display: grid;
-      grid-template-columns: 1.3fr 1fr;
-
-      gap: 14px;
-
-      margin-bottom: 14px;
-    }
-
-    .overview-card {
-      padding: 22px;
-    }
-
-    .ohlc-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-
-      gap: 10px;
-    }
-
-    .ohlc-item {
-      min-width: 0;
-
-      padding: 16px;
-
-      background: var(--panel-2);
-
-      border: 1px solid var(--border-soft);
-      border-radius: 12px;
-    }
-
-    .ohlc-label {
-      color: var(--muted);
-
-      font-size: 11px;
-
-      margin-bottom: 8px;
-    }
-
-    .ohlc-value {
-      font-size: clamp(16px, 2vw, 20px);
-      font-weight: 720;
-
-      font-variant-numeric: tabular-nums;
-
-      white-space: nowrap;
-    }
-
-    .market-extra {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-
-      gap: 10px;
-
-      margin-top: 10px;
-    }
-
-    .extra-item {
-      padding: 13px 15px;
-
-      background:
-        rgba(255, 255, 255, 0.025);
-
-      border-radius: 10px;
-    }
-
-    .extra-label {
-      color: var(--muted);
-
-      font-size: 10px;
-    }
-
-    .extra-value {
-      margin-top: 5px;
-
-      font-size: 14px;
-      font-weight: 700;
-
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ========================================
-       BREADTH
-    ======================================== */
-
-    .breadth-row {
-      margin-bottom: 18px;
-    }
-
-    .breadth-row:last-child {
-      margin-bottom: 0;
-    }
-
-    .breadth-info {
-      display: flex;
-      justify-content: space-between;
-
-      margin-bottom: 8px;
-
-      font-size: 12px;
-    }
-
-    .breadth-track {
-      width: 100%;
-      height: 8px;
-
-      background: var(--panel-3);
-
-      border-radius: 999px;
-
-      overflow: hidden;
-    }
-
-    .breadth-fill {
-      height: 100%;
-
-      border-radius: inherit;
-
-      transition: width 0.4s ease;
-    }
-
-    .up-bar {
-      background: var(--up);
-    }
-
-    .down-bar {
-      background: var(--down);
-    }
-
-    .flat-bar {
-      background: var(--flat);
-    }
-
-    .breadth-summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-
-      gap: 7px;
-
-      margin-top: 20px;
-    }
-
-    .breadth-summary-item {
-      padding: 11px;
-
-      background: rgba(255, 255, 255, 0.02);
-
-      border-radius: 9px;
-
-      text-align: center;
-    }
-
-    .breadth-summary-label {
-      color: var(--muted);
-
-      font-size: 9px;
-    }
-
-    .breadth-summary-value {
-      margin-top: 5px;
-
-      font-size: 15px;
-      font-weight: 730;
-    }
-
-    /* ========================================
-       SECTOR
-    ======================================== */
-
-    .sector-card {
-      padding: 20px;
-
-      margin-bottom: 14px;
-    }
-
-    .sector-grid {
-      display: grid;
-      grid-template-columns:
-        repeat(6, minmax(0, 1fr));
-
-      gap: 8px;
-    }
-
-    .sector-item {
-      min-width: 0;
-
-      padding: 13px;
-
-      background: var(--panel-2);
-
-      border: 1px solid var(--border-soft);
-      border-radius: 10px;
-    }
-
-    .sector-name {
-      min-height: 31px;
-
-      color: var(--muted);
-
-      font-size: 10px;
-      line-height: 1.5;
-    }
-
-    .sector-value {
-      margin-top: 8px;
-
-      font-size: 15px;
-      font-weight: 750;
-
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ========================================
-       RANKING
-    ======================================== */
-
-    .ranking-grid {
-      display: grid;
-      grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-      gap: 14px;
-
-      margin-bottom: 14px;
-    }
-
-    .ranking-card {
-      min-width: 0;
-
-      padding: 20px;
-    }
-
-    .ranking-list {
-      display: flex;
-      flex-direction: column;
-
-      gap: 3px;
-    }
-
-    .ranking-item {
-      display: grid;
-      grid-template-columns:
-        30px
-        minmax(0, 1fr)
-        auto;
-
-      align-items: center;
-
-      gap: 9px;
-
-      padding: 10px 7px;
-
-      border-radius: 9px;
-    }
-
-    .ranking-item:hover {
-      background:
-        rgba(255, 255, 255, 0.025);
-    }
-
-    .ranking-number {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      width: 24px;
-      height: 24px;
-
-      background: var(--panel-2);
-
-      border-radius: 7px;
-
-      color: var(--muted);
-
-      font-size: 10px;
-      font-weight: 700;
-    }
-
-    .ranking-stock {
-      min-width: 0;
-    }
-
-    .ranking-name {
-      overflow: hidden;
-
-      font-size: 12px;
-      font-weight: 700;
-
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .ranking-code {
-      color: var(--muted);
-
-      font-size: 9px;
-
-      margin-top: 3px;
-    }
-
-    .ranking-value {
-      text-align: right;
-
-      font-size: 12px;
-      font-weight: 720;
-
-      font-variant-numeric: tabular-nums;
-
-      white-space: nowrap;
-    }
-
-    /* ========================================
-       SCANNER
-    ======================================== */
-
-    .scanner {
-      padding: 20px;
-    }
-
-    .scanner-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-
-      gap: 16px;
-
-      margin-bottom: 16px;
-    }
-
-    .toolbar-right {
-      display: flex;
-      align-items: center;
-
-      gap: 8px;
-    }
-
-    .filter-group {
-      display: flex;
-      align-items: center;
-
-      gap: 6px;
-    }
-
-    .filter-btn {
-      padding: 8px 11px;
-
-      background: var(--panel-2);
-
-      border: 1px solid var(--border);
-
-      border-radius: 8px;
-
-      color: var(--muted);
-
-      font-size: 11px;
-
+    button {
+      border: 0;
+      padding: 10px 18px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 15px;
+      background: #222;
+      color: #fff;
     }
 
-    .filter-btn.active {
-      background: var(--text);
-
-      border-color: var(--text);
-
-      color: var(--bg);
-
-      font-weight: 700;
+    button:hover {
+      opacity: 0.85;
     }
 
-    .search-box {
-      position: relative;
-
-      width: 300px;
-    }
-
-    .search-box input {
-      width: 100%;
-
-      padding:
-        10px
-        13px
-        10px
-        37px;
-
-      background: var(--panel-2);
-
-      border: 1px solid var(--border);
-      border-radius: 9px;
-
-      outline: none;
-
-      color: var(--text);
-
-      font-size: 12px;
-    }
-
-    .search-box input:focus {
-      border-color: #48566b;
-    }
-
-    .search-icon {
-      position: absolute;
-
-      left: 13px;
-      top: 50%;
-
-      transform: translateY(-50%);
-
-      color: var(--muted);
+    .status {
+      padding: 12px 16px;
+      background: #fff;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
     }
 
     .table-wrap {
-      max-height: 720px;
-
-      overflow: auto;
-
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      overflow-x: auto;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #ddd;
     }
 
     table {
       width: 100%;
-
-      min-width: 1000px;
-
       border-collapse: collapse;
+      min-width: 1000px;
     }
 
-    thead {
-      position: sticky;
-
-      top: 0;
-
-      z-index: 5;
-
-      background: #151b24;
+    th,
+    td {
+      padding: 12px 10px;
+      text-align: right;
+      border-bottom: 1px solid #eee;
+      white-space: nowrap;
     }
 
     th {
-      padding: 13px 14px;
-
-      border-bottom:
-        1px solid var(--border);
-
-      color: var(--muted);
-
-      font-size: 10px;
-      font-weight: 650;
-
-      text-align: right;
-
-      white-space: nowrap;
-
-      user-select: none;
+      background: #fafafa;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
     }
 
     th:first-child,
-    th:nth-child(2) {
-      text-align: left;
-    }
-
-    th[data-sort] {
-      cursor: pointer;
-    }
-
-    th[data-sort]:hover {
-      color: var(--text);
-    }
-
-    td {
-      padding: 13px 14px;
-
-      border-bottom:
-        1px solid
-        rgba(40, 50, 65, 0.6);
-
-      font-size: 11px;
-
-      text-align: right;
-
-      font-variant-numeric: tabular-nums;
-
-      white-space: nowrap;
-    }
-
+    th:nth-child(2),
     td:first-child,
     td:nth-child(2) {
       text-align: left;
     }
 
     tbody tr:hover {
-      background:
-        rgba(255, 255, 255, 0.022);
+      background: #fafafa;
     }
 
-    tbody tr:last-child td {
-      border-bottom: none;
+    .up {
+      color: #d32f2f;
     }
 
-    .stock-code {
-      color: var(--muted);
-
-      font-weight: 650;
+    .down {
+      color: #188038;
     }
 
-    .stock-name {
-      font-weight: 700;
+    .neutral {
+      color: #666;
     }
 
-    .stock-type {
-      display: inline-flex;
-
-      margin-left: 6px;
-
-      padding: 3px 6px;
-
-      border: 1px solid var(--border);
-
-      border-radius: 5px;
-
-      color: var(--muted);
-
-      font-size: 8px;
-    }
-
-    .scanner-footer {
-      display: flex;
-      justify-content: space-between;
-
-      gap: 15px;
-
-      padding-top: 12px;
-
-      color: var(--muted);
-
-      font-size: 10px;
-    }
-
-    /* ========================================
-       LOADING
-    ======================================== */
-
-    .loading-cover {
-      position: fixed;
-
-      inset: 0;
-
-      z-index: 99;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      background:
-        rgba(8, 11, 16, 0.88);
-
-      backdrop-filter: blur(8px);
-
-      transition: opacity 0.2s;
-    }
-
-    .loading-cover.hidden {
-      opacity: 0;
-
-      visibility: hidden;
-
-      pointer-events: none;
-    }
-
-    .loading-box {
-      text-align: center;
-    }
-
-    .spinner {
-      width: 35px;
-      height: 35px;
-
-      margin: 0 auto 14px;
-
-      border:
-        3px solid var(--panel-3);
-
-      border-top-color: var(--accent);
-
-      border-radius: 50%;
-
-      animation: spin 0.75s linear infinite;
-    }
-
-    .loading-text {
-      color: var(--muted);
-
-      font-size: 12px;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* ========================================
-       MOBILE
-    ======================================== */
-
-    @media (max-width: 1100px) {
-      .market-grid {
-        grid-template-columns:
-          repeat(2, 1fr);
-      }
-
-      .overview-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .ranking-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .sector-grid {
-        grid-template-columns:
-          repeat(3, 1fr);
-      }
-    }
-
-    @media (max-width: 720px) {
-      .app {
-        width: calc(100% - 28px);
-
-        padding-top:
-          calc(22px + env(safe-area-inset-top));
-      }
-
-      .header {
-        flex-direction: column;
-
-        margin-bottom: 22px;
-      }
-
-      .header-actions {
-        width: 100%;
-      }
-
-      .date-card {
-        min-width: 0;
-
-        flex: 1;
-      }
-
-      .refresh-btn {
-        min-width: 120px;
-      }
-
-      .market-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .market-card {
-        padding: 20px;
-      }
-
-      .ohlc-grid {
-        grid-template-columns:
-          repeat(2, 1fr);
-      }
-
-      .market-extra {
-        grid-template-columns: 1fr;
-      }
-
-      .sector-grid {
-        grid-template-columns:
-          repeat(2, 1fr);
-      }
-
-      .scanner-toolbar {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .toolbar-right {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .filter-group {
-        overflow-x: auto;
-      }
-
-      .search-box {
-        width: 100%;
-      }
-
-      .scanner-footer {
-        flex-direction: column;
-      }
-    }
-
-    @media (max-width: 430px) {
-      h1 {
-        font-size: 34px;
-      }
-
-      .brand-name {
-        font-size: 11px;
-      }
-
-      .header-actions {
-        gap: 8px;
-      }
-
-      .date-card {
-        padding: 12px 13px;
-      }
-
-      .refresh-btn {
-        min-width: 110px;
-
-        padding: 0 12px;
-      }
-
-      .ohlc-item {
-        padding: 14px;
-      }
-
-      .overview-card,
-      .sector-card,
-      .ranking-card,
-      .scanner {
-        padding: 17px;
-      }
+    .error {
+      color: #d32f2f;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Loading -->
-  <div
-    id="loadingCover"
-    class="loading-cover"
-  >
-    <div class="loading-box">
+  <div class="container">
 
-      <div class="spinner"></div>
+    <h1>台股隔日當沖候選系統</h1>
 
-      <div class="loading-text">
-        讀取盤後資料...
-      </div>
+    <div class="subtitle">
+      使用前一交易日資料建立隔日觀察清單
+    </div>
+
+
+    <div class="toolbar">
+
+      <button id="loadBtn">
+        讀取證交所資料
+      </button>
+
+      <button id="sortVolumeBtn">
+        成交量排序
+      </button>
 
     </div>
+
+
+    <div
+      id="status"
+      class="status"
+    >
+      尚未載入資料
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>代號</th>
+
+            <th>名稱</th>
+
+            <th>成交量</th>
+
+            <th>成交筆數</th>
+
+            <th>成交金額</th>
+
+            <th>開盤</th>
+
+            <th>最高</th>
+
+            <th>最低</th>
+
+            <th>收盤</th>
+
+            <th>漲跌</th>
+
+            <th>振幅</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="stockTableBody">
+
+        </tbody>
+
+      </table>
+
+    </div>
+
   </div>
 
-  <!-- App -->
-  <main class="app">
-
-    <!-- Header -->
-    <header class="header">
-
-      <div>
-
-        <div class="brand">
-          <span class="brand-dot"></span>
-
-          <span class="brand-name">
-            TWSE MARKET DASHBOARD
-          </span>
-        </div>
-
-        <h1>
-          台股盤後速覽
-        </h1>
-
-        <div class="subtitle">
-          快速掌握最新交易日大盤與上市個股行情
-        </div>
-
-      </div>
-
-      <div class="header-actions">
-
-        <div class="date-card">
-
-          <div class="date-label">
-            資料交易日
-          </div>
-
-          <div
-            id="tradeDate"
-            class="date-value"
-          >
-            --
-          </div>
-
-          <div
-            id="updateTime"
-            class="update-time"
-          >
-            尚未更新
-          </div>
-
-        </div>
-
-        <button
-          id="refreshBtn"
-          class="refresh-btn"
-        >
-          ↻ 更新資料
-        </button>
-
-      </div>
-
-    </header>
-
-    <!-- Error -->
-    <div
-      id="errorBanner"
-      class="error-banner"
-    ></div>
-
-    <!-- KPI -->
-    <section class="market-grid">
-
-      <article class="card market-card">
-
-        <div class="metric-label">
-          加權指數 TAIEX
-        </div>
-
-        <div
-          id="taiexClose"
-          class="metric-value"
-        >
-          --
-        </div>
-
-        <div class="metric-bottom">
-          最新交易日收盤
-        </div>
-
-      </article>
-
-      <article class="card market-card">
-
-        <div class="metric-label">
-          指數漲跌
-        </div>
-
-        <div
-          id="taiexChange"
-          class="metric-value"
-        >
-          --
-        </div>
-
-        <div
-          id="taiexPercent"
-          class="metric-bottom"
-        >
-          --
-        </div>
-
-      </article>
-
-      <article class="card market-card">
-
-        <div class="metric-label">
-          市場成交金額
-        </div>
-
-        <div
-          id="marketValue"
-          class="metric-value"
-        >
-          --
-        </div>
-
-        <div class="metric-bottom">
-          集中市場成交金額
-        </div>
-
-      </article>
-
-      <article class="card market-card">
-
-        <div class="metric-label">
-          上漲 / 下跌比
-        </div>
-
-        <div
-          id="breadthRatio"
-          class="metric-value"
-        >
-          --
-        </div>
-
-        <div
-          id="breadthText"
-          class="metric-bottom"
-        >
-          --
-        </div>
-
-      </article>
-
-    </section>
-
-    <!-- Market overview -->
-    <section class="overview-grid">
-
-      <!-- OHLC -->
-      <article class="card overview-card">
-
-        <div class="section-header">
-
-          <div>
-
-            <div class="section-title">
-              加權指數行情
-            </div>
-
-            <div class="section-subtitle">
-              最新交易日 Open / High / Low / Close
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="ohlc-grid">
-
-          <div class="ohlc-item">
-
-            <div class="ohlc-label">
-              開盤
-            </div>
-
-            <div
-              id="indexOpen"
-              class="ohlc-value"
-            >
-              --
-            </div>
-
-          </div>
-
-          <div class="ohlc-item">
-
-            <div class="ohlc-label">
-              最高
-            </div>
-
-            <div
-              id="indexHigh"
-              class="ohlc-value"
-            >
-              --
-            </div>
-
-          </div>
-
-          <div class="ohlc-item">
-
-            <div class="ohlc-label">
-              最低
-            </div>
-
-            <div
-              id="indexLow"
-              class="ohlc-value"
-            >
-              --
-            </div>
-
-          </div>
-
-          <div class="ohlc-item">
-
-            <div class="ohlc-label">
-              收盤
-            </div>
-
-            <div
-              id="indexClose"
-              class="ohlc-value"
-            >
-              --
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="market-extra">
-
-          <div class="extra-item">
-
-            <div class="extra-label">
-              日內振幅
-            </div>
-
-            <div
-              id="indexRange"
-              class="extra-value"
-            >
-              --
-            </div>
-
-          </div>
-
-          <div class="extra-item">
-
-            <div class="extra-label">
-              收盤位置
-            </div>
-
-            <div
-              id="closePosition"
-              class="extra-value"
-            >
-              --
-            </div>
-
-          </div>
-
-          <div class="extra-item">
-
-            <div class="extra-label">
-              成交筆數
-            </div>
-
-            <div
-              id="transactionCount"
-              class="extra-value"
-            >
-              --
-            </div>
-
-          </div>
-
-        </div>
-
-      </article>
-
-      <!-- Breadth -->
-      <article class="card overview-card">
-
-        <div class="section-header">
-
-          <div>
-
-            <div class="section-title">
-              市場廣度
-            </div>
-
-            <div class="section-subtitle">
-              一般上市股票漲跌分布
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="breadth-row">
-
-          <div class="breadth-info">
-
-            <span>
-              上漲
-            </span>
-
-            <strong
-              id="upCount"
-              class="up"
-            >
-              --
-            </strong>
-
-          </div>
-
-          <div class="breadth-track">
-
-            <div
-              id="upBar"
-              class="breadth-fill up-bar"
-            ></div>
-
-          </div>
-
-        </div>
-
-        <div class="breadth-row">
-
-          <div class="breadth-info">
-
-            <span>
-              下跌
-            </span>
-
-            <strong
-              id="downCount"
-              class="down"
-            >
-              --
-            </strong>
-
-          </div>
-
-          <div class="breadth-track">
-
-            <div
-              id="downBar"
-              class="breadth-fill down-bar"
-            ></div>
-
-          </div>
-
-        </div>
-
-        <div class="breadth-row">
-
-          <div class="breadth-info">
-
-            <span>
-              平盤
-            </span>
-
-            <strong
-              id="flatCount"
-              class="flat"
-            >
-              --
-            </strong>
-
-          </div>
-
-          <div class="breadth-track">
-
-            <div
-              id="flatBar"
-              class="breadth-fill flat-bar"
-            ></div>
-
-          </div>
-
-        </div>
-
-        <div class="breadth-summary">
-
-          <div class="breadth-summary-item">
-
-            <div class="breadth-summary-label">
-              上漲比例
-            </div>
-
-            <div
-              id="upPercent"
-              class="breadth-summary-value up"
-            >
-              --
-            </div>
-
-          </div>
-
-          <div class="breadth-summary-item">
-
-            <div class="breadth-summary-label">
-              下跌比例
-            </div>
-
-            <div
-              id="downPercent"
-              class="breadth-summary-value down"
-            >
-              --
-            </div>
-
-          </div>
-
-          <div class="breadth-summary-item">
-
-            <div class="breadth-summary-label">
-              統計檔數
-            </div>
-
-            <div
-              id="breadthTotal"
-              class="breadth-summary-value"
-            >
-              --
-            </div>
-
-          </div>
-
-        </div>
-
-      </article>
-
-    </section>
-
-    <!-- Sectors -->
-    <section class="card sector-card">
-
-      <div class="section-header">
-
-        <div>
-
-          <div class="section-title">
-            產業類股強弱
-          </div>
-
-          <div class="section-subtitle">
-            最強 3 類 / 最弱 3 類
-          </div>
-
-        </div>
-
-      </div>
-
-      <div
-        id="sectorGrid"
-        class="sector-grid"
-      ></div>
-
-    </section>
-
-    <!-- Ranking -->
-    <section class="ranking-grid">
-
-      <article class="card ranking-card">
-
-        <div class="section-header">
-
-          <div>
-
-            <div class="section-title">
-              漲幅排行
-            </div>
-
-            <div class="section-subtitle">
-              一般上市股票 TOP 5
-            </div>
-
-          </div>
-
-        </div>
-
-        <div
-          id="gainersList"
-          class="ranking-list"
-        ></div>
-
-      </article>
-
-      <article class="card ranking-card">
-
-        <div class="section-header">
-
-          <div>
-
-            <div class="section-title">
-              跌幅排行
-            </div>
-
-            <div class="section-subtitle">
-              一般上市股票 TOP 5
-            </div>
-
-          </div>
-
-        </div>
-
-        <div
-          id="losersList"
-          class="ranking-list"
-        ></div>
-
-      </article>
-
-      <article class="card ranking-card">
-
-        <div class="section-header">
-
-          <div>
-
-            <div class="section-title">
-              成交額排行
-            </div>
-
-            <div class="section-subtitle">
-              資金集中 TOP 5
-            </div>
-
-          </div>
-
-        </div>
-
-        <div
-          id="turnoverList"
-          class="ranking-list"
-        ></div>
-
-      </article>
-
-    </section>
-
-    <!-- Scanner -->
-    <section class="card scanner">
-
-      <div class="scanner-toolbar">
-
-        <div>
-
-          <div class="section-title">
-            全市場 Scanner
-          </div>
-
-          <div class="section-subtitle">
-            搜尋股票或點擊欄位排序
-          </div>
-
-        </div>
-
-        <div class="toolbar-right">
-
-          <div class="filter-group">
-
-            <button
-              class="filter-btn active"
-              data-filter="all"
-            >
-              全部
-            </button>
-
-            <button
-              class="filter-btn"
-              data-filter="stock"
-            >
-              股票
-            </button>
-
-            <button
-              class="filter-btn"
-              data-filter="etf"
-            >
-              ETF
-            </button>
-
-          </div>
-
-          <div class="search-box">
-
-            <span class="search-icon">
-              ⌕
-            </span>
-
-            <input
-              id="searchInput"
-              type="search"
-              autocomplete="off"
-              placeholder="搜尋 2330 / 台積電..."
-            />
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="table-wrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th data-sort="code">
-                代號
-              </th>
-
-              <th data-sort="name">
-                名稱
-              </th>
-
-              <th data-sort="open">
-                開盤
-              </th>
-
-              <th data-sort="high">
-                最高
-              </th>
-
-              <th data-sort="low">
-                最低
-              </th>
-
-              <th data-sort="close">
-                收盤
-              </th>
-
-              <th data-sort="change">
-                漲跌
-              </th>
-
-              <th data-sort="changePercent">
-                漲跌幅
-              </th>
-
-              <th data-sort="volume">
-                成交量
-              </th>
-
-              <th data-sort="tradeValue">
-                成交額
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody
-            id="stockTableBody"
-          ></tbody>
-
-        </table>
-
-      </div>
-
-      <div class="scanner-footer">
-
-        <span id="stockCount">
-          0 檔標的
-        </span>
-
-        <span>
-          資料來源：臺灣證券交易所 OpenAPI
-        </span>
-
-      </div>
-
-    </section>
-
-  </main>
 
   <script>
 
-    /* ========================================
-       LOCAL DATA ONLY
-    ======================================== */
+    /*
+      證交所 OpenAPI
 
-    const DATA_URL = "./stocks.json";
+      上市股票每日成交資訊
+    */
 
-
-    /* ========================================
-       STATE
-    ======================================== */
-
-    const state = {
-
-      raw: null,
-
-      stocks: [],
-
-      indexData: [],
-
-      indexOHLC: [],
-
-      marketData: [],
-
-      filter: "all",
-
-      keyword: "",
-
-      sortKey: "tradeValue",
-
-      sortDirection: -1
-
-    };
+    const API_URL =
+      "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL";
 
 
-    /* ========================================
-       BASIC UTILS
-    ======================================== */
+    let stockData = [];
 
-    function parseNumber(value) {
+
+    const statusElement =
+      document.getElementById("status");
+
+
+    const tableBody =
+      document.getElementById("stockTableBody");
+
+
+    const loadBtn =
+      document.getElementById("loadBtn");
+
+
+    const sortVolumeBtn =
+      document.getElementById("sortVolumeBtn");
+
+
+
+    /*
+      字串數字轉換
+
+      例如：
+
+      "12,345"
+
+      →
+
+      12345
+    */
+
+    function toNumber(value) {
 
       if (
         value === undefined ||
         value === null ||
-        value === "" ||
-        value === "--" ||
-        value === "---"
+        value === ""
       ) {
-        return NaN;
+        return 0;
       }
 
       const cleaned =
         String(value)
-          .replaceAll(",", "")
-          .replaceAll("+", "")
+          .replace(/,/g, "")
+          .replace(/[+]/g, "")
           .trim();
 
       const number =
@@ -1887,2150 +263,330 @@
 
       return Number.isFinite(number)
         ? number
-        : NaN;
+        : 0;
+
     }
 
 
-    function formatNumber(
-      value,
-      digits = 2
-    ) {
 
-      if (!Number.isFinite(value)) {
-        return "--";
-      }
+    /*
+      格式化整數
+    */
 
-      return value.toLocaleString(
-        "zh-TW",
-        {
-          minimumFractionDigits: digits,
-          maximumFractionDigits: digits
-        }
-      );
-    }
+    function formatNumber(value) {
 
-
-    function formatInteger(value) {
-
-      if (!Number.isFinite(value)) {
-        return "--";
-      }
-
-      return Math.round(value)
+      return Number(value || 0)
         .toLocaleString("zh-TW");
+
     }
 
 
-    function formatMoney(value) {
 
-      if (!Number.isFinite(value)) {
-        return "--";
+    /*
+      計算振幅
+
+      (最高 - 最低)
+      ÷
+      開盤價
+      × 100
+
+      第一版暫時使用開盤價。
+
+      之後如果加入「昨日收盤價」，
+      可以再改成正式策略公式。
+    */
+
+    function calculateAmplitude(stock) {
+
+      const high =
+        toNumber(stock.HighestPrice);
+
+      const low =
+        toNumber(stock.LowestPrice);
+
+      const open =
+        toNumber(stock.OpeningPrice);
+
+
+      if (
+        high <= 0 ||
+        low <= 0 ||
+        open <= 0
+      ) {
+        return 0;
       }
 
-      if (value >= 1_000_000_000_000) {
 
-        return (
-          value /
-          1_000_000_000_000
-        ).toFixed(2) + " 兆";
-      }
+      return (
+        (high - low)
+        /
+        open
+        *
+        100
+      );
 
-      if (value >= 100_000_000) {
-
-        return (
-          value /
-          100_000_000
-        ).toFixed(0) + " 億";
-      }
-
-      if (value >= 10_000) {
-
-        return (
-          value /
-          10_000
-        ).toFixed(0) + " 萬";
-      }
-
-      return formatInteger(value);
     }
 
 
-    function formatVolume(value) {
 
-      if (!Number.isFinite(value)) {
-        return "--";
-      }
+    /*
+      判斷漲跌顏色
+    */
 
-      const lots =
-        value / 1000;
+    function getChangeClass(value) {
 
-      if (lots >= 10_000) {
-
-        return (
-          lots /
-          10_000
-        ).toFixed(1) + " 萬張";
-      }
-
-      return lots
-        .toLocaleString(
-          "zh-TW",
-          {
-            maximumFractionDigits: 0
-          }
-        ) + " 張";
-    }
+      const change =
+        toNumber(value);
 
 
-    function percentClass(value) {
-
-      if (value > 0) {
+      if (change > 0) {
         return "up";
       }
 
-      if (value < 0) {
+
+      if (change < 0) {
         return "down";
       }
 
-      return "flat";
+
+      return "neutral";
+
     }
 
 
-    function sign(value) {
 
-      return value > 0
-        ? "+"
-        : "";
-    }
+    /*
+      繪製表格
+    */
 
+    function renderTable(data) {
 
-    function getValue(
-      object,
-      keys
-    ) {
+      tableBody.innerHTML = "";
 
-      if (!object) {
-        return undefined;
-      }
 
-      for (const key of keys) {
+      data.forEach(stock => {
 
-        const value =
-          object[key];
+        const row =
+          document.createElement("tr");
 
-        if (
-          value !== undefined &&
-          value !== null &&
-          value !== ""
-        ) {
-          return value;
-        }
-      }
 
-      return undefined;
-    }
-
-
-    function escapeHtml(value) {
-
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+        const amplitude =
+          calculateAmplitude(stock);
 
-
-    /* ========================================
-       DATE
-    ======================================== */
 
-    function normalizeDate(value) {
+        row.innerHTML = `
 
-      if (!value) {
-        return "";
-      }
+          <td>
+            ${stock.Code || ""}
+          </td>
 
-      const raw =
-        String(value)
-          .replaceAll("/", "")
-          .replaceAll("-", "")
-          .trim();
-
-      /*
-        民國日期：
-        1150807
-      */
-
-      if (/^\d{7}$/.test(raw)) {
-
-        const rocYear =
-          Number(
-            raw.slice(0, 3)
-          );
-
-        const year =
-          rocYear + 1911;
+          <td>
+            ${stock.Name || ""}
+          </td>
 
-        const month =
-          raw.slice(3, 5);
-
-        const day =
-          raw.slice(5, 7);
+          <td>
+            ${formatNumber(
+              toNumber(stock.TradeVolume)
+            )}
+          </td>
 
-        return `${year}/${month}/${day}`;
-      }
-
-      /*
-        西元日期：
-        20260807
-      */
+          <td>
+            ${formatNumber(
+              toNumber(stock.Transaction)
+            )}
+          </td>
 
-      if (/^\d{8}$/.test(raw)) {
+          <td>
+            ${formatNumber(
+              toNumber(stock.TradeValue)
+            )}
+          </td>
 
-        return (
-          raw.slice(0, 4) +
-          "/" +
-          raw.slice(4, 6) +
-          "/" +
-          raw.slice(6, 8)
-        );
-      }
-
-      return String(value);
-    }
-
-
-    function formatGeneratedAt(value) {
-
-      if (!value) {
-        return "尚未更新";
-      }
-
-      const date =
-        new Date(value);
-
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return value;
-      }
-
-      return (
-        "資料更新：" +
-        date.toLocaleString(
-          "zh-TW",
-          {
-            timeZone: "Asia/Taipei",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false
-          }
-        )
-      );
-    }
-
-
-    /* ========================================
-       SECURITY TYPE
-    ======================================== */
-
-    function securityType(code) {
-
-      const value =
-        String(code || "");
-
-      /*
-        00 開頭：
-        ETF / ETN 為主
-      */
-
-      if (
-        value.startsWith("00")
-      ) {
-        return "etf";
-      }
-
-      /*
-        普通四碼上市股票
-      */
-
-      if (
-        /^[1-9]\d{3}$/.test(
-          value
-        )
-      ) {
-        return "stock";
-      }
-
-      return "other";
-    }
-
-
-    /* ========================================
-       PARSE STOCKS
-    ======================================== */
-
-    function parseStocks(rows) {
-
-      if (!Array.isArray(rows)) {
-        return [];
-      }
-
-      return rows.map(row => {
-
-        const close =
-          parseNumber(
-            getValue(
-              row,
-              [
-                "ClosingPrice",
-                "收盤價"
-              ]
-            )
-          );
-
-        let change =
-          parseNumber(
-            getValue(
-              row,
-              [
-                "Change",
-                "漲跌價差",
-                "漲跌"
-              ]
-            )
-          );
-
-        const direction =
-          getValue(
-            row,
-            [
-              "Direction",
-              "漲跌符號"
-            ]
-          );
-
-        if (
-          direction === "-" &&
-          change > 0
-        ) {
-          change *= -1;
-        }
-
-        const previousClose =
-          (
-            Number.isFinite(close) &&
-            Number.isFinite(change)
-          )
-            ? close - change
-            : NaN;
-
-        const changePercent =
-          (
-            Number.isFinite(change) &&
-            Number.isFinite(previousClose) &&
-            previousClose !== 0
-          )
-            ? (
-                change /
-                previousClose
-              ) * 100
-            : 0;
-
-        const code =
-          String(
-            getValue(
-              row,
-              [
-                "Code",
-                "證券代號",
-                "股票代號"
-              ]
-            ) || ""
-          );
-
-        return {
-
-          date:
-            normalizeDate(
-              getValue(
-                row,
-                [
-                  "Date",
-                  "日期"
-                ]
-              )
-            ),
-
-          code,
-
-          name:
-            String(
-              getValue(
-                row,
-                [
-                  "Name",
-                  "證券名稱",
-                  "股票名稱"
-                ]
-              ) || ""
-            ),
-
-          open:
-            parseNumber(
-              getValue(
-                row,
-                [
-                  "OpeningPrice",
-                  "開盤價"
-                ]
-              )
-            ),
-
-          high:
-            parseNumber(
-              getValue(
-                row,
-                [
-                  "HighestPrice",
-                  "最高價"
-                ]
-              )
-            ),
-
-          low:
-            parseNumber(
-              getValue(
-                row,
-                [
-                  "LowestPrice",
-                  "最低價"
-                ]
-              )
-            ),
-
-          close,
-
-          change,
-
-          changePercent,
-
-          volume:
-            parseNumber(
-              getValue(
-                row,
-                [
-                  "TradeVolume",
-                  "成交股數"
-                ]
-              )
-            ),
-
-          tradeValue:
-            parseNumber(
-              getValue(
-                row,
-                [
-                  "TradeValue",
-                  "成交金額"
-                ]
-              )
-            ),
-
-          transaction:
-            parseNumber(
-              getValue(
-                row,
-                [
-                  "Transaction",
-                  "成交筆數"
-                ]
-              )
-            ),
-
-          type:
-            securityType(code)
-        };
+          <td>
+            ${stock.OpeningPrice || "-"}
+          </td>
+
+          <td>
+            ${stock.HighestPrice || "-"}
+          </td>
+
+          <td>
+            ${stock.LowestPrice || "-"}
+          </td>
+
+          <td>
+            ${stock.ClosingPrice || "-"}
+          </td>
+
+          <td
+            class="
+              ${getChangeClass(
+                stock.Change
+              )}
+            "
+          >
+            ${stock.Change || "0"}
+          </td>
+
+          <td>
+            ${amplitude.toFixed(2)}%
+          </td>
+
+        `;
+
+
+        tableBody.appendChild(row);
 
       });
+
+
+      statusElement.textContent =
+        `共載入 ${data.length} 檔上市股票`;
+
     }
 
 
-    /* ========================================
-       LATEST DATE
-    ======================================== */
 
-    function getLatestTradeDate() {
+    /*
+      讀取證交所 API
+    */
 
-      if (state.raw?.tradeDate) {
+    async function loadStocks() {
 
-        return normalizeDate(
-          state.raw.tradeDate
-        );
-      }
+      statusElement.textContent =
+        "讀取證交所資料中...";
 
-      const stock =
-        state.stocks.find(
-          item => item.date
-        );
 
-      if (stock) {
-        return stock.date;
-      }
-
-      const taiex =
-        state.indexData.find(
-          item =>
-            item["指數"] ===
-            "發行量加權股價指數"
-        );
-
-      if (taiex) {
-
-        return normalizeDate(
-          taiex["日期"]
-        );
-      }
-
-      return "";
-    }
-
-
-    /* ========================================
-       TAIEX
-    ======================================== */
-
-    function getTaiex() {
-
-      const row =
-        state.indexData.find(
-          row => {
-
-            const name =
-              getValue(
-                row,
-                [
-                  "指數",
-                  "Index",
-                  "Name"
-                ]
-              );
-
-            return (
-              name ===
-              "發行量加權股價指數"
-            );
-          }
-        );
-
-      /*
-        如果 MI_INDEX 沒資料，
-        用 FMTQIK fallback
-      */
-
-      if (!row) {
-
-        const market =
-          getMarketData();
-
-        if (!market) {
-          return null;
-        }
-
-        return {
-
-          close:
-            market.taiex,
-
-          change:
-            market.change,
-
-          changePercent:
-            NaN
-        };
-      }
-
-      let change =
-        parseNumber(
-          getValue(
-            row,
-            [
-              "漲跌點數",
-              "Change"
-            ]
-          )
-        );
-
-      let percent =
-        parseNumber(
-          getValue(
-            row,
-            [
-              "漲跌百分比",
-              "ChangePercent"
-            ]
-          )
-        );
-
-      const direction =
-        getValue(
-          row,
-          [
-            "漲跌",
-            "Direction"
-          ]
-        );
-
-      if (
-        direction === "-" &&
-        change > 0
-      ) {
-        change *= -1;
-      }
-
-      if (
-        direction === "-" &&
-        percent > 0
-      ) {
-        percent *= -1;
-      }
-
-      return {
-
-        close:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "收盤指數",
-                "ClosingIndex",
-                "TAIEX"
-              ]
-            )
-          ),
-
-        change,
-
-        changePercent:
-          percent
-      };
-    }
-
-
-    /* ========================================
-       MARKET DATA
-    ======================================== */
-
-    function getMarketData() {
-
-      if (
-        !Array.isArray(
-          state.marketData
-        ) ||
-        state.marketData.length === 0
-      ) {
-        return null;
-      }
-
-      const latestDate =
-        getLatestTradeDate();
-
-      let row =
-        state.marketData.find(
-          item => {
-
-            return (
-              normalizeDate(
-                getValue(
-                  item,
-                  [
-                    "Date",
-                    "日期"
-                  ]
-                )
-              ) ===
-              latestDate
-            );
-          }
-        );
-
-      if (!row) {
-
-        row =
-          state.marketData[
-            state.marketData.length - 1
-          ];
-      }
-
-      return {
-
-        volume:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "TradeVolume",
-                "成交股數"
-              ]
-            )
-          ),
-
-        value:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "TradeValue",
-                "成交金額"
-              ]
-            )
-          ),
-
-        transaction:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "Transaction",
-                "成交筆數"
-              ]
-            )
-          ),
-
-        taiex:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "TAIEX",
-                "發行量加權股價指數"
-              ]
-            )
-          ),
-
-        change:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "Change",
-                "漲跌點數"
-              ]
-            )
-          )
-      };
-    }
-
-
-    /* ========================================
-       INDEX OHLC
-    ======================================== */
-
-    function getIndexOHLC() {
-
-      if (
-        !Array.isArray(
-          state.indexOHLC
-        ) ||
-        state.indexOHLC.length === 0
-      ) {
-        return null;
-      }
-
-      const latestDate =
-        getLatestTradeDate();
-
-      let row =
-        state.indexOHLC.find(
-          item => {
-
-            return (
-              normalizeDate(
-                getValue(
-                  item,
-                  [
-                    "日期",
-                    "Date"
-                  ]
-                )
-              ) ===
-              latestDate
-            );
-          }
-        );
-
-      if (!row) {
-
-        row =
-          state.indexOHLC[
-            state.indexOHLC.length - 1
-          ];
-      }
-
-      return {
-
-        open:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "開盤指數",
-                "OpeningIndex",
-                "Open"
-              ]
-            )
-          ),
-
-        high:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "最高指數",
-                "HighestIndex",
-                "High"
-              ]
-            )
-          ),
-
-        low:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "最低指數",
-                "LowestIndex",
-                "Low"
-              ]
-            )
-          ),
-
-        close:
-          parseNumber(
-            getValue(
-              row,
-              [
-                "收盤指數",
-                "ClosingIndex",
-                "Close"
-              ]
-            )
-          )
-      };
-    }
-
-
-    /* ========================================
-       BREADTH
-    ======================================== */
-
-    function calculateBreadth() {
-
-      const commonStocks =
-        state.stocks.filter(
-          stock =>
-            stock.type === "stock" &&
-            Number.isFinite(
-              stock.close
-            )
-        );
-
-      let up = 0;
-      let down = 0;
-      let flat = 0;
-
-      commonStocks.forEach(
-        stock => {
-
-          if (stock.change > 0) {
-
-            up++;
-
-          } else if (
-            stock.change < 0
-          ) {
-
-            down++;
-
-          } else {
-
-            flat++;
-          }
-        }
+      statusElement.classList.remove(
+        "error"
       );
 
-      return {
-
-        up,
-
-        down,
-
-        flat,
-
-        total:
-          up + down + flat
-      };
-    }
-
-
-    /* ========================================
-       MARKET RENDER
-    ======================================== */
-
-    function renderMarket() {
-
-      const tradeDate =
-        getLatestTradeDate();
-
-      const taiex =
-        getTaiex();
-
-      const market =
-        getMarketData();
-
-      const ohlc =
-        getIndexOHLC();
-
-      const breadth =
-        calculateBreadth();
-
-
-      document.getElementById(
-        "tradeDate"
-      ).textContent =
-        tradeDate || "--";
-
-
-      document.getElementById(
-        "updateTime"
-      ).textContent =
-        formatGeneratedAt(
-          state.raw?.generatedAt
-        );
-
-
-      /* TAIEX */
-
-      if (taiex) {
-
-        document.getElementById(
-          "taiexClose"
-        ).textContent =
-          formatNumber(
-            taiex.close,
-            2
-          );
-
-        const changeEl =
-          document.getElementById(
-            "taiexChange"
-          );
-
-        changeEl.textContent =
-          sign(
-            taiex.change
-          ) +
-          formatNumber(
-            taiex.change,
-            2
-          );
-
-        changeEl.className =
-          "metric-value " +
-          percentClass(
-            taiex.change
-          );
-
-
-        const percentEl =
-          document.getElementById(
-            "taiexPercent"
-          );
-
-        if (
-          Number.isFinite(
-            taiex.changePercent
-          )
-        ) {
-
-          percentEl.textContent =
-            sign(
-              taiex.changePercent
-            ) +
-            formatNumber(
-              taiex.changePercent,
-              2
-            ) +
-            "%";
-
-        } else {
-
-          percentEl.textContent =
-            "--";
-        }
-
-        percentEl.className =
-          "metric-bottom " +
-          percentClass(
-            taiex.changePercent
-          );
-      }
-
-
-      /* MARKET */
-
-      if (market) {
-
-        document.getElementById(
-          "marketValue"
-        ).textContent =
-          formatMoney(
-            market.value
-          );
-
-        document.getElementById(
-          "transactionCount"
-        ).textContent =
-          formatInteger(
-            market.transaction
-          );
-      }
-
-
-      /* BREADTH */
-
-      const ratio =
-        breadth.down > 0
-          ? breadth.up /
-            breadth.down
-          : breadth.up;
-
-      document.getElementById(
-        "breadthRatio"
-      ).textContent =
-        formatNumber(
-          ratio,
-          2
-        );
-
-      document.getElementById(
-        "breadthText"
-      ).textContent =
-        `${breadth.up} 上漲 / ${breadth.down} 下跌`;
-
-
-      /* OHLC */
-
-      if (ohlc) {
-
-        document.getElementById(
-          "indexOpen"
-        ).textContent =
-          formatNumber(
-            ohlc.open
-          );
-
-        document.getElementById(
-          "indexHigh"
-        ).textContent =
-          formatNumber(
-            ohlc.high
-          );
-
-        document.getElementById(
-          "indexLow"
-        ).textContent =
-          formatNumber(
-            ohlc.low
-          );
-
-        document.getElementById(
-          "indexClose"
-        ).textContent =
-          formatNumber(
-            ohlc.close
-          );
-
-
-        const range =
-          (
-            Number.isFinite(
-              ohlc.high
-            ) &&
-            Number.isFinite(
-              ohlc.low
-            ) &&
-            ohlc.low !== 0
-          )
-            ? (
-                (
-                  ohlc.high -
-                  ohlc.low
-                ) /
-                ohlc.low
-              ) * 100
-            : NaN;
-
-
-        document.getElementById(
-          "indexRange"
-        ).textContent =
-          Number.isFinite(range)
-            ? range.toFixed(2) + "%"
-            : "--";
-
-
-        const closePosition =
-          (
-            Number.isFinite(
-              ohlc.high
-            ) &&
-            Number.isFinite(
-              ohlc.low
-            ) &&
-            Number.isFinite(
-              ohlc.close
-            ) &&
-            ohlc.high !==
-              ohlc.low
-          )
-            ? (
-                (
-                  ohlc.close -
-                  ohlc.low
-                ) /
-                (
-                  ohlc.high -
-                  ohlc.low
-                )
-              ) * 100
-            : NaN;
-
-
-        document.getElementById(
-          "closePosition"
-        ).textContent =
-          Number.isFinite(
-            closePosition
-          )
-            ? closePosition
-                .toFixed(0) +
-              "%"
-            : "--";
-      }
-
-      renderBreadth(
-        breadth
-      );
-    }
-
-
-    /* ========================================
-       BREADTH RENDER
-    ======================================== */
-
-    function renderBreadth(data) {
-
-      const total =
-        data.total || 1;
-
-      const upPercent =
-        data.up /
-        total *
-        100;
-
-      const downPercent =
-        data.down /
-        total *
-        100;
-
-      const flatPercent =
-        data.flat /
-        total *
-        100;
-
-
-      document.getElementById(
-        "upCount"
-      ).textContent =
-        data.up;
-
-
-      document.getElementById(
-        "downCount"
-      ).textContent =
-        data.down;
-
-
-      document.getElementById(
-        "flatCount"
-      ).textContent =
-        data.flat;
-
-
-      document.getElementById(
-        "upBar"
-      ).style.width =
-        upPercent + "%";
-
-
-      document.getElementById(
-        "downBar"
-      ).style.width =
-        downPercent + "%";
-
-
-      document.getElementById(
-        "flatBar"
-      ).style.width =
-        flatPercent + "%";
-
-
-      document.getElementById(
-        "upPercent"
-      ).textContent =
-        upPercent.toFixed(
-          1
-        ) + "%";
-
-
-      document.getElementById(
-        "downPercent"
-      ).textContent =
-        downPercent.toFixed(
-          1
-        ) + "%";
-
-
-      document.getElementById(
-        "breadthTotal"
-      ).textContent =
-        data.total;
-    }
-
-
-    /* ========================================
-       SECTOR
-    ======================================== */
-
-    function getSectorData() {
-
-      return state.indexData
-        .map(row => {
-
-          const name =
-            String(
-              getValue(
-                row,
-                [
-                  "指數",
-                  "Index",
-                  "Name"
-                ]
-              ) || ""
-            );
-
-          let percent =
-            parseNumber(
-              getValue(
-                row,
-                [
-                  "漲跌百分比",
-                  "ChangePercent"
-                ]
-              )
-            );
-
-          const direction =
-            getValue(
-              row,
-              [
-                "漲跌",
-                "Direction"
-              ]
-            );
-
-          if (
-            direction === "-" &&
-            percent > 0
-          ) {
-            percent *= -1;
-          }
-
-          return {
-            name,
-            percent
-          };
-        })
-        .filter(
-          item =>
-            item.name.endsWith(
-              "類指數"
-            ) &&
-            Number.isFinite(
-              item.percent
-            )
-        );
-    }
-
-
-    function renderSectors() {
-
-      const sectors =
-        getSectorData()
-          .sort(
-            (a, b) =>
-              b.percent -
-              a.percent
-          );
-
-      const strongest =
-        sectors.slice(
-          0,
-          3
-        );
-
-      const weakest =
-        sectors.slice(
-          -3
-        );
-
-      const display =
-        [
-          ...strongest,
-          ...weakest
-        ];
-
-      const container =
-        document.getElementById(
-          "sectorGrid"
-        );
-
-      if (
-        display.length === 0
-      ) {
-
-        container.innerHTML =
-          `
-            <div class="sector-item">
-              <div class="sector-name">
-                尚無產業資料
-              </div>
-            </div>
-          `;
-
-        return;
-      }
-
-      container.innerHTML =
-        display.map(
-          item => {
-
-            const name =
-              item.name.replace(
-                "類指數",
-                ""
-              );
-
-            return `
-              <div class="sector-item">
-
-                <div class="sector-name">
-                  ${escapeHtml(name)}
-                </div>
-
-                <div
-                  class="
-                    sector-value
-                    ${percentClass(
-                      item.percent
-                    )}
-                  "
-                >
-                  ${
-                    sign(
-                      item.percent
-                    )
-                  }${
-                    item.percent.toFixed(
-                      2
-                    )
-                  }%
-                </div>
-
-              </div>
-            `;
-          }
-        ).join("");
-    }
-
-
-    /* ========================================
-       RANKINGS
-    ======================================== */
-
-    function renderRankings() {
-
-      const common =
-        state.stocks.filter(
-          stock =>
-            stock.type === "stock" &&
-            Number.isFinite(
-              stock.close
-            )
-        );
-
-      const gainers =
-        [...common]
-          .filter(
-            stock =>
-              Number.isFinite(
-                stock.changePercent
-              )
-          )
-          .sort(
-            (a, b) =>
-              b.changePercent -
-              a.changePercent
-          )
-          .slice(
-            0,
-            5
-          );
-
-      const losers =
-        [...common]
-          .filter(
-            stock =>
-              Number.isFinite(
-                stock.changePercent
-              )
-          )
-          .sort(
-            (a, b) =>
-              a.changePercent -
-              b.changePercent
-          )
-          .slice(
-            0,
-            5
-          );
-
-      const turnover =
-        [...common]
-          .filter(
-            stock =>
-              Number.isFinite(
-                stock.tradeValue
-              )
-          )
-          .sort(
-            (a, b) =>
-              b.tradeValue -
-              a.tradeValue
-          )
-          .slice(
-            0,
-            5
-          );
-
-
-      renderRankingList(
-        "gainersList",
-        gainers,
-        stock =>
-          `${
-            sign(
-              stock.changePercent
-            )
-          }${
-            stock.changePercent.toFixed(
-              2
-            )
-          }%`,
-        true
-      );
-
-
-      renderRankingList(
-        "losersList",
-        losers,
-        stock =>
-          `${
-            stock.changePercent.toFixed(
-              2
-            )
-          }%`,
-        true
-      );
-
-
-      renderRankingList(
-        "turnoverList",
-        turnover,
-        stock =>
-          formatMoney(
-            stock.tradeValue
-          ),
-        false
-      );
-    }
-
-
-    function renderRankingList(
-      id,
-      stocks,
-      formatter,
-      useColor
-    ) {
-
-      const container =
-        document.getElementById(
-          id
-        );
-
-      if (
-        stocks.length === 0
-      ) {
-
-        container.innerHTML =
-          `
-            <div
-              style="
-                color:var(--muted);
-                font-size:11px;
-                padding:12px 6px;
-              "
-            >
-              尚無資料
-            </div>
-          `;
-
-        return;
-      }
-
-      container.innerHTML =
-        stocks.map(
-          (stock, index) => {
-
-            const valueClass =
-              useColor
-                ? percentClass(
-                    stock.changePercent
-                  )
-                : "";
-
-            return `
-              <div class="ranking-item">
-
-                <div class="ranking-number">
-                  ${index + 1}
-                </div>
-
-                <div class="ranking-stock">
-
-                  <div class="ranking-name">
-                    ${escapeHtml(stock.name)}
-                  </div>
-
-                  <div class="ranking-code">
-                    ${escapeHtml(stock.code)}
-                  </div>
-
-                </div>
-
-                <div
-                  class="
-                    ranking-value
-                    ${valueClass}
-                  "
-                >
-                  ${formatter(stock)}
-                </div>
-
-              </div>
-            `;
-          }
-        ).join("");
-    }
-
-
-    /* ========================================
-       FILTER
-    ======================================== */
-
-    function getFilteredStocks() {
-
-      let data =
-        state.stocks.filter(
-          stock =>
-            Number.isFinite(
-              stock.close
-            )
-        );
-
-      if (
-        state.filter ===
-        "stock"
-      ) {
-
-        data =
-          data.filter(
-            stock =>
-              stock.type ===
-              "stock"
-          );
-      }
-
-      if (
-        state.filter ===
-        "etf"
-      ) {
-
-        data =
-          data.filter(
-            stock =>
-              stock.type ===
-              "etf"
-          );
-      }
-
-      const keyword =
-        state.keyword
-          .trim()
-          .toLowerCase();
-
-      if (keyword) {
-
-        data =
-          data.filter(
-            stock =>
-              stock.code
-                .toLowerCase()
-                .includes(keyword) ||
-
-              stock.name
-                .toLowerCase()
-                .includes(keyword)
-          );
-      }
-
-      const key =
-        state.sortKey;
-
-      const direction =
-        state.sortDirection;
-
-      data =
-        [...data].sort(
-          (a, b) => {
-
-            const av =
-              a[key];
-
-            const bv =
-              b[key];
-
-            if (
-              typeof av === "string" &&
-              typeof bv === "string"
-            ) {
-
-              return (
-                av.localeCompare(
-                  bv,
-                  "zh-Hant"
-                ) *
-                direction
-              );
-            }
-
-            const numberA =
-              Number.isFinite(av)
-                ? av
-                : -Infinity;
-
-            const numberB =
-              Number.isFinite(bv)
-                ? bv
-                : -Infinity;
-
-            return (
-              (
-                numberA -
-                numberB
-              ) *
-              direction
-            );
-          }
-        );
-
-      return data;
-    }
-
-
-    /* ========================================
-       TABLE
-    ======================================== */
-
-    function renderTable() {
-
-      const stocks =
-        getFilteredStocks();
-
-      const tbody =
-        document.getElementById(
-          "stockTableBody"
-        );
-
-      if (
-        stocks.length === 0
-      ) {
-
-        tbody.innerHTML =
-          `
-            <tr>
-
-              <td
-                colspan="10"
-                style="
-                  text-align:center;
-                  color:var(--muted);
-                  padding:40px;
-                "
-              >
-                沒有符合條件的標的
-              </td>
-
-            </tr>
-          `;
-
-      } else {
-
-        tbody.innerHTML =
-          stocks.map(
-            stock => {
-
-              let typeText =
-                "其他";
-
-              if (
-                stock.type ===
-                "stock"
-              ) {
-                typeText =
-                  "股票";
-              }
-
-              if (
-                stock.type ===
-                "etf"
-              ) {
-                typeText =
-                  "ETF";
-              }
-
-              return `
-                <tr>
-
-                  <td>
-                    <span class="stock-code">
-                      ${escapeHtml(stock.code)}
-                    </span>
-                  </td>
-
-                  <td>
-
-                    <span class="stock-name">
-                      ${escapeHtml(stock.name)}
-                    </span>
-
-                    <span class="stock-type">
-                      ${typeText}
-                    </span>
-
-                  </td>
-
-                  <td>
-                    ${formatNumber(
-                      stock.open
-                    )}
-                  </td>
-
-                  <td>
-                    ${formatNumber(
-                      stock.high
-                    )}
-                  </td>
-
-                  <td>
-                    ${formatNumber(
-                      stock.low
-                    )}
-                  </td>
-
-                  <td>
-                    <strong>
-                      ${formatNumber(
-                        stock.close
-                      )}
-                    </strong>
-                  </td>
-
-                  <td
-                    class="${percentClass(
-                      stock.change
-                    )}"
-                  >
-                    ${
-                      sign(
-                        stock.change
-                      )
-                    }${
-                      formatNumber(
-                        stock.change
-                      )
-                    }
-                  </td>
-
-                  <td
-                    class="${percentClass(
-                      stock.changePercent
-                    )}"
-                  >
-                    ${
-                      sign(
-                        stock.changePercent
-                      )
-                    }${
-                      stock.changePercent.toFixed(
-                        2
-                      )
-                    }%
-                  </td>
-
-                  <td>
-                    ${formatVolume(
-                      stock.volume
-                    )}
-                  </td>
-
-                  <td>
-                    ${formatMoney(
-                      stock.tradeValue
-                    )}
-                  </td>
-
-                </tr>
-              `;
-            }
-          ).join("");
-      }
-
-      document.getElementById(
-        "stockCount"
-      ).textContent =
-        `${stocks.length.toLocaleString(
-          "zh-TW"
-        )} 檔標的`;
-    }
-
-
-    /* ========================================
-       UI STATE
-    ======================================== */
-
-    function showError(message) {
-
-      const element =
-        document.getElementById(
-          "errorBanner"
-        );
-
-      element.textContent =
-        message;
-
-      element.classList.add(
-        "show"
-      );
-    }
-
-
-    function clearError() {
-
-      document.getElementById(
-        "errorBanner"
-      ).classList.remove(
-        "show"
-      );
-    }
-
-
-    function setLoading(value) {
-
-      const cover =
-        document.getElementById(
-          "loadingCover"
-        );
-
-      const button =
-        document.getElementById(
-          "refreshBtn"
-        );
-
-      button.disabled =
-        value;
-
-      if (value) {
-
-        cover.classList.remove(
-          "hidden"
-        );
-
-      } else {
-
-        cover.classList.add(
-          "hidden"
-        );
-      }
-    }
-
-
-    /* ========================================
-       LOAD LOCAL JSON
-    ======================================== */
-
-    async function loadDashboard() {
-
-      setLoading(true);
-
-      clearError();
 
       try {
 
-        /*
-          Cache busting：
-          避免 GitHub Pages / Browser
-          留著舊 stocks.json
-        */
-
-        const url =
-          DATA_URL +
-          "?t=" +
-          Date.now();
-
         const response =
-          await fetch(
-            url,
-            {
-              cache: "no-store"
-            }
-          );
+          await fetch(API_URL);
+
 
         if (!response.ok) {
 
           throw new Error(
             `HTTP ${response.status}`
           );
+
         }
+
 
         const data =
           await response.json();
 
-        if (
-          !data ||
-          typeof data !==
-            "object"
-        ) {
-
-          throw new Error(
-            "stocks.json 格式錯誤"
-          );
-        }
-
-        state.raw =
-          data;
-
-        state.stocks =
-          parseStocks(
-            data.stocks || []
-          );
-
-        state.indexData =
-          Array.isArray(
-            data.index
-          )
-            ? data.index
-            : [];
-
-        state.indexOHLC =
-          Array.isArray(
-            data.indexOHLC
-          )
-            ? data.indexOHLC
-            : [];
-
-        state.marketData =
-          Array.isArray(
-            data.market
-          )
-            ? data.market
-            : [];
-
 
         /*
-          初始化 stocks.json
-          還沒跑 Action
+          基本清理
+
+          排除：
+
+          沒有代號
+          沒有價格
+          ETF / 特殊商品後續再處理
         */
 
-        if (
-          state.stocks.length === 0
-        ) {
+        stockData =
+          data.filter(stock => {
 
-          showError(
-            "stocks.json 尚未取得證交所資料。請先讓 GitHub Actions 執行 update-stock-data.yml；第一次部署後通常只需要執行一次即可。"
-          );
-        }
+            const code =
+              stock.Code || "";
 
 
-        renderMarket();
+            const close =
+              toNumber(
+                stock.ClosingPrice
+              );
 
-        renderSectors();
 
-        renderRankings();
+            return (
+              code &&
+              close > 0
+            );
 
-        renderTable();
+          });
+
+
+        renderTable(
+          stockData
+        );
+
 
       } catch (error) {
 
         console.error(error);
 
-        showError(
-          "讀取 stocks.json 失敗。請確認 index.html 與 stocks.json 位於同一層，且 GitHub Actions 已成功產生資料。"
+
+        statusElement.textContent =
+          "API 讀取失敗：" +
+          error.message;
+
+
+        statusElement.classList.add(
+          "error"
         );
 
-      } finally {
-
-        setLoading(false);
       }
+
     }
 
 
-    /* ========================================
-       EVENTS
-    ======================================== */
 
-    document.getElementById(
-      "refreshBtn"
-    ).addEventListener(
+    /*
+      成交量排序
+    */
+
+    function sortByVolume() {
+
+      const sorted =
+        [...stockData]
+          .sort(
+            (a, b) =>
+              toNumber(
+                b.TradeVolume
+              )
+              -
+              toNumber(
+                a.TradeVolume
+              )
+          );
+
+
+      renderTable(
+        sorted
+      );
+
+    }
+
+
+
+    /*
+      Events
+    */
+
+    loadBtn.addEventListener(
       "click",
-      loadDashboard
+      loadStocks
     );
 
 
-    document.getElementById(
-      "searchInput"
-    ).addEventListener(
-      "input",
-      event => {
-
-        state.keyword =
-          event.target.value;
-
-        renderTable();
-      }
+    sortVolumeBtn.addEventListener(
+      "click",
+      sortByVolume
     );
 
 
-    document.querySelectorAll(
-      ".filter-btn"
-    ).forEach(
-      button => {
+    /*
+      網頁開啟後
+      自動讀取
+    */
 
-        button.addEventListener(
-          "click",
-          () => {
-
-            document.querySelectorAll(
-              ".filter-btn"
-            ).forEach(
-              item =>
-                item.classList.remove(
-                  "active"
-                )
-            );
-
-            button.classList.add(
-              "active"
-            );
-
-            state.filter =
-              button.dataset.filter;
-
-            renderTable();
-          }
-        );
-      }
-    );
-
-
-    document.querySelectorAll(
-      "th[data-sort]"
-    ).forEach(
-      header => {
-
-        header.addEventListener(
-          "click",
-          () => {
-
-            const key =
-              header.dataset.sort;
-
-            if (
-              state.sortKey ===
-              key
-            ) {
-
-              state.sortDirection *=
-                -1;
-
-            } else {
-
-              state.sortKey =
-                key;
-
-              /*
-                名稱 / 代號預設升冪，
-                數值預設降冪
-              */
-
-              state.sortDirection =
-                (
-                  key === "code" ||
-                  key === "name"
-                )
-                  ? 1
-                  : -1;
-            }
-
-            renderTable();
-          }
-        );
-      }
-    );
-
-
-    /* ========================================
-       START
-    ======================================== */
-
-    loadDashboard();
+    loadStocks();
 
   </script>
 
