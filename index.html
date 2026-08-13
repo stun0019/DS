@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>台股隔日當沖候選系統</title>
 
@@ -30,25 +34,25 @@
     }
 
     .subtitle {
-      margin-bottom: 24px;
       color: #666;
+      margin-bottom: 24px;
     }
 
     .toolbar {
       display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
       flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
     button {
-      border: 0;
-      padding: 10px 18px;
+      border: none;
       border-radius: 6px;
-      cursor: pointer;
-      font-size: 15px;
+      padding: 10px 18px;
       background: #222;
-      color: #fff;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
     }
 
     button:hover {
@@ -56,39 +60,41 @@
     }
 
     .status {
-      padding: 12px 16px;
-      background: #fff;
-      border-radius: 8px;
-      margin-bottom: 20px;
+      background: white;
       border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+
+    .error {
+      color: #d93025;
     }
 
     .table-wrap {
       overflow-x: auto;
-      background: #fff;
-      border-radius: 10px;
+      background: white;
       border: 1px solid #ddd;
+      border-radius: 10px;
     }
 
     table {
       width: 100%;
+      min-width: 1100px;
       border-collapse: collapse;
-      min-width: 1000px;
     }
 
     th,
     td {
       padding: 12px 10px;
-      text-align: right;
       border-bottom: 1px solid #eee;
+      text-align: right;
       white-space: nowrap;
     }
 
     th {
       background: #fafafa;
       font-weight: 600;
-      position: sticky;
-      top: 0;
     }
 
     th:first-child,
@@ -103,7 +109,7 @@
     }
 
     .up {
-      color: #d32f2f;
+      color: #d93025;
     }
 
     .down {
@@ -113,16 +119,12 @@
     .neutral {
       color: #666;
     }
-
-    .error {
-      color: #d32f2f;
-    }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+  <main class="container">
 
     <h1>台股隔日當沖候選系統</h1>
 
@@ -133,12 +135,20 @@
 
     <div class="toolbar">
 
-      <button id="loadBtn">
-        讀取證交所資料
+      <button id="reloadBtn">
+        重新讀取
       </button>
 
-      <button id="sortVolumeBtn">
+      <button id="volumeBtn">
         成交量排序
+      </button>
+
+      <button id="valueBtn">
+        成交金額排序
+      </button>
+
+      <button id="amplitudeBtn">
+        振幅排序
       </button>
 
     </div>
@@ -148,7 +158,7 @@
       id="status"
       class="status"
     >
-      尚未載入資料
+      資料載入中...
     </div>
 
 
@@ -159,94 +169,50 @@
         <thead>
 
           <tr>
-
             <th>代號</th>
-
             <th>名稱</th>
-
             <th>成交量</th>
-
             <th>成交筆數</th>
-
             <th>成交金額</th>
-
             <th>開盤</th>
-
             <th>最高</th>
-
             <th>最低</th>
-
             <th>收盤</th>
-
             <th>漲跌</th>
-
             <th>振幅</th>
-
           </tr>
 
         </thead>
 
 
         <tbody id="stockTableBody">
-
         </tbody>
 
       </table>
 
     </div>
 
-  </div>
+  </main>
 
 
   <script>
 
-    /*
-      證交所 OpenAPI
+    const DATA_URL = "./stocks.json";
 
-      上市股票每日成交資訊
-    */
+    let stocks = [];
 
-    const API_URL =
-      "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL";
-
-
-    let stockData = [];
-
-
-    const statusElement =
+    const statusEl =
       document.getElementById("status");
-
 
     const tableBody =
       document.getElementById("stockTableBody");
 
 
-    const loadBtn =
-      document.getElementById("loadBtn");
-
-
-    const sortVolumeBtn =
-      document.getElementById("sortVolumeBtn");
-
-
-
-    /*
-      字串數字轉換
-
-      例如：
-
-      "12,345"
-
-      →
-
-      12345
-    */
-
     function toNumber(value) {
 
       if (
-        value === undefined ||
         value === null ||
+        value === undefined ||
         value === ""
       ) {
         return 0;
@@ -255,7 +221,7 @@
       const cleaned =
         String(value)
           .replace(/,/g, "")
-          .replace(/[+]/g, "")
+          .replace(/\+/g, "")
           .trim();
 
       const number =
@@ -264,36 +230,59 @@
       return Number.isFinite(number)
         ? number
         : 0;
-
     }
 
-
-
-    /*
-      格式化整數
-    */
 
     function formatNumber(value) {
 
       return Number(value || 0)
         .toLocaleString("zh-TW");
-
     }
 
 
+    function formatPrice(value) {
+
+      const number =
+        toNumber(value);
+
+      if (number <= 0) {
+        return "-";
+      }
+
+      return number.toLocaleString(
+        "zh-TW",
+        {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        }
+      );
+    }
+
+
+    function getChangeClass(value) {
+
+      const change =
+        toNumber(value);
+
+      if (change > 0) {
+        return "up";
+      }
+
+      if (change < 0) {
+        return "down";
+      }
+
+      return "neutral";
+    }
+
 
     /*
-      計算振幅
+      暫時振幅公式：
 
-      (最高 - 最低)
-      ÷
-      開盤價
-      × 100
+      (最高 - 最低) / 開盤 × 100
 
-      第一版暫時使用開盤價。
-
-      之後如果加入「昨日收盤價」，
-      可以再改成正式策略公式。
+      後面建立正式選股 SOP 時
+      再改成我們最後決定的公式。
     */
 
     function calculateAmplitude(stock) {
@@ -307,7 +296,6 @@
       const open =
         toNumber(stock.OpeningPrice);
 
-
       if (
         high <= 0 ||
         low <= 0 ||
@@ -316,7 +304,6 @@
         return 0;
       }
 
-
       return (
         (high - low)
         /
@@ -324,57 +311,29 @@
         *
         100
       );
-
     }
 
-
-
-    /*
-      判斷漲跌顏色
-    */
-
-    function getChangeClass(value) {
-
-      const change =
-        toNumber(value);
-
-
-      if (change > 0) {
-        return "up";
-      }
-
-
-      if (change < 0) {
-        return "down";
-      }
-
-
-      return "neutral";
-
-    }
-
-
-
-    /*
-      繪製表格
-    */
 
     function renderTable(data) {
 
       tableBody.innerHTML = "";
 
+      const fragment =
+        document.createDocumentFragment();
+
 
       data.forEach(stock => {
 
-        const row =
+        const tr =
           document.createElement("tr");
-
 
         const amplitude =
           calculateAmplitude(stock);
 
+        const change =
+          toNumber(stock.Change);
 
-        row.innerHTML = `
+        tr.innerHTML = `
 
           <td>
             ${stock.Code || ""}
@@ -403,69 +362,66 @@
           </td>
 
           <td>
-            ${stock.OpeningPrice || "-"}
+            ${formatPrice(
+              stock.OpeningPrice
+            )}
           </td>
 
           <td>
-            ${stock.HighestPrice || "-"}
+            ${formatPrice(
+              stock.HighestPrice
+            )}
           </td>
 
           <td>
-            ${stock.LowestPrice || "-"}
+            ${formatPrice(
+              stock.LowestPrice
+            )}
           </td>
 
           <td>
-            ${stock.ClosingPrice || "-"}
+            ${formatPrice(
+              stock.ClosingPrice
+            )}
           </td>
 
           <td
-            class="
-              ${getChangeClass(
-                stock.Change
-              )}
-            "
+            class="${getChangeClass(change)}"
           >
-            ${stock.Change || "0"}
+            ${
+              change > 0
+                ? "+"
+                : ""
+            }${change}
           </td>
 
           <td>
             ${amplitude.toFixed(2)}%
           </td>
-
         `;
 
-
-        tableBody.appendChild(row);
-
+        fragment.appendChild(tr);
       });
 
 
-      statusElement.textContent =
-        `共載入 ${data.length} 檔上市股票`;
-
+      tableBody.appendChild(fragment);
     }
 
 
-
-    /*
-      讀取證交所 API
-    */
-
     async function loadStocks() {
 
-      statusElement.textContent =
-        "讀取證交所資料中...";
+      statusEl.classList.remove("error");
 
-
-      statusElement.classList.remove(
-        "error"
-      );
+      statusEl.textContent =
+        "讀取 stocks.json 中...";
 
 
       try {
 
         const response =
-          await fetch(API_URL);
+          await fetch(
+            `${DATA_URL}?t=${Date.now()}`
+          );
 
 
         if (!response.ok) {
@@ -473,118 +429,173 @@
           throw new Error(
             `HTTP ${response.status}`
           );
-
         }
 
 
-        const data =
+        const json =
           await response.json();
 
 
         /*
-          基本清理
+          支援兩種格式：
 
-          排除：
+          1.
+          {
+            "updatedAt": "...",
+            "data": [...]
+          }
 
-          沒有代號
-          沒有價格
-          ETF / 特殊商品後續再處理
+          2.
+          [...]
         */
 
-        stockData =
+        const data =
+          Array.isArray(json)
+            ? json
+            : json.data;
+
+
+        if (!Array.isArray(data)) {
+
+          throw new Error(
+            "stocks.json 格式錯誤"
+          );
+        }
+
+
+        stocks =
           data.filter(stock => {
 
             const code =
-              stock.Code || "";
-
+              String(
+                stock.Code || ""
+              ).trim();
 
             const close =
               toNumber(
                 stock.ClosingPrice
               );
 
-
             return (
-              code &&
+              code !== "" &&
               close > 0
             );
-
           });
 
 
-        renderTable(
-          stockData
-        );
+        renderTable(stocks);
+
+
+        const updatedAt =
+          Array.isArray(json)
+            ? ""
+            : (
+                json.updatedAt || ""
+              );
+
+
+        statusEl.textContent =
+          `共載入 ${stocks.length} 筆資料`
+          +
+          (
+            updatedAt
+              ? ` ｜ 更新：${updatedAt}`
+              : ""
+          );
 
 
       } catch (error) {
 
         console.error(error);
 
+        stocks = [];
 
-        statusElement.textContent =
-          "API 讀取失敗：" +
-          error.message;
+        tableBody.innerHTML = "";
 
+        statusEl.classList.add("error");
 
-        statusElement.classList.add(
-          "error"
-        );
-
+        statusEl.textContent =
+          `stocks.json 讀取失敗：${error.message}`;
       }
-
     }
 
-
-
-    /*
-      成交量排序
-    */
 
     function sortByVolume() {
 
-      const sorted =
-        [...stockData]
+      const result =
+        [...stocks]
           .sort(
             (a, b) =>
-              toNumber(
-                b.TradeVolume
-              )
+              toNumber(b.TradeVolume)
               -
-              toNumber(
-                a.TradeVolume
-              )
+              toNumber(a.TradeVolume)
           );
 
-
-      renderTable(
-        sorted
-      );
-
+      renderTable(result);
     }
 
 
+    function sortByValue() {
 
-    /*
-      Events
-    */
+      const result =
+        [...stocks]
+          .sort(
+            (a, b) =>
+              toNumber(b.TradeValue)
+              -
+              toNumber(a.TradeValue)
+          );
 
-    loadBtn.addEventListener(
-      "click",
-      loadStocks
-    );
-
-
-    sortVolumeBtn.addEventListener(
-      "click",
-      sortByVolume
-    );
+      renderTable(result);
+    }
 
 
-    /*
-      網頁開啟後
-      自動讀取
-    */
+    function sortByAmplitude() {
+
+      const result =
+        [...stocks]
+          .sort(
+            (a, b) =>
+              calculateAmplitude(b)
+              -
+              calculateAmplitude(a)
+          );
+
+      renderTable(result);
+    }
+
+
+    document
+      .getElementById("reloadBtn")
+      .addEventListener(
+        "click",
+        loadStocks
+      );
+
+
+    document
+      .getElementById("volumeBtn")
+      .addEventListener(
+        "click",
+        sortByVolume
+      );
+
+
+    document
+      .getElementById("valueBtn")
+      .addEventListener(
+        "click",
+        sortByValue
+      );
+
+
+    document
+      .getElementById("amplitudeBtn")
+      .addEventListener(
+        "click",
+        sortByAmplitude
+      );
+
 
     loadStocks();
 
