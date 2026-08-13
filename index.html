@@ -28,6 +28,7 @@
 
       --surface: #171a20;
       --surface-2: #1d2129;
+      --surface-3: #242933;
 
       --border: #2b313d;
 
@@ -49,7 +50,7 @@
           0,
           0,
           0,
-          0.2
+          0.22
         );
 
     }
@@ -61,8 +62,7 @@
 
 
     html {
-      background:
-        var(--bg);
+      background: var(--bg);
     }
 
 
@@ -86,8 +86,7 @@
           var(--bg) 220px
         );
 
-      color:
-        var(--text);
+      color: var(--text);
 
       -webkit-font-smoothing:
         antialiased;
@@ -95,9 +94,20 @@
     }
 
 
+    body.menu-open {
+      overflow: hidden;
+    }
+
+
     button,
     select {
       font: inherit;
+    }
+
+
+    button {
+      -webkit-tap-highlight-color:
+        transparent;
     }
 
 
@@ -113,26 +123,379 @@
         0 auto;
 
       padding:
-        28px
+        26px
         0
         50px;
 
     }
 
 
-    /* ===============================
+    /* ========================================
+       Drawer
+    ======================================== */
+
+    .drawer-overlay {
+
+      position: fixed;
+
+      inset: 0;
+
+      z-index: 90;
+
+      background:
+        rgba(
+          0,
+          0,
+          0,
+          0.56
+        );
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+
+    }
+
+
+    .drawer-overlay.show {
+
+      opacity: 1;
+
+      visibility: visible;
+
+    }
+
+
+    .drawer {
+
+      position: fixed;
+
+      top: 0;
+      left: 0;
+      bottom: 0;
+
+      z-index: 100;
+
+      width:
+        min(
+          310px,
+          84vw
+        );
+
+      padding:
+        max(
+          24px,
+          env(
+            safe-area-inset-top
+          )
+        )
+        16px
+        24px;
+
+      background:
+        #15181e;
+
+      border-right:
+        1px solid
+        var(--border);
+
+      box-shadow:
+        18px
+        0
+        40px
+        rgba(
+          0,
+          0,
+          0,
+          0.32
+        );
+
+      transform:
+        translateX(
+          -102%
+        );
+
+      transition:
+        transform 0.22s ease;
+
+    }
+
+
+    .drawer.show {
+      transform:
+        translateX(
+          0
+        );
+    }
+
+
+    .drawer-header {
+
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 24px;
+
+      padding:
+        0
+        4px;
+
+    }
+
+
+    .drawer-brand {
+
+      min-width: 0;
+
+    }
+
+
+    .drawer-eyebrow {
+
+      margin-bottom:
+        5px;
+
+      color:
+        var(--accent);
+
+      font-size:
+        10px;
+
+      font-weight:
+        750;
+
+      letter-spacing:
+        0.08em;
+
+    }
+
+
+    .drawer-title {
+
+      color:
+        var(--text);
+
+      font-size:
+        18px;
+
+      font-weight:
+        750;
+
+    }
+
+
+    .drawer-close {
+
+      width: 36px;
+      height: 36px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        10px;
+
+      background:
+        var(--surface-2);
+
+      color:
+        var(--text-secondary);
+
+      cursor: pointer;
+
+    }
+
+
+    .drawer-section-title {
+
+      margin:
+        18px
+        8px
+        8px;
+
+      color:
+        var(--text-muted);
+
+      font-size:
+        10px;
+
+      font-weight:
+        700;
+
+      letter-spacing:
+        0.08em;
+
+    }
+
+
+    .nav-item {
+
+      display: flex;
+
+      width: 100%;
+
+      align-items: center;
+
+      gap: 12px;
+
+      margin-bottom:
+        5px;
+
+      border:
+        1px solid
+        transparent;
+
+      border-radius:
+        11px;
+
+      padding:
+        12px
+        13px;
+
+      background:
+        transparent;
+
+      color:
+        var(--text-secondary);
+
+      text-align:
+        left;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    .nav-item:hover {
+
+      background:
+        var(--surface-2);
+
+      color:
+        var(--text);
+
+    }
+
+
+    .nav-item.active {
+
+      border-color:
+        rgba(
+          124,
+          140,
+          255,
+          0.25
+        );
+
+      background:
+        rgba(
+          124,
+          140,
+          255,
+          0.11
+        );
+
+      color:
+        var(--text);
+
+    }
+
+
+    .nav-icon {
+
+      display: grid;
+
+      flex-shrink: 0;
+
+      width: 34px;
+      height: 34px;
+
+      place-items: center;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        9px;
+
+      background:
+        rgba(
+          255,
+          255,
+          255,
+          0.025
+        );
+
+      font-size:
+        13px;
+
+      font-weight:
+        800;
+
+    }
+
+
+    .nav-copy {
+
+      min-width: 0;
+
+    }
+
+
+    .nav-name {
+
+      color: inherit;
+
+      font-size:
+        13px;
+
+      font-weight:
+        700;
+
+    }
+
+
+    .nav-description {
+
+      overflow: hidden;
+
+      margin-top:
+        3px;
+
+      color:
+        var(--text-muted);
+
+      font-size:
+        10px;
+
+      text-overflow:
+        ellipsis;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    /* ========================================
        Header
-    =============================== */
+    ======================================== */
 
     .header {
 
       display: flex;
 
-      align-items:
-        flex-start;
-
-      justify-content:
-        space-between;
+      align-items: flex-start;
+      justify-content: space-between;
 
       gap: 18px;
 
@@ -142,24 +505,120 @@
     }
 
 
-    .title-area {
+    .header-left {
+
+      display: flex;
+
+      align-items: flex-start;
+
       min-width: 0;
+
+      gap: 13px;
+
+    }
+
+
+    .menu-btn {
+
+      display: grid;
+
+      flex-shrink: 0;
+
+      width: 42px;
+      height: 42px;
+
+      margin-top:
+        1px;
+
+      place-items: center;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        11px;
+
+      padding: 0;
+
+      background:
+        var(--surface-2);
+
+      color:
+        var(--text);
+
+      cursor: pointer;
+
+    }
+
+
+    .hamburger {
+
+      position: relative;
+
+      width: 17px;
+      height: 12px;
+
+    }
+
+
+    .hamburger::before,
+    .hamburger::after,
+    .hamburger span {
+
+      position: absolute;
+
+      left: 0;
+
+      width: 17px;
+      height: 2px;
+
+      border-radius:
+        2px;
+
+      background:
+        currentColor;
+
+      content: "";
+
+    }
+
+
+    .hamburger::before {
+      top: 0;
+    }
+
+
+    .hamburger span {
+      top: 5px;
+    }
+
+
+    .hamburger::after {
+      bottom: 0;
+    }
+
+
+    .title-area {
+
+      min-width: 0;
+
     }
 
 
     .eyebrow {
 
       margin-bottom:
-        7px;
+        6px;
 
       color:
         var(--accent);
 
       font-size:
-        12px;
+        11px;
 
       font-weight:
-        700;
+        750;
 
       letter-spacing:
         0.08em;
@@ -172,7 +631,7 @@
       margin: 0;
 
       font-size:
-        28px;
+        27px;
 
       line-height:
         1.25;
@@ -186,16 +645,16 @@
     .subtitle {
 
       margin-top:
-        8px;
+        7px;
 
       color:
         var(--text-secondary);
 
       font-size:
-        14px;
+        13px;
 
       line-height:
-        1.6;
+        1.55;
 
     }
 
@@ -221,23 +680,122 @@
       color:
         var(--text);
 
-      cursor:
-        pointer;
+      cursor: pointer;
 
     }
 
 
-    .reload-btn:active {
+    .reload-btn:active,
+    .menu-btn:active {
+
       transform:
         scale(
           0.97
         );
+
     }
 
 
-    /* ===============================
+    /* ========================================
+       View heading
+    ======================================== */
+
+    .view-heading {
+
+      display: flex;
+
+      align-items:
+        flex-end;
+
+      justify-content:
+        space-between;
+
+      gap: 12px;
+
+      margin:
+        0
+        0
+        14px;
+
+    }
+
+
+    .view-name {
+
+      font-size:
+        16px;
+
+      font-weight:
+        750;
+
+    }
+
+
+    .view-description {
+
+      margin-top:
+        4px;
+
+      color:
+        var(--text-muted);
+
+      font-size:
+        11px;
+
+    }
+
+
+    .candidate-chip {
+
+      display: none;
+
+      flex-shrink: 0;
+
+      border:
+        1px solid
+        rgba(
+          124,
+          140,
+          255,
+          0.25
+        );
+
+      border-radius:
+        999px;
+
+      padding:
+        6px
+        9px;
+
+      background:
+        rgba(
+          124,
+          140,
+          255,
+          0.09
+        );
+
+      color:
+        #b8c0ff;
+
+      font-size:
+        10px;
+
+      font-weight:
+        700;
+
+    }
+
+
+    .candidate-chip.show {
+      display:
+        inline-block;
+    }
+
+
+    /* ========================================
        Summary
-    =============================== */
+    ======================================== */
 
     .summary {
 
@@ -252,11 +810,10 @@
           )
         );
 
-      gap:
-        12px;
+      gap: 12px;
 
       margin-bottom:
-        20px;
+        18px;
 
     }
 
@@ -264,8 +821,8 @@
     .summary-card {
 
       padding:
-        15px
-        17px;
+        14px
+        16px;
 
       background:
         linear-gradient(
@@ -287,27 +844,26 @@
     .summary-label {
 
       margin-bottom:
-        7px;
+        6px;
 
       color:
         var(--text-secondary);
 
       font-size:
-        12px;
+        11px;
 
     }
 
 
     .summary-value {
 
-      overflow:
-        hidden;
+      overflow: hidden;
 
       font-size:
-        18px;
+        17px;
 
       font-weight:
-        700;
+        750;
 
       text-overflow:
         ellipsis;
@@ -318,25 +874,23 @@
     }
 
 
-    /* ===============================
+    /* ========================================
        Controls
-    =============================== */
+    ======================================== */
 
     .controls {
 
       display: flex;
 
-      align-items:
-        center;
+      align-items: center;
 
       justify-content:
         space-between;
 
-      gap:
-        12px;
+      gap: 12px;
 
       margin-bottom:
-        16px;
+        14px;
 
     }
 
@@ -347,7 +901,7 @@
         var(--text-secondary);
 
       font-size:
-        13px;
+        12px;
 
     }
 
@@ -364,21 +918,19 @@
         var(--text-muted);
 
       font-size:
-        12px;
+        11px;
 
     }
 
 
     .mobile-sort {
-      display:
-        none;
+      display: none;
     }
 
 
     .sort-select {
 
-      width:
-        100%;
+      width: 100%;
 
       border:
         1px solid
@@ -388,10 +940,10 @@
         10px;
 
       padding:
-        11px
-        38px
-        11px
-        13px;
+        10px
+        36px
+        10px
+        12px;
 
       background:
         var(--surface-2);
@@ -399,20 +951,108 @@
       color:
         var(--text);
 
-      outline:
-        none;
+      outline: none;
 
     }
 
 
-    /* ===============================
-       Desktop Table
-    =============================== */
+    /* ========================================
+       Market badge
+    ======================================== */
+
+    .market-badge {
+
+      display:
+        inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      min-width:
+        32px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        6px;
+
+      padding:
+        3px
+        5px;
+
+      font-size:
+        9px;
+
+      font-weight:
+        750;
+
+      line-height:
+        1;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    .market-twse {
+
+      border-color:
+        rgba(
+          124,
+          140,
+          255,
+          0.26
+        );
+
+      background:
+        rgba(
+          124,
+          140,
+          255,
+          0.10
+        );
+
+      color:
+        #aeb7ff;
+
+    }
+
+
+    .market-tpex {
+
+      border-color:
+        rgba(
+          53,
+          201,
+          139,
+          0.25
+        );
+
+      background:
+        rgba(
+          53,
+          201,
+          139,
+          0.09
+        );
+
+      color:
+        #78dcb1;
+
+    }
+
+
+    /* ========================================
+       Desktop table
+    ======================================== */
 
     .desktop-table {
 
-      overflow:
-        hidden;
+      overflow: hidden;
 
       border:
         1px solid
@@ -431,18 +1071,16 @@
 
 
     .table-scroll {
-      overflow-x:
-        auto;
+      overflow-x: auto;
     }
 
 
     table {
 
-      width:
-        100%;
+      width: 100%;
 
       min-width:
-        1300px;
+        1340px;
 
       border-collapse:
         collapse;
@@ -458,14 +1096,11 @@
 
     th {
 
-      position:
-        sticky;
+      position: sticky;
 
-      top:
-        0;
+      top: 0;
 
-      z-index:
-        2;
+      z-index: 2;
 
       padding:
         13px
@@ -482,10 +1117,10 @@
         #1b1f27;
 
       font-size:
-        12px;
+        11px;
 
       font-weight:
-        600;
+        650;
 
       text-align:
         right;
@@ -518,7 +1153,7 @@
         #d9dde3;
 
       font-size:
-        13px;
+        12px;
 
       text-align:
         right;
@@ -536,28 +1171,26 @@
 
 
     tbody tr:last-child td {
-      border-bottom:
-        none;
+      border-bottom: none;
     }
 
 
     th:nth-child(1),
     th:nth-child(2),
     th:nth-child(3),
-
+    th:nth-child(4),
     td:nth-child(1),
     td:nth-child(2),
-    td:nth-child(3) {
+    td:nth-child(3),
+    td:nth-child(4) {
 
-      text-align:
-        left;
+      text-align: left;
 
     }
 
 
     .sortable {
-      cursor:
-        pointer;
+      cursor: pointer;
     }
 
 
@@ -589,7 +1222,7 @@
         inline-block;
 
       min-width:
-        14px;
+        12px;
 
       margin-left:
         3px;
@@ -612,7 +1245,7 @@
         var(--text);
 
       font-weight:
-        650;
+        700;
 
     }
 
@@ -641,20 +1274,18 @@
     }
 
 
-    /* ===============================
+    /* ========================================
        Mobile
-    =============================== */
+    ======================================== */
 
     .mobile-list {
-      display:
-        none;
+      display: none;
     }
 
 
     .mobile-stock-card {
 
-      position:
-        relative;
+      position: relative;
 
       margin-bottom:
         8px;
@@ -666,6 +1297,8 @@
       border-radius:
         14px;
 
+      overflow: hidden;
+
       background:
         linear-gradient(
           145deg,
@@ -673,15 +1306,7 @@
           #16191f
         );
 
-      overflow:
-        hidden;
-
-      cursor:
-        pointer;
-
-      transition:
-        border-color 0.15s,
-        background 0.15s;
+      cursor: pointer;
 
     }
 
@@ -704,24 +1329,18 @@
 
     .mobile-line {
 
-      display:
-        flex;
+      display: flex;
 
-      align-items:
-        center;
+      align-items: center;
 
-      min-width:
-        0;
+      min-width: 0;
 
     }
 
 
-    /* 第一行 */
-
     .mobile-line-primary {
 
-      gap:
-        7px;
+      gap: 6px;
 
       line-height:
         1.35;
@@ -729,10 +1348,40 @@
     }
 
 
+    .mobile-rank {
+
+      display:
+        none;
+
+      flex-shrink: 0;
+
+      width:
+        21px;
+
+      color:
+        var(--accent);
+
+      font-size:
+        10px;
+
+      font-weight:
+        800;
+
+    }
+
+
+    .candidate-mode
+    .mobile-rank {
+
+      display:
+        inline-block;
+
+    }
+
+
     .mobile-name {
 
-      flex-shrink:
-        0;
+      flex-shrink: 0;
 
       color:
         var(--text);
@@ -748,14 +1397,13 @@
 
     .mobile-code {
 
-      flex-shrink:
-        0;
+      flex-shrink: 0;
 
       color:
         var(--text-muted);
 
       font-size:
-        11px;
+        10px;
 
       font-weight:
         650;
@@ -763,27 +1411,15 @@
     }
 
 
-    .mobile-divider {
-
-      flex-shrink:
-        0;
-
-      color:
-        #414854;
-
-      font-size:
-        11px;
-
-    }
-
-
     .mobile-change-percent {
 
-      flex-shrink:
-        0;
+      flex-shrink: 0;
+
+      margin-left:
+        auto;
 
       font-size:
-        14px;
+        13px;
 
       font-weight:
         750;
@@ -794,21 +1430,20 @@
     }
 
 
-    /* 第二行 */
-
     .mobile-line-secondary {
 
-      gap:
-        6px;
+      gap: 6px;
 
       margin-top:
         8px;
+
+      overflow: hidden;
 
       color:
         var(--text-secondary);
 
       font-size:
-        11px;
+        10.5px;
 
       line-height:
         1.4;
@@ -818,17 +1453,14 @@
 
     .mobile-industry-inline {
 
-      flex-shrink:
-        1;
+      flex-shrink: 1;
 
-      min-width:
-        0;
+      min-width: 0;
 
-      overflow:
-        hidden;
+      overflow: hidden;
 
       max-width:
-        110px;
+        105px;
 
       color:
         #aeb5c0;
@@ -842,10 +1474,19 @@
     }
 
 
+    .mobile-divider {
+
+      flex-shrink: 0;
+
+      color:
+        #414854;
+
+    }
+
+
     .mobile-stat-inline {
 
-      flex-shrink:
-        0;
+      flex-shrink: 0;
 
       white-space:
         nowrap;
@@ -856,12 +1497,9 @@
     }
 
 
-    /* 第三行 */
-
     .mobile-ohlc-row {
 
-      position:
-        relative;
+      position: relative;
 
       margin-top:
         9px;
@@ -873,7 +1511,7 @@
         var(--text-secondary);
 
       font-size:
-        10.5px;
+        10px;
 
       line-height:
         1.4;
@@ -889,24 +1527,19 @@
 
     .mobile-ohlc-separator {
 
-      color:
-        #4a515d;
-
       margin:
         0
         2px;
 
+      color:
+        #4a515d;
+
     }
 
 
-    /* ===============================
-       Arrow
-    =============================== */
-
     .mobile-arrow {
 
-      position:
-        absolute;
+      position: absolute;
 
       right:
         16px;
@@ -915,10 +1548,10 @@
         17px;
 
       width:
-        10px;
+        9px;
 
       height:
-        10px;
+        9px;
 
       border-right:
         2px solid
@@ -942,34 +1575,27 @@
     .mobile-stock-card.expanded
     .mobile-arrow {
 
+      top:
+        64px;
+
+      bottom:
+        auto;
+
       transform:
         rotate(
           225deg
         );
 
-      bottom:
-        auto;
-
-      top:
-        64px;
-
     }
 
 
-    /* ===============================
-       Expanded
-    =============================== */
-
     .mobile-card-details {
 
-      max-height:
-        0;
+      max-height: 0;
 
-      overflow:
-        hidden;
+      overflow: hidden;
 
-      opacity:
-        0;
+      opacity: 0;
 
       border-top:
         1px solid
@@ -988,15 +1614,14 @@
     .mobile-card-details {
 
       max-height:
-        320px;
+        340px;
 
       padding:
         12px
         14px
         14px;
 
-      opacity:
-        1;
+      opacity: 1;
 
       border-top:
         1px solid
@@ -1007,8 +1632,7 @@
 
     .detail-grid {
 
-      display:
-        grid;
+      display: grid;
 
       grid-template-columns:
         repeat(
@@ -1019,16 +1643,14 @@
           )
         );
 
-      gap:
-        8px;
+      gap: 8px;
 
     }
 
 
     .detail-item {
 
-      min-width:
-        0;
+      min-width: 0;
 
       padding:
         9px
@@ -1073,26 +1695,25 @@
 
     .detail-value {
 
-      overflow:
-        hidden;
+      overflow: hidden;
 
       color:
         #e1e5ea;
 
       font-size:
-        12px;
+        11px;
 
       font-weight:
         650;
-
-      font-variant-numeric:
-        tabular-nums;
 
       text-overflow:
         ellipsis;
 
       white-space:
         nowrap;
+
+      font-variant-numeric:
+        tabular-nums;
 
     }
 
@@ -1112,9 +1733,24 @@
     }
 
 
-    /* ===============================
-       Mobile 9:16
-    =============================== */
+    .empty {
+
+      padding:
+        48px
+        20px;
+
+      color:
+        var(--text-muted);
+
+      text-align:
+        center;
+
+    }
+
+
+    /* ========================================
+       Mobile
+    ======================================== */
 
     @media (
       max-width: 720px
@@ -1128,12 +1764,11 @@
 
       .app {
 
-        width:
-          100%;
+        width: 100%;
 
         padding:
           max(
-            18px,
+            17px,
             env(
               safe-area-inset-top
             )
@@ -1161,38 +1796,80 @@
       }
 
 
+      .header-left {
+
+        align-items:
+          center;
+
+        gap: 10px;
+
+      }
+
+
+      .menu-btn {
+
+        width: 38px;
+        height: 38px;
+
+        margin-top: 0;
+
+      }
+
+
       .eyebrow {
 
         margin-bottom:
-          5px;
+          4px;
 
         font-size:
-          10px;
+          9px;
 
       }
 
 
       h1 {
         font-size:
-          21px;
+          19px;
       }
 
 
       .subtitle {
-        display:
-          none;
+        display: none;
       }
 
 
       .reload-btn {
 
         padding:
-          9px
-          12px;
+          8px
+          10px;
 
         font-size:
-          12px;
+          11px;
 
+      }
+
+
+      .view-heading {
+
+        align-items:
+          center;
+
+        margin-bottom:
+          11px;
+
+      }
+
+
+      .view-name {
+        font-size:
+          14px;
+      }
+
+
+      .view-description {
+        font-size:
+          9.5px;
       }
 
 
@@ -1202,11 +1879,10 @@
           1fr
           1fr;
 
-        gap:
-          8px;
+        gap: 8px;
 
         margin-bottom:
-          14px;
+          13px;
 
       }
 
@@ -1214,8 +1890,8 @@
       .summary-card {
 
         padding:
-          12px
-          13px;
+          11px
+          12px;
 
       }
 
@@ -1231,27 +1907,26 @@
       .summary-label {
 
         margin-bottom:
-          5px;
+          4px;
 
         font-size:
-          10px;
+          9px;
 
       }
 
 
       .summary-value {
         font-size:
-          15px;
+          14px;
       }
 
 
       .controls {
 
-        display:
-          block;
+        display: block;
 
         margin-bottom:
-          12px;
+          11px;
 
       }
 
@@ -1259,35 +1934,31 @@
       .status {
 
         margin-bottom:
-          9px;
+          8px;
 
         font-size:
-          11px;
+          10px;
 
       }
 
 
       .desktop-hint {
-        display:
-          none;
+        display: none;
       }
 
 
       .mobile-sort {
-        display:
-          block;
+        display: block;
       }
 
 
       .desktop-table {
-        display:
-          none;
+        display: none;
       }
 
 
       .mobile-list {
-        display:
-          block;
+        display: block;
       }
 
     }
@@ -1297,13 +1968,24 @@
       max-width: 390px
     ) {
 
+      .app {
+
+        padding-left:
+          11px;
+
+        padding-right:
+          11px;
+
+      }
+
+
       .mobile-card-summary {
 
         padding-left:
-          12px;
+          11px;
 
         padding-right:
-          12px;
+          11px;
 
       }
 
@@ -1314,37 +1996,26 @@
       }
 
 
-      .mobile-change-percent {
-        font-size:
-          13px;
+      .mobile-industry-inline {
+        max-width:
+          75px;
       }
 
 
       .mobile-line-secondary {
 
         gap:
-          5px;
-
-        font-size:
-          10px;
-
-      }
-
-
-      .mobile-industry-inline {
-        max-width:
-          82px;
-      }
-
-
-      .mobile-ohlc-row {
-
-        padding-right:
-          28px;
+          4px;
 
         font-size:
           9.5px;
 
+      }
+
+
+      .mobile-ohlc-row {
+        font-size:
+          9.3px;
       }
 
     }
@@ -1356,25 +2027,192 @@
 
 <body>
 
+
+  <!-- ========================================
+       Drawer
+  ========================================= -->
+
+  <div
+    id="drawerOverlay"
+    class="drawer-overlay"
+  ></div>
+
+
+  <aside
+    id="drawer"
+    class="drawer"
+  >
+
+    <div class="drawer-header">
+
+      <div class="drawer-brand">
+
+        <div class="drawer-eyebrow">
+          TWSE / TPEX
+        </div>
+
+        <div class="drawer-title">
+          MARKET WATCH
+        </div>
+
+      </div>
+
+
+      <button
+        id="drawerCloseBtn"
+        class="drawer-close"
+        aria-label="關閉選單"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="drawer-section-title">
+      市場
+    </div>
+
+
+    <button
+      class="nav-item"
+      data-view="candidate"
+    >
+
+      <span class="nav-icon">
+        10
+      </span>
+
+      <span class="nav-copy">
+
+        <span class="nav-name">
+          候選池
+        </span>
+
+        <span class="nav-description">
+          成交量最高 TOP 10
+        </span>
+
+      </span>
+
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-view="all"
+    >
+
+      <span class="nav-icon">
+        全
+      </span>
+
+      <span class="nav-copy">
+
+        <span class="nav-name">
+          全部市場
+        </span>
+
+        <span class="nav-description">
+          上市＋上櫃全部個股
+        </span>
+
+      </span>
+
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-view="twse"
+    >
+
+      <span class="nav-icon">
+        市
+      </span>
+
+      <span class="nav-copy">
+
+        <span class="nav-name">
+          上市股票
+        </span>
+
+        <span class="nav-description">
+          TWSE
+        </span>
+
+      </span>
+
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-view="tpex"
+    >
+
+      <span class="nav-icon">
+        櫃
+      </span>
+
+      <span class="nav-copy">
+
+        <span class="nav-name">
+          上櫃股票
+        </span>
+
+        <span class="nav-description">
+          TPEx
+        </span>
+
+      </span>
+
+    </button>
+
+  </aside>
+
+
+  <!-- ========================================
+       App
+  ========================================= -->
+
   <main class="app">
 
 
+    <!-- Header -->
+
     <header class="header">
 
-      <div class="title-area">
-
-        <div class="eyebrow">
-          TWSE MARKET WATCH
-        </div>
+      <div class="header-left">
 
 
-        <h1>
-          台股隔日當沖候選
-        </h1>
+        <button
+          id="menuBtn"
+          class="menu-btn"
+          aria-label="開啟選單"
+        >
+
+          <span class="hamburger">
+            <span></span>
+          </span>
+
+        </button>
 
 
-        <div class="subtitle">
-          使用前一交易日上市個股行情，觀察一般交易量、價格與產業分布。
+        <div class="title-area">
+
+          <div class="eyebrow">
+            TWSE / TPEX MARKET WATCH
+          </div>
+
+          <h1>
+            台股隔日當沖候選
+          </h1>
+
+          <div class="subtitle">
+            上市＋上櫃前一交易日行情
+          </div>
+
         </div>
 
       </div>
@@ -1389,6 +2227,41 @@
 
     </header>
 
+
+    <!-- Current view -->
+
+    <section class="view-heading">
+
+      <div>
+
+        <div
+          id="viewName"
+          class="view-name"
+        >
+          候選池
+        </div>
+
+        <div
+          id="viewDescription"
+          class="view-description"
+        >
+          成交量最高 TOP 10
+        </div>
+
+      </div>
+
+
+      <div
+        id="candidateChip"
+        class="candidate-chip show"
+      >
+        TOP 10
+      </div>
+
+    </section>
+
+
+    <!-- Summary -->
 
     <section class="summary">
 
@@ -1412,7 +2285,7 @@
       <div class="summary-card">
 
         <div class="summary-label">
-          有效個股
+          目前顯示
         </div>
 
         <div
@@ -1443,8 +2316,9 @@
     </section>
 
 
-    <section class="controls">
+    <!-- Controls -->
 
+    <section class="controls">
 
       <div
         id="status"
@@ -1455,7 +2329,7 @@
 
 
       <div class="desktop-hint">
-        點擊欄位名稱切換升冪 / 降冪
+        點擊欄位名稱排序
       </div>
 
 
@@ -1511,7 +2385,11 @@
           </option>
 
           <option value="Industry:asc">
-            產業別｜A → Z
+            產業別
+          </option>
+
+          <option value="MarketName:asc">
+            市場
           </option>
 
         </select>
@@ -1520,6 +2398,8 @@
 
     </section>
 
+
+    <!-- Desktop table -->
 
     <section class="desktop-table">
 
@@ -1533,13 +2413,21 @@
 
               <th
                 class="sortable"
+                data-key="MarketName"
+                data-type="text"
+              >
+                市場
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
                 data-key="Code"
                 data-type="text"
               >
                 代號
                 <span class="sort-icon"></span>
               </th>
-
 
               <th
                 class="sortable"
@@ -1550,7 +2438,6 @@
                 <span class="sort-icon"></span>
               </th>
 
-
               <th
                 class="sortable"
                 data-key="Industry"
@@ -1560,16 +2447,14 @@
                 <span class="sort-icon"></span>
               </th>
 
-
               <th
                 class="sortable"
                 data-key="TradeVolume"
                 data-type="number"
               >
-                成交量（一般盤／張）
+                成交量（排除零股／張）
                 <span class="sort-icon"></span>
               </th>
-
 
               <th
                 class="sortable"
@@ -1580,7 +2465,6 @@
                 <span class="sort-icon"></span>
               </th>
 
-
               <th
                 class="sortable"
                 data-key="TradeValue"
@@ -1589,7 +2473,6 @@
                 成交金額
                 <span class="sort-icon"></span>
               </th>
-
 
               <th
                 class="sortable"
@@ -1600,7 +2483,6 @@
                 <span class="sort-icon"></span>
               </th>
 
-
               <th
                 class="sortable"
                 data-key="HighestPrice"
@@ -1609,7 +2491,6 @@
                 最高
                 <span class="sort-icon"></span>
               </th>
-
 
               <th
                 class="sortable"
@@ -1620,7 +2501,6 @@
                 <span class="sort-icon"></span>
               </th>
 
-
               <th
                 class="sortable"
                 data-key="ClosingPrice"
@@ -1630,7 +2510,6 @@
                 <span class="sort-icon"></span>
               </th>
 
-
               <th
                 class="sortable"
                 data-key="ChangePercent"
@@ -1639,7 +2518,6 @@
                 漲跌幅
                 <span class="sort-icon"></span>
               </th>
-
 
               <th
                 class="sortable"
@@ -1657,8 +2535,7 @@
 
           <tbody
             id="stockTableBody"
-          >
-          </tbody>
+          ></tbody>
 
         </table>
 
@@ -1666,6 +2543,8 @@
 
     </section>
 
+
+    <!-- Mobile -->
 
     <section
       id="mobileStockList"
@@ -1687,9 +2566,70 @@
       "./stocks.json";
 
 
+    const VIEW_CONFIG = {
+
+      candidate: {
+
+        name:
+          "候選池",
+
+        description:
+          "上市＋上櫃成交量最高 TOP 10"
+
+      },
+
+      all: {
+
+        name:
+          "全部市場",
+
+        description:
+          "上市＋上櫃全部個股"
+
+      },
+
+      twse: {
+
+        name:
+          "上市股票",
+
+        description:
+          "TWSE 上市個股"
+
+      },
+
+      tpex: {
+
+        name:
+          "上櫃股票",
+
+        description:
+          "TPEx 上櫃個股"
+
+      }
+
+    };
+
+
     let stocks = [];
 
     let currentView = [];
+
+    let currentPage =
+      getInitialPage();
+
+
+    let metadata = {
+
+      tradeDate: "",
+
+      updatedAt: "",
+
+      volumeMode: "",
+
+      marketCounts: {}
+
+    };
 
 
     let sortState = {
@@ -1699,6 +2639,18 @@
       direction: null
 
     };
+
+
+    const drawer =
+      document.getElementById(
+        "drawer"
+      );
+
+
+    const drawerOverlay =
+      document.getElementById(
+        "drawerOverlay"
+      );
 
 
     const statusEl =
@@ -1743,9 +2695,59 @@
       );
 
 
-    /* ===============================
+    const viewName =
+      document.getElementById(
+        "viewName"
+      );
+
+
+    const viewDescription =
+      document.getElementById(
+        "viewDescription"
+      );
+
+
+    const candidateChip =
+      document.getElementById(
+        "candidateChip"
+      );
+
+
+    /* ========================================
+       Initial page
+    ======================================== */
+
+    function getInitialPage() {
+
+      const hash =
+        location.hash
+        .replace(
+          "#",
+          ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+      if (
+        VIEW_CONFIG[
+          hash
+        ]
+      ) {
+
+        return hash;
+
+      }
+
+
+      return "candidate";
+
+    }
+
+
+    /* ========================================
        Number
-    =============================== */
+    ======================================== */
 
     function toNumber(
       value
@@ -1768,17 +2770,14 @@
         String(
           value
         )
-
         .replace(
           /,/g,
           ""
         )
-
         .replace(
           /\+/g,
           ""
         )
-
         .trim();
 
 
@@ -1797,9 +2796,9 @@
     }
 
 
-    /* ===============================
-       Escape
-    =============================== */
+    /* ========================================
+       HTML
+    ======================================== */
 
     function escapeHtml(
       value
@@ -1809,37 +2808,251 @@
         value ?? ""
       )
 
-        .replace(
-          /&/g,
-          "&amp;"
-        )
+      .replace(
+        /&/g,
+        "&amp;"
+      )
 
-        .replace(
-          /</g,
-          "&lt;"
-        )
+      .replace(
+        /</g,
+        "&lt;"
+      )
 
-        .replace(
-          />/g,
-          "&gt;"
-        )
+      .replace(
+        />/g,
+        "&gt;"
+      )
 
-        .replace(
-          /"/g,
-          "&quot;"
-        )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
 
-        .replace(
-          /'/g,
-          "&#039;"
-        );
+      .replace(
+        /'/g,
+        "&#039;"
+      );
 
     }
 
 
-    /* ===============================
-       Number Format
-    =============================== */
+    /* ========================================
+       Market
+    ======================================== */
+
+    function getMarketName(
+      stock
+    ) {
+
+      if (
+        stock.MarketName
+      ) {
+
+        return stock.MarketName;
+
+      }
+
+
+      if (
+        stock.Market ===
+        "TPEX"
+      ) {
+
+        return "上櫃";
+
+      }
+
+
+      return "上市";
+
+    }
+
+
+    function getMarketClass(
+      stock
+    ) {
+
+      return (
+        stock.Market ===
+        "TPEX"
+      )
+        ? "market-tpex"
+        : "market-twse";
+
+    }
+
+
+    function marketBadge(
+      stock
+    ) {
+
+      return `
+
+        <span
+          class="
+            market-badge
+            ${getMarketClass(
+              stock
+            )}
+          "
+        >
+
+          ${escapeHtml(
+            getMarketName(
+              stock
+            )
+          )}
+
+        </span>
+
+      `;
+
+    }
+
+
+    /* ========================================
+       Volume
+    ======================================== */
+
+    function getTradeVolumeShares(
+      stock
+    ) {
+
+      if (
+        stock.AdjustedTradeVolume
+        !== undefined
+        &&
+        stock.AdjustedTradeVolume
+        !== null
+        &&
+        stock.AdjustedTradeVolume
+        !== ""
+      ) {
+
+        return Math.max(
+
+          0,
+
+          toNumber(
+            stock.AdjustedTradeVolume
+          )
+        );
+
+      }
+
+
+      if (
+        stock.RegularTradeVolume
+        !== undefined
+        &&
+        stock.RegularTradeVolume
+        !== null
+        &&
+        stock.RegularTradeVolume
+        !== ""
+      ) {
+
+        return Math.max(
+
+          0,
+
+          toNumber(
+            stock.RegularTradeVolume
+          )
+        );
+
+      }
+
+
+      if (
+        stock.NonOddLotTradeVolume
+        !== undefined
+        &&
+        stock.NonOddLotTradeVolume
+        !== null
+        &&
+        stock.NonOddLotTradeVolume
+        !== ""
+      ) {
+
+        return Math.max(
+
+          0,
+
+          toNumber(
+            stock.NonOddLotTradeVolume
+          )
+        );
+
+      }
+
+
+      return Math.max(
+
+        0,
+
+        toNumber(
+          stock.TradeVolume
+        )
+      );
+
+    }
+
+
+    function getVolumeLots(
+      stock
+    ) {
+
+      return (
+        getTradeVolumeShares(
+          stock
+        )
+        /
+        1000
+      );
+
+    }
+
+
+    function formatVolumeLots(
+      stock
+    ) {
+
+      return (
+        Math.round(
+          getVolumeLots(
+            stock
+          )
+        )
+        .toLocaleString(
+          "zh-TW"
+        )
+        +
+        "張"
+      );
+
+    }
+
+
+    function formatVolumeLotsNumber(
+      stock
+    ) {
+
+      return Math.round(
+        getVolumeLots(
+          stock
+        )
+      )
+      .toLocaleString(
+        "zh-TW"
+      );
+
+    }
+
+
+    /* ========================================
+       Formatting
+    ======================================== */
 
     function formatNumber(
       value
@@ -1847,7 +3060,8 @@
 
       return toNumber(
         value
-      ).toLocaleString(
+      )
+      .toLocaleString(
         "zh-TW"
       );
 
@@ -1890,168 +3104,6 @@
 
     }
 
-
-    /* ===============================
-       一般盤成交量
-    =============================== */
-
-    function getTradeVolumeShares(
-      stock
-    ) {
-
-      /*
-        新版：
-
-        一般交易成交量
-      */
-
-      if (
-
-        stock
-          .RegularTradeVolume
-        !== undefined
-
-        &&
-
-        stock
-          .RegularTradeVolume
-        !== null
-
-        &&
-
-        stock
-          .RegularTradeVolume
-        !== ""
-
-      ) {
-
-        return Math.max(
-
-          0,
-
-          toNumber(
-            stock
-              .RegularTradeVolume
-          )
-        );
-
-      }
-
-
-      /*
-        上一版 fallback
-      */
-
-      if (
-
-        stock
-          .NonOddLotTradeVolume
-        !== undefined
-
-        &&
-
-        stock
-          .NonOddLotTradeVolume
-        !== null
-
-        &&
-
-        stock
-          .NonOddLotTradeVolume
-        !== ""
-
-      ) {
-
-        return Math.max(
-
-          0,
-
-          toNumber(
-            stock
-              .NonOddLotTradeVolume
-          )
-        );
-
-      }
-
-
-      /*
-        最舊版 fallback
-      */
-
-      return Math.max(
-
-        0,
-
-        toNumber(
-          stock.TradeVolume
-        )
-      );
-
-    }
-
-
-    /* ===============================
-       股 → 張
-    =============================== */
-
-    function getVolumeLots(
-      stock
-    ) {
-
-      return (
-        getTradeVolumeShares(
-          stock
-        )
-        /
-        1000
-      );
-
-    }
-
-
-    function formatVolumeLots(
-      stock
-    ) {
-
-      return (
-        Math.round(
-          getVolumeLots(
-            stock
-          )
-        )
-
-        .toLocaleString(
-          "zh-TW"
-        )
-
-        +
-        "張"
-      );
-
-    }
-
-
-    function formatVolumeLotsNumber(
-      stock
-    ) {
-
-      return Math.round(
-        getVolumeLots(
-          stock
-        )
-      )
-
-      .toLocaleString(
-        "zh-TW"
-      );
-
-    }
-
-
-    /* ===============================
-       Money
-    =============================== */
 
     function formatCompactMoney(
       value
@@ -2126,10 +3178,6 @@
     }
 
 
-    /* ===============================
-       Date
-    =============================== */
-
     function formatTradeDate(
       value
     ) {
@@ -2137,41 +3185,36 @@
       const raw =
         String(
           value || ""
-        ).trim();
+        )
+        .replace(
+          /\D/g,
+          ""
+        );
 
 
       if (
         raw.length !== 7
       ) {
 
-        return raw || "-";
+        return value || "-";
 
       }
 
 
-      const rocYear =
+      const year =
         Number(
           raw.slice(
             0,
             3
           )
-        );
-
-
-      if (
-        !Number.isFinite(
-          rocYear
         )
-      ) {
-
-        return raw;
-
-      }
+        +
+        1911;
 
 
       return (
 
-        `${rocYear + 1911}/`
+        `${year}/`
         +
         `${raw.slice(3, 5)}/`
         +
@@ -2182,42 +3225,9 @@
     }
 
 
-    /* ===============================
+    /* ========================================
        Change
-    =============================== */
-
-    function getChangeClass(
-      value
-    ) {
-
-      const number =
-        toNumber(
-          value
-        );
-
-
-      if (
-        number > 0
-      ) {
-
-        return "up";
-
-      }
-
-
-      if (
-        number < 0
-      ) {
-
-        return "down";
-
-      }
-
-
-      return "neutral";
-
-    }
-
+    ======================================== */
 
     function calculatePreviousClose(
       stock
@@ -2250,12 +3260,6 @@
         );
 
 
-      const change =
-        toNumber(
-          stock.Change
-        );
-
-
       if (
         previousClose <= 0
       ) {
@@ -2267,13 +3271,52 @@
 
       return (
 
-        change
+        toNumber(
+          stock.Change
+        )
+
         /
+
         previousClose
+
         *
+
         100
 
       );
+
+    }
+
+
+    function getChangeClass(
+      value
+    ) {
+
+      const number =
+        toNumber(
+          value
+        );
+
+
+      if (
+        number > 0
+      ) {
+
+        return "up";
+
+      }
+
+
+      if (
+        number < 0
+      ) {
+
+        return "down";
+
+      }
+
+
+      return "neutral";
 
     }
 
@@ -2331,16 +3374,26 @@
 
         +
 
-        change
+        change.toLocaleString(
+
+          "zh-TW",
+
+          {
+
+            maximumFractionDigits:
+              2
+
+          }
+        )
 
       );
 
     }
 
 
-    /* ===============================
+    /* ========================================
        Amplitude
-    =============================== */
+    ======================================== */
 
     function calculateAmplitude(
       stock
@@ -2398,9 +3451,284 @@
     }
 
 
-    /* ===============================
-       Desktop Render
-    =============================== */
+    /* ========================================
+       Page
+    ======================================== */
+
+    function getPageStocks() {
+
+      if (
+        currentPage ===
+        "twse"
+      ) {
+
+        return stocks.filter(
+          stock =>
+            stock.Market ===
+            "TWSE"
+        );
+
+      }
+
+
+      if (
+        currentPage ===
+        "tpex"
+      ) {
+
+        return stocks.filter(
+          stock =>
+            stock.Market ===
+            "TPEX"
+        );
+
+      }
+
+
+      if (
+        currentPage ===
+        "candidate"
+      ) {
+
+        return [...stocks]
+
+        .filter(
+          stock =>
+            getTradeVolumeShares(
+              stock
+            ) > 0
+        )
+
+        .sort(
+          (
+            a,
+            b
+          ) =>
+
+            getTradeVolumeShares(
+              b
+            )
+            -
+            getTradeVolumeShares(
+              a
+            )
+        )
+
+        .slice(
+          0,
+          10
+        );
+
+      }
+
+
+      return [
+        ...stocks
+      ];
+
+    }
+
+
+    function updateViewHeader() {
+
+      const config =
+        VIEW_CONFIG[
+          currentPage
+        ];
+
+
+      viewName.textContent =
+        config.name;
+
+
+      viewDescription.textContent =
+        config.description;
+
+
+      candidateChip.classList.toggle(
+
+        "show",
+
+        currentPage ===
+        "candidate"
+
+      );
+
+
+      document
+      .querySelectorAll(
+        ".nav-item"
+      )
+      .forEach(
+        item => {
+
+          item.classList.toggle(
+
+            "active",
+
+            item.dataset.view
+            ===
+            currentPage
+
+          );
+
+        }
+      );
+
+    }
+
+
+    function setPage(
+      page,
+      updateHash=true
+    ) {
+
+      if (
+        !VIEW_CONFIG[
+          page
+        ]
+      ) {
+
+        page =
+          "candidate";
+
+      }
+
+
+      currentPage =
+        page;
+
+
+      if (
+        updateHash
+      ) {
+
+        history.replaceState(
+
+          null,
+
+          "",
+
+          `#${page}`
+
+        );
+
+      }
+
+
+      sortState = {
+
+        key: null,
+
+        direction: null
+
+      };
+
+
+      mobileSortSelect.value =
+        "";
+
+
+      currentView =
+        getPageStocks();
+
+
+      updateViewHeader();
+
+
+      updateSummary();
+
+
+      renderAll();
+
+
+      updateDesktopSortIcons();
+
+
+      closeDrawer();
+
+    }
+
+
+    /* ========================================
+       Summary
+    ======================================== */
+
+    function updateSummary() {
+
+      tradeDateValue.textContent =
+        formatTradeDate(
+          metadata.tradeDate
+        );
+
+
+      countValue.textContent =
+        `${currentView.length.toLocaleString(
+          "zh-TW"
+        )} 檔`;
+
+
+      updatedAtValue.textContent =
+        metadata.updatedAt
+        ||
+        "-";
+
+
+      const twseCount =
+        stocks.filter(
+          stock =>
+            stock.Market ===
+            "TWSE"
+        ).length;
+
+
+      const tpexCount =
+        stocks.filter(
+          stock =>
+            stock.Market ===
+            "TPEX"
+        ).length;
+
+
+      if (
+        currentPage ===
+        "candidate"
+      ) {
+
+        statusEl.textContent =
+
+          `候選池 TOP ${currentView.length}`
+          +
+          `｜上市 ${twseCount}`
+          +
+          `｜上櫃 ${tpexCount}`
+          +
+          `｜成交量排除零股`;
+
+      }
+
+      else {
+
+        statusEl.textContent =
+
+          `目前顯示 ${currentView.length.toLocaleString(
+            "zh-TW"
+          )} 檔`
+          +
+          `｜上市 ${twseCount}`
+          +
+          `｜上櫃 ${tpexCount}`
+          +
+          `｜成交量排除零股`;
+
+      }
+
+    }
+
+
+    /* ========================================
+       Desktop
+    ======================================== */
 
     function renderDesktopTable(
       data
@@ -2438,97 +3766,73 @@
 
           tr.innerHTML = `
 
-            <td class="code">
+            <td>
+              ${marketBadge(
+                stock
+              )}
+            </td>
 
+            <td class="code">
               ${escapeHtml(
                 stock.Code || ""
               )}
-
             </td>
 
-
             <td class="stock-name">
-
               ${escapeHtml(
                 stock.Name || ""
               )}
-
             </td>
 
-
             <td class="industry">
-
               ${escapeHtml(
                 stock.Industry
                 ||
                 "未分類"
               )}
-
             </td>
 
-
             <td>
-
               ${formatVolumeLotsNumber(
                 stock
               )}
-
             </td>
 
-
             <td>
-
               ${formatNumber(
                 stock.Transaction
               )}
-
             </td>
 
-
             <td>
-
               ${formatNumber(
                 stock.TradeValue
               )}
-
             </td>
 
-
             <td>
-
               ${formatPrice(
                 stock.OpeningPrice
               )}
-
             </td>
 
-
             <td>
-
               ${formatPrice(
                 stock.HighestPrice
               )}
-
             </td>
 
-
             <td>
-
               ${formatPrice(
                 stock.LowestPrice
               )}
-
             </td>
 
-
             <td>
-
               ${formatPrice(
                 stock.ClosingPrice
               )}
-
             </td>
-
 
             <td
               class="
@@ -2537,20 +3841,15 @@
                 )}
               "
             >
-
               ${formatChangePercent(
                 stock
               )}
-
             </td>
 
-
             <td>
-
               ${amplitude.toFixed(
                 2
               )}%
-
             </td>
 
           `;
@@ -2571,9 +3870,9 @@
     }
 
 
-    /* ===============================
-       Mobile Render
-    =============================== */
+    /* ========================================
+       Mobile
+    ======================================== */
 
     function renderMobileCards(
       data
@@ -2583,13 +3882,43 @@
         "";
 
 
+      mobileStockList.classList.toggle(
+
+        "candidate-mode",
+
+        currentPage ===
+        "candidate"
+
+      );
+
+
+      if (
+        data.length === 0
+      ) {
+
+        mobileStockList.innerHTML =
+          `
+            <div class="empty">
+              沒有資料
+            </div>
+          `;
+
+
+        return;
+
+      }
+
+
       const fragment =
         document
         .createDocumentFragment();
 
 
       data.forEach(
-        stock => {
+        (
+          stock,
+          index
+        ) => {
 
           const card =
             document.createElement(
@@ -2631,13 +3960,8 @@
 
           card.innerHTML = `
 
-            <div
-              class="
-                mobile-card-summary
-              "
-            >
+            <div class="mobile-card-summary">
 
-              <!-- 第一行 -->
 
               <div
                 class="
@@ -2646,11 +3970,11 @@
                 "
               >
 
-                <span
-                  class="
-                    mobile-name
-                  "
-                >
+                <span class="mobile-rank">
+                  #${index + 1}
+                </span>
+
+                <span class="mobile-name">
 
                   ${escapeHtml(
                     stock.Name || ""
@@ -2658,12 +3982,7 @@
 
                 </span>
 
-
-                <span
-                  class="
-                    mobile-code
-                  "
-                >
+                <span class="mobile-code">
 
                   ${escapeHtml(
                     stock.Code || ""
@@ -2671,15 +3990,9 @@
 
                 </span>
 
-
-                <span
-                  class="
-                    mobile-divider
-                  "
-                >
-                  |
-                </span>
-
+                ${marketBadge(
+                  stock
+                )}
 
                 <span
                   class="
@@ -2696,8 +4009,6 @@
 
               </div>
 
-
-              <!-- 第二行 -->
 
               <div
                 class="
@@ -2720,21 +4031,11 @@
 
                 </span>
 
-
-                <span
-                  class="
-                    mobile-divider
-                  "
-                >
+                <span class="mobile-divider">
                   |
                 </span>
 
-
-                <span
-                  class="
-                    mobile-stat-inline
-                  "
-                >
+                <span class="mobile-stat-inline">
 
                   成交量
                   ${formatVolumeLots(
@@ -2743,21 +4044,11 @@
 
                 </span>
 
-
-                <span
-                  class="
-                    mobile-divider
-                  "
-                >
+                <span class="mobile-divider">
                   |
                 </span>
 
-
-                <span
-                  class="
-                    mobile-stat-inline
-                  "
-                >
+                <span class="mobile-stat-inline">
 
                   成交金額
                   ${formatCompactMoney(
@@ -2769,78 +4060,46 @@
               </div>
 
 
-              <!-- 第三行 -->
-
-              <div
-                class="
-                  mobile-ohlc-row
-                "
-              >
+              <div class="mobile-ohlc-row">
 
                 <span>
-
                   開
                   ${formatPrice(
                     stock.OpeningPrice
                   )}
-
                 </span>
 
-
-                <span
-                  class="
-                    mobile-ohlc-separator
-                  "
-                >
+                <span class="mobile-ohlc-separator">
                   ｜
                 </span>
 
-
                 <span>
-
                   高
                   ${formatPrice(
                     stock.HighestPrice
                   )}
-
                 </span>
 
-
-                <span
-                  class="
-                    mobile-ohlc-separator
-                  "
-                >
+                <span class="mobile-ohlc-separator">
                   ｜
                 </span>
 
-
                 <span>
-
                   低
                   ${formatPrice(
                     stock.LowestPrice
                   )}
-
                 </span>
 
-
-                <span
-                  class="
-                    mobile-ohlc-separator
-                  "
-                >
+                <span class="mobile-ohlc-separator">
                   ｜
                 </span>
 
-
                 <span>
-
                   收
                   ${formatPrice(
                     stock.ClosingPrice
                   )}
-
                 </span>
 
               </div>
@@ -2848,49 +4107,38 @@
             </div>
 
 
-            <span
-              class="
-                mobile-arrow
-              "
-            >
-            </span>
+            <span class="mobile-arrow"></span>
 
 
-            <!-- 展開資訊 -->
+            <div class="mobile-card-details">
 
-            <div
-              class="
-                mobile-card-details
-              "
-            >
-
-              <div
-                class="
-                  detail-grid
-                "
-              >
+              <div class="detail-grid">
 
 
-                <div
-                  class="
-                    detail-item
-                  "
-                >
+                <div class="detail-item">
 
-                  <div
-                    class="
-                      detail-label
-                    "
-                  >
+                  <div class="detail-label">
+                    市場
+                  </div>
+
+                  <div class="detail-value">
+                    ${escapeHtml(
+                      getMarketName(
+                        stock
+                      )
+                    )}
+                  </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
                     成交筆數
                   </div>
 
-
-                  <div
-                    class="
-                      detail-value
-                    "
-                  >
+                  <div class="detail-value">
 
                     ${formatNumber(
                       stock.Transaction
@@ -2901,20 +4149,11 @@
                 </div>
 
 
-                <div
-                  class="
-                    detail-item
-                  "
-                >
+                <div class="detail-item">
 
-                  <div
-                    class="
-                      detail-label
-                    "
-                  >
+                  <div class="detail-label">
                     漲跌價差
                   </div>
-
 
                   <div
                     class="
@@ -2932,26 +4171,13 @@
                 </div>
 
 
-                <div
-                  class="
-                    detail-item
-                  "
-                >
+                <div class="detail-item">
 
-                  <div
-                    class="
-                      detail-label
-                    "
-                  >
+                  <div class="detail-label">
                     振幅
                   </div>
 
-
-                  <div
-                    class="
-                      detail-value
-                    "
-                  >
+                  <div class="detail-value">
 
                     ${amplitude.toFixed(
                       2
@@ -2962,26 +4188,13 @@
                 </div>
 
 
-                <div
-                  class="
-                    detail-item
-                  "
-                >
+                <div class="detail-item">
 
-                  <div
-                    class="
-                      detail-label
-                    "
-                  >
+                  <div class="detail-label">
                     昨收
                   </div>
 
-
-                  <div
-                    class="
-                      detail-value
-                    "
-                  >
+                  <div class="detail-value">
 
                     ${formatPrice(
                       calculatePreviousClose(
@@ -2994,26 +4207,13 @@
                 </div>
 
 
-                <div
-                  class="
-                    detail-item
-                  "
-                >
+                <div class="detail-item">
 
-                  <div
-                    class="
-                      detail-label
-                    "
-                  >
-                    一般盤成交量
+                  <div class="detail-label">
+                    排除零股成交量
                   </div>
 
-
-                  <div
-                    class="
-                      detail-value
-                    "
-                  >
+                  <div class="detail-value">
 
                     ${formatVolumeLots(
                       stock
@@ -3024,29 +4224,59 @@
                 </div>
 
 
-                <div
-                  class="
-                    detail-item
-                  "
-                >
+                <div class="detail-item">
 
-                  <div
-                    class="
-                      detail-label
-                    "
-                  >
+                  <div class="detail-label">
+                    零股成交量
+                  </div>
+
+                  <div class="detail-value">
+
+                    ${Math.round(
+                      toNumber(
+                        stock.OddLotVolume
+                      )
+                      /
+                      1000
+                    )
+                    .toLocaleString(
+                      "zh-TW"
+                    )}張
+
+                  </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
                     完整成交金額
                   </div>
 
-
-                  <div
-                    class="
-                      detail-value
-                    "
-                  >
+                  <div class="detail-value">
 
                     ${formatNumber(
                       stock.TradeValue
+                    )}
+
+                  </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    產業
+                  </div>
+
+                  <div class="detail-value">
+
+                    ${escapeHtml(
+                      stock.Industry
+                      ||
+                      "未分類"
                     )}
 
                   </div>
@@ -3060,13 +4290,14 @@
           `;
 
 
-          const toggle = () => {
+          const toggle =
+            () => {
 
-            card.classList.toggle(
-              "expanded"
-            );
+              card.classList.toggle(
+                "expanded"
+              );
 
-          };
+            };
 
 
           card.addEventListener(
@@ -3080,9 +4311,11 @@
             event => {
 
               if (
-                event.key === "Enter"
+                event.key ===
+                "Enter"
                 ||
-                event.key === " "
+                event.key ===
+                " "
               ) {
 
                 event.preventDefault();
@@ -3110,9 +4343,9 @@
     }
 
 
-    /* ===============================
+    /* ========================================
        Render
-    =============================== */
+    ======================================== */
 
     function renderAll() {
 
@@ -3128,9 +4361,9 @@
     }
 
 
-    /* ===============================
-       Sort Value
-    =============================== */
+    /* ========================================
+       Sorting
+    ======================================== */
 
     function getSortValue(
       stock,
@@ -3140,10 +4373,10 @@
 
       if (
         key ===
-        "Amplitude"
+        "TradeVolume"
       ) {
 
-        return calculateAmplitude(
+        return getTradeVolumeShares(
           stock
         );
 
@@ -3162,17 +4395,24 @@
       }
 
 
-      /*
-        成交量排序
-        使用一般盤成交量
-      */
+      if (
+        key ===
+        "Amplitude"
+      ) {
+
+        return calculateAmplitude(
+          stock
+        );
+
+      }
+
 
       if (
         key ===
-        "TradeVolume"
+        "MarketName"
       ) {
 
-        return getTradeVolumeShares(
+        return getMarketName(
           stock
         );
 
@@ -3204,10 +4444,6 @@
     }
 
 
-    /* ===============================
-       Apply Sort
-    =============================== */
-
     function applySort(
       key,
       direction,
@@ -3224,7 +4460,7 @@
 
 
       currentView =
-        [...stocks]
+        [...currentView]
         .sort(
           (
             a,
@@ -3247,8 +4483,7 @@
               );
 
 
-            let result =
-              0;
+            let result = 0;
 
 
             if (
@@ -3266,8 +4501,13 @@
             else {
 
               result =
-                aValue.localeCompare(
-                  bValue,
+                String(
+                  aValue
+                )
+                .localeCompare(
+                  String(
+                    bValue
+                  ),
                   "zh-Hant"
                 );
 
@@ -3275,8 +4515,7 @@
 
 
             return (
-              direction
-              ===
+              direction ===
               "asc"
             )
               ? result
@@ -3294,10 +4533,6 @@
     }
 
 
-    /* ===============================
-       Header Sort
-    =============================== */
-
     function sortFromHeader(
       th
     ) {
@@ -3314,14 +4549,12 @@
 
 
       if (
-        sortState.key
-        ===
+        sortState.key ===
         key
       ) {
 
         direction =
-          sortState.direction
-          ===
+          sortState.direction ===
           "desc"
             ? "asc"
             : "desc";
@@ -3331,8 +4564,7 @@
       else {
 
         direction =
-          type
-          ===
+          type ===
           "number"
             ? "desc"
             : "asc";
@@ -3348,10 +4580,6 @@
 
     }
 
-
-    /* ===============================
-       Icons
-    =============================== */
 
     function updateDesktopSortIcons() {
 
@@ -3378,8 +4606,7 @@
 
 
           if (
-            th.dataset.key
-            ===
+            th.dataset.key ===
             sortState.key
           ) {
 
@@ -3389,8 +4616,7 @@
 
 
             icon.textContent =
-              sortState.direction
-              ===
+              sortState.direction ===
               "desc"
                 ? "↓"
                 : "↑";
@@ -3403,9 +4629,51 @@
     }
 
 
-    /* ===============================
+    /* ========================================
+       Drawer
+    ======================================== */
+
+    function openDrawer() {
+
+      drawer.classList.add(
+        "show"
+      );
+
+
+      drawerOverlay.classList.add(
+        "show"
+      );
+
+
+      document.body.classList.add(
+        "menu-open"
+      );
+
+    }
+
+
+    function closeDrawer() {
+
+      drawer.classList.remove(
+        "show"
+      );
+
+
+      drawerOverlay.classList.remove(
+        "show"
+      );
+
+
+      document.body.classList.remove(
+        "menu-open"
+      );
+
+    }
+
+
+    /* ========================================
        Load
-    =============================== */
+    ======================================== */
 
     async function loadStocks() {
 
@@ -3489,99 +4757,55 @@
 
 
               return (
-
                 code !== ""
-
                 &&
-
                 close > 0
-
               );
 
             }
           );
 
 
-        currentView =
-          [...stocks];
+        metadata = {
 
+          tradeDate:
+            Array.isArray(
+              json
+            )
+              ? ""
+              : json.tradeDate,
 
-        sortState = {
+          updatedAt:
+            Array.isArray(
+              json
+            )
+              ? ""
+              : json.updatedAt,
 
-          key: null,
+          volumeMode:
+            Array.isArray(
+              json
+            )
+              ? ""
+              : json.volumeMode,
 
-          direction: null
-
+          marketCounts:
+            Array.isArray(
+              json
+            )
+              ? {}
+              : (
+                  json.marketCounts
+                  ||
+                  {}
+                )
         };
 
 
-        mobileSortSelect.value =
-          "";
-
-
-        renderAll();
-
-
-        updateDesktopSortIcons();
-
-
-        const tradeDate =
-          Array.isArray(
-            json
-          )
-            ? ""
-            : json.tradeDate;
-
-
-        const updatedAt =
-          Array.isArray(
-            json
-          )
-            ? ""
-            : json.updatedAt;
-
-
-        const volumeMode =
-          Array.isArray(
-            json
-          )
-            ? ""
-            : json.volumeMode;
-
-
-        tradeDateValue.textContent =
-          formatTradeDate(
-            tradeDate
-          );
-
-
-        countValue.textContent =
-          `${stocks.length} 檔`;
-
-
-        updatedAtValue.textContent =
-          updatedAt
-          ||
-          "-";
-
-
-        if (
-          volumeMode
-          ===
-          "REGULAR_TRADING_ONLY"
-        ) {
-
-          statusEl.textContent =
-            `已載入 ${stocks.length} 檔有效上市個股｜成交量：一般交易`;
-
-        }
-
-        else {
-
-          statusEl.textContent =
-            `已載入 ${stocks.length} 檔有效上市個股｜成交量資料仍為舊版`;
-
-        }
+        setPage(
+          currentPage,
+          false
+        );
 
       }
 
@@ -3638,9 +4862,57 @@
     }
 
 
-    /* ===============================
+    /* ========================================
        Events
-    =============================== */
+    ======================================== */
+
+    document
+    .getElementById(
+      "menuBtn"
+    )
+    .addEventListener(
+      "click",
+      openDrawer
+    );
+
+
+    document
+    .getElementById(
+      "drawerCloseBtn"
+    )
+    .addEventListener(
+      "click",
+      closeDrawer
+    );
+
+
+    drawerOverlay.addEventListener(
+      "click",
+      closeDrawer
+    );
+
+
+    document
+    .querySelectorAll(
+      ".nav-item"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            setPage(
+              button.dataset.view
+            );
+
+          }
+        );
+
+      }
+    );
+
 
     document
     .querySelectorAll(
@@ -3664,7 +4936,8 @@
     );
 
 
-    mobileSortSelect.addEventListener(
+    mobileSortSelect
+    .addEventListener(
       "change",
       () => {
 
@@ -3677,7 +4950,7 @@
         ) {
 
           currentView =
-            [...stocks];
+            getPageStocks();
 
 
           sortState = {
@@ -3712,10 +4985,9 @@
         const textKeys = [
 
           "Code",
-
           "Name",
-
-          "Industry"
+          "Industry",
+          "MarketName"
 
         ];
 
@@ -3748,9 +5020,50 @@
     );
 
 
-    /* ===============================
+    window.addEventListener(
+      "hashchange",
+      () => {
+
+        const page =
+          getInitialPage();
+
+
+        if (
+          page !==
+          currentPage
+        ) {
+
+          setPage(
+            page,
+            false
+          );
+
+        }
+
+      }
+    );
+
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key ===
+          "Escape"
+        ) {
+
+          closeDrawer();
+
+        }
+
+      }
+    );
+
+
+    /* ========================================
        Init
-    =============================== */
+    ======================================== */
 
     loadStocks();
 
