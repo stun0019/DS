@@ -3,12 +3,11 @@ name: Update Taiwan Stock Data
 on:
   workflow_dispatch:
 
-  # 台灣時間週一～週五 15:10
-  # GitHub Actions cron = UTC
-  # 07:10 UTC = 台灣 15:10
+  # 台灣時間週一～週五 17:40
+  # GitHub Actions 使用 UTC
+  # 09:40 UTC = 台灣 17:40
   schedule:
-    - cron: "10 7 * * 1-5"
-
+    - cron: "40 9 * * 1-5"
 
 permissions:
   contents: write
@@ -19,7 +18,6 @@ jobs:
   update-stock-data:
 
     runs-on: ubuntu-latest
-
 
     steps:
 
@@ -69,26 +67,23 @@ jobs:
               "https://openapi.twse.com.tw/v1"
           )
 
-
           TWSE_WEB = (
               "https://www.twse.com.tw"
           )
-
 
           TPEX_OPENAPI = (
               "https://www.tpex.org.tw/openapi/v1"
           )
 
 
-          # -------------------------------
+          # --------------------------------------------------
           # TWSE
-          # -------------------------------
+          # --------------------------------------------------
 
           TWSE_MARKET_API = (
               TWSE_OPENAPI
               + "/exchangeReport/STOCK_DAY_ALL"
           )
-
 
           TWSE_COMPANY_API = (
               TWSE_OPENAPI
@@ -96,31 +91,36 @@ jobs:
           )
 
 
-          # -------------------------------
+          # --------------------------------------------------
           # TPEx
-          # -------------------------------
+          #
+          # 改用 latest quotes
+          # 不再使用 daily_close_quotes 當主資料
+          # --------------------------------------------------
 
           TPEX_MARKET_API = (
               TPEX_OPENAPI
-              + "/tpex_mainboard_daily_close_quotes"
+              + "/tpex_mainboard_quotes"
           )
-
 
           TPEX_COMPANY_API = (
               TPEX_OPENAPI
               + "/mopsfin_t187ap03_O"
           )
 
-
           TPEX_ODD_API = (
               TPEX_OPENAPI
               + "/tpex_odd_stock"
           )
 
-
-          TPEX_OFF_MARKET_API = (
+          TPEX_FIXED_API = (
               TPEX_OPENAPI
               + "/tpex_off_market"
+          )
+
+          TPEX_BLOCK_API = (
+              TPEX_OPENAPI
+              + "/tpex_daily_trading_block"
           )
 
 
@@ -184,7 +184,6 @@ jobs:
                   f"Fetching: {url}"
               )
 
-
               last_error = None
 
 
@@ -195,31 +194,40 @@ jobs:
 
                   try:
 
-                      request = (
-                          urllib.request.Request(
+                      if "tpex.org.tw" in url:
 
-                              url,
-
-                              headers={
-
-                                  "User-Agent":
-                                      (
-                                          "Mozilla/5.0 "
-                                          "Taiwan-Stock-Dashboard"
-                                      ),
-
-                                  "Accept":
-                                      (
-                                          "application/json,"
-                                          "text/plain,*/*"
-                                      ),
-
-                                  "Referer":
-                                      (
-                                          "https://www.twse.com.tw/"
-                                      )
-                              }
+                          referer = (
+                              "https://www.tpex.org.tw/"
                           )
+
+                      else:
+
+                          referer = (
+                              "https://www.twse.com.tw/"
+                          )
+
+
+                      request = urllib.request.Request(
+
+                          url,
+
+                          headers={
+
+                              "User-Agent":
+                                  (
+                                      "Mozilla/5.0 "
+                                      "Taiwan-Stock-Dashboard"
+                                  ),
+
+                              "Accept":
+                                  (
+                                      "application/json,"
+                                      "text/plain,*/*"
+                                  ),
+
+                              "Referer":
+                                  referer
+                          }
                       )
 
 
@@ -242,7 +250,6 @@ jobs:
 
                       last_error = error
 
-
                       print(
                           f"Attempt {attempt} failed:",
                           repr(
@@ -254,7 +261,7 @@ jobs:
                       if attempt < 3:
 
                           time.sleep(
-                              2 * attempt
+                              attempt * 2
                           )
 
 
@@ -267,10 +274,9 @@ jobs:
 
 
               print(
-                  "Optional API unavailable:",
+                  "Optional API failed:",
                   url
               )
-
 
               return []
 
@@ -289,13 +295,11 @@ jobs:
                   else ""
               )
 
-
               text = re.sub(
                   r"<[^>]+>",
                   "",
                   text
               )
-
 
               return (
                   text
@@ -311,11 +315,31 @@ jobs:
               )
 
 
-          def to_number_text(
+          def normalize_key(
               value
           ):
 
               return (
+                  clean_text(
+                      value
+                  )
+                  .replace(
+                      " ",
+                      ""
+                  )
+                  .replace(
+                      "_",
+                      ""
+                  )
+                  .lower()
+              )
+
+
+          def to_int(
+              value
+          ):
+
+              text = (
                   clean_text(
                       value
                   )
@@ -328,17 +352,6 @@ jobs:
                       ""
                   )
                   .strip()
-              )
-
-
-          def to_int(
-              value
-          ):
-
-              text = (
-                  to_number_text(
-                      value
-                  )
               )
 
 
@@ -391,7 +404,6 @@ jobs:
                   value
               )
 
-
               text = (
                   text
                   .replace(
@@ -408,7 +420,6 @@ jobs:
                   )
               )
 
-
               return re.sub(
                   r"[^0-9A-Za-z]",
                   "",
@@ -424,11 +435,9 @@ jobs:
                   value
               )
 
-
               if not text:
 
                   return ""
-
 
               if text.isdigit():
 
@@ -436,82 +445,31 @@ jobs:
                       2
                   )
 
-
               return text
 
 
-          def get_industry_name(
-              raw_value
-          ):
-
-              raw_value = clean_text(
-                  raw_value
-              )
-
-
-              industry_code = (
-                  normalize_industry_code(
-                      raw_value
-                  )
-              )
-
-
-              if industry_code in INDUSTRY_MAP:
-
-                  return (
-                      industry_code,
-                      INDUSTRY_MAP[
-                          industry_code
-                      ]
-                  )
-
-
-              if raw_value:
-
-                  return (
-                      industry_code,
-                      raw_value
-                  )
-
-
-              return (
-                  "",
-                  "未分類"
-              )
-
-
-          def roc_to_gregorian(
+          def get_industry(
               value
           ):
 
-              raw = re.sub(
-                  r"\D",
-                  "",
-                  str(
-                      value or ""
+              raw = clean_text(
+                  value
+              )
+
+              code = (
+                  normalize_industry_code(
+                      raw
                   )
               )
 
+              name = INDUSTRY_MAP.get(
+                  code,
+                  raw if raw else "未分類"
+              )
 
-              if len(
-                  raw
-              ) == 7:
-
-                  return (
-                      f"{int(raw[:3]) + 1911}"
-                      f"{raw[3:]}"
-                  )
-
-
-              if len(
-                  raw
-              ) == 8:
-
-                  return raw
-
-
-              raise RuntimeError(
-                  f"Invalid trade date: {value}"
+              return (
+                  code,
+                  name
               )
 
 
@@ -528,6 +486,7 @@ jobs:
               )
 
 
+              # ROC 1150812
               if len(
                   raw
               ) == 7:
@@ -535,14 +494,18 @@ jobs:
                   return raw
 
 
+              # Gregorian 20260812
               if len(
                   raw
               ) == 8:
 
-                  year = int(
-                      raw[:4]
-                  ) - 1911
-
+                  year = (
+                      int(
+                          raw[:4]
+                      )
+                      -
+                      1911
+                  )
 
                   return (
                       f"{year:03d}"
@@ -553,29 +516,31 @@ jobs:
               return ""
 
 
-          # ==================================================
-          # Generic dictionary helpers
-          # ==================================================
-
-          def normalized_key(
+          def roc_to_gregorian(
               value
           ):
 
-              return (
-                  clean_text(
-                      value
-                  )
-                  .replace(
-                      " ",
-                      ""
-                  )
-                  .replace(
-                      "_",
-                      ""
-                  )
-                  .lower()
+              raw = normalize_trade_date(
+                  value
               )
 
+              if len(
+                  raw
+              ) != 7:
+
+                  raise RuntimeError(
+                      f"Invalid ROC date: {value}"
+                  )
+
+              return (
+                  f"{int(raw[:3]) + 1911}"
+                  f"{raw[3:]}"
+              )
+
+
+          # ==================================================
+          # Generic dict
+          # ==================================================
 
           def pick_value(
               row,
@@ -591,8 +556,7 @@ jobs:
                   return default
 
 
-              # Exact key first
-
+              # Exact match
               for candidate in candidates:
 
                   if candidate in row:
@@ -600,7 +564,6 @@ jobs:
                       value = row.get(
                           candidate
                       )
-
 
                       if value not in (
                           None,
@@ -610,11 +573,9 @@ jobs:
                           return value
 
 
-              # Normalized key
-
               normalized_candidates = {
 
-                  normalized_key(
+                  normalize_key(
                       candidate
                   )
 
@@ -626,7 +587,7 @@ jobs:
               for key, value in row.items():
 
                   if (
-                      normalized_key(
+                      normalize_key(
                           key
                       )
                       in
@@ -671,24 +632,87 @@ jobs:
                   "results"
               ):
 
-                  value = payload.get(
+                  rows = payload.get(
                       key
                   )
 
-
                   if isinstance(
-                      value,
+                      rows,
                       list
                   ):
 
-                      return value
+                      return rows
 
 
               return []
 
 
           # ==================================================
-          # TWSE Web table parser
+          # Date matching
+          #
+          # 避免 API 一次回傳多日資料後
+          # 被全部加總
+          # ==================================================
+
+          DATE_KEYS = [
+
+              "Date",
+              "TradeDate",
+              "TradingDate",
+              "資料日期",
+              "交易日期",
+              "日期"
+          ]
+
+
+          def row_matches_date(
+              row,
+              target_roc
+          ):
+
+              if not isinstance(
+                  row,
+                  dict
+              ):
+
+                  return True
+
+
+              raw_date = pick_value(
+                  row,
+                  DATE_KEYS,
+                  ""
+              )
+
+
+              # endpoint 沒有日期欄位
+              # 視為 latest snapshot
+              if not raw_date:
+
+                  return True
+
+
+              normalized = (
+                  normalize_trade_date(
+                      raw_date
+                  )
+              )
+
+
+              if not normalized:
+
+                  return True
+
+
+              return (
+                  normalized
+                  ==
+                  target_roc
+              )
+
+
+          # ==================================================
+          # TWSE table parser
           # ==================================================
 
           def iter_twse_tables(
@@ -706,7 +730,6 @@ jobs:
               fields = payload.get(
                   "fields"
               )
-
 
               data = payload.get(
                   "data"
@@ -739,7 +762,6 @@ jobs:
                   fields = payload.get(
                       f"fields{index}"
                   )
-
 
                   data = payload.get(
                       f"data{index}"
@@ -788,7 +810,6 @@ jobs:
                           "fields"
                       )
 
-
                       data = table.get(
                           "data"
                       )
@@ -819,22 +840,22 @@ jobs:
 
               normalized_fields = [
 
-                  normalized_key(
-                      item
+                  normalize_key(
+                      field
                   )
 
-                  for item
+                  for field
                   in fields
               ]
 
 
               normalized_candidates = [
 
-                  normalized_key(
-                      item
+                  normalize_key(
+                      candidate
                   )
 
-                  for item
+                  for candidate
                   in candidates
               ]
 
@@ -864,8 +885,10 @@ jobs:
               result = {}
 
 
-              for fields, rows in iter_twse_tables(
-                  payload
+              for fields, rows in (
+                  iter_twse_tables(
+                      payload
+                  )
               ):
 
                   code_index = (
@@ -927,7 +950,16 @@ jobs:
                       )
 
 
-                      if not code:
+                      # 排除合計
+                      if (
+                          not code
+                          or
+                          code in (
+                              "TOTAL",
+                              "合計",
+                              "總計"
+                          )
+                      ):
 
                           continue
 
@@ -962,7 +994,7 @@ jobs:
               urls,
               volume_fields,
               multiplier=1,
-              minimum_records=1
+              required=True
           ):
 
               errors = []
@@ -1006,54 +1038,54 @@ jobs:
 
                               payload,
 
-                              volume_fields=
-                                  volume_fields,
+                              volume_fields,
 
-                              multiplier=
-                                  multiplier
+                              multiplier
                           )
                       )
 
 
                       print(
-                          "Parsed:",
+                          "Parsed",
                           len(
                               result
                           ),
-                          url
+                          "records"
                       )
 
 
-                      if len(
-                          result
-                      ) >= minimum_records:
-
-                          return (
-                              result,
-                              url
-                          )
+                      return (
+                          result,
+                          url
+                      )
 
 
                   except Exception as error:
 
                       errors.append(
-                          str(
-                              error
-                          )
+                          f"{url}: {error}"
                       )
 
 
-              raise RuntimeError(
-                  "TWSE report failed:\n"
-                  +
-                  "\n".join(
-                      errors
+              if required:
+
+                  raise RuntimeError(
+                      "TWSE report failed:\n"
+                      +
+                      "\n".join(
+                          errors
+                      )
                   )
+
+
+              return (
+                  {},
+                  ""
               )
 
 
           # ==================================================
-          # TPEx volume parser
+          # TPEx parser
           # ==================================================
 
           TPEX_CODE_KEYS = [
@@ -1062,6 +1094,7 @@ jobs:
               "SecuritiesCode",
               "StockCode",
               "Code",
+
               "證券代號",
               "股票代號",
               "公司代號",
@@ -1069,104 +1102,37 @@ jobs:
           ]
 
 
-          TPEX_VOLUME_KEYS = [
+          TPEX_NAME_KEYS = [
+
+              "CompanyName",
+              "SecuritiesCompanyName",
+              "SecuritiesName",
+              "StockName",
+              "Name",
+
+              "公司簡稱",
+              "證券名稱",
+              "名稱"
+          ]
+
+
+          VOLUME_KEYS = [
 
               "TradingShares",
               "TradingVolume",
               "TransactionShares",
+              "Volume",
+
               "成交股數",
               "成交量",
               "成交數量"
           ]
 
 
-          def find_tpex_volume_value(
-              row
-          ):
-
-              # Exact candidates
-
-              value = pick_value(
-                  row,
-                  TPEX_VOLUME_KEYS,
-                  None
-              )
-
-
-              if value is not None:
-
-                  return (
-                      to_int(
-                          value
-                      ),
-                      ""
-                  )
-
-
-              # Fuzzy fallback
-
-              for key, value in row.items():
-
-                  key_text = normalized_key(
-                      key
-                  )
-
-
-                  if (
-                      "成交金額"
-                      in key_text
-                      or
-                      "amount"
-                      in key_text
-                  ):
-
-                      continue
-
-
-                  if (
-                      "成交股數"
-                      in key_text
-                      or
-                      "成交數量"
-                      in key_text
-                      or
-                      "tradingshares"
-                      in key_text
-                      or
-                      "tradingvolume"
-                      in key_text
-                  ):
-
-                      number = to_int(
-                          value
-                      )
-
-
-                      # 若欄位明確標示張數
-                      if (
-                          "張"
-                          in clean_text(
-                              key
-                          )
-                      ):
-
-                          number *= 1000
-
-
-                      return (
-                          number,
-                          key
-                      )
-
-
-              return (
-                  0,
-                  ""
-              )
-
-
           def extract_tpex_volume_map(
-              payload
+              payload,
+              target_date,
+              multiplier=1
           ):
 
               result = {}
@@ -1184,10 +1150,19 @@ jobs:
                       continue
 
 
+                  if not row_matches_date(
+                      row,
+                      target_date
+                  ):
+
+                      continue
+
+
                   code = normalize_code(
                       pick_value(
                           row,
-                          TPEX_CODE_KEYS
+                          TPEX_CODE_KEYS,
+                          ""
                       )
                   )
 
@@ -1197,11 +1172,57 @@ jobs:
                       continue
 
 
-                  volume, _ = (
-                      find_tpex_volume_value(
-                          row
+                  volume = to_int(
+                      pick_value(
+                          row,
+                          VOLUME_KEYS,
+                          0
                       )
                   )
+
+
+                  # 部分欄位若明確標示「張」
+                  # 自動轉成股
+                  for key in row.keys():
+
+                      key_normalized = (
+                          normalize_key(
+                              key
+                          )
+                      )
+
+                      if (
+                          normalize_key(
+                              key
+                          )
+                          in
+                          {
+                              normalize_key(
+                                  item
+                              )
+                              for item
+                              in VOLUME_KEYS
+                          }
+                      ):
+
+                          if (
+                              "張"
+                              in clean_text(
+                                  key
+                              )
+                              or
+                              "千股"
+                              in clean_text(
+                                  key
+                              )
+                          ):
+
+                              volume *= 1000
+
+                          break
+
+
+                  volume *= multiplier
 
 
                   result[
@@ -1220,14 +1241,26 @@ jobs:
 
 
           # ==================================================
-          # 1. TWSE daily data
+          #
+          # TWSE
+          #
           # ==================================================
 
           print("")
           print(
-              "===== TWSE ====="
+              "=============================="
+          )
+          print(
+              "TWSE"
+          )
+          print(
+              "=============================="
           )
 
+
+          # ==================================================
+          # 1. Market
+          # ==================================================
 
           twse_market_data = fetch_json(
               TWSE_MARKET_API
@@ -1255,24 +1288,8 @@ jobs:
               )
 
 
-          if (
-              not isinstance(
-                  twse_company_data,
-                  list
-              )
-              or
-              len(
-                  twse_company_data
-              ) < 500
-          ):
-
-              raise RuntimeError(
-                  "TWSE company data too small"
-              )
-
-
           # ==================================================
-          # 2. TWSE company whitelist
+          # 2. Company whitelist
           # ==================================================
 
           twse_company_info = {}
@@ -1306,7 +1323,7 @@ jobs:
               (
                   industry_code,
                   industry_name
-              ) = get_industry_name(
+              ) = get_industry(
                   company.get(
                       "產業別",
                       ""
@@ -1327,15 +1344,13 @@ jobs:
 
 
           # ==================================================
-          # 3. TWSE pure listed stocks
+          # 3. Listed stocks only
           # ==================================================
 
           twse_stocks = []
 
 
-          for stock in (
-              twse_market_data
-          ):
+          for stock in twse_market_data:
 
               if not isinstance(
                   stock,
@@ -1417,7 +1432,7 @@ jobs:
 
 
           # ==================================================
-          # 4. Trade date
+          # 4. Trade Date
           # ==================================================
 
           trade_date = normalize_trade_date(
@@ -1430,6 +1445,13 @@ jobs:
           )
 
 
+          if not trade_date:
+
+              raise RuntimeError(
+                  "Cannot detect TWSE trade date"
+              )
+
+
           gregorian_date = (
               roc_to_gregorian(
                   trade_date
@@ -1439,66 +1461,16 @@ jobs:
 
           print(
               "Trade date:",
-              trade_date
+              trade_date,
+              gregorian_date
           )
 
 
           # ==================================================
-          # 5. TWSE MI_INDEX
+          # 5. TWSE Intraday Odd Lot
           # ==================================================
 
-          mi_params = (
-              urllib.parse.urlencode({
-
-                  "date":
-                      gregorian_date,
-
-                  "type":
-                      "ALLBUT0999",
-
-                  "response":
-                      "json"
-              })
-          )
-
-
-          (
-              twse_market_volume_map,
-              twse_mi_source
-          ) = fetch_twse_report(
-
-              [
-
-                  (
-                      TWSE_WEB
-                      + "/rwd/zh/"
-                      + "afterTrading/"
-                      + "MI_INDEX?"
-                      + mi_params
-                  ),
-
-                  (
-                      TWSE_WEB
-                      + "/exchangeReport/"
-                      + "MI_INDEX?"
-                      + mi_params
-                  )
-
-              ],
-
-              volume_fields=[
-                  "成交股數"
-              ],
-
-              minimum_records=500
-          )
-
-
-          # ==================================================
-          # 6. TWSE odd lots
-          # ==================================================
-
-          odd_params = (
+          common_params = (
               urllib.parse.urlencode({
 
                   "date":
@@ -1514,7 +1486,7 @@ jobs:
 
 
           (
-              twse_intraday_odd_map,
+              twse_intraday_odd,
               twse_intraday_source
           ) = fetch_twse_report(
 
@@ -1522,31 +1494,31 @@ jobs:
 
                   (
                       TWSE_WEB
-                      + "/rwd/zh/"
-                      + "afterTrading/"
+                      + "/rwd/zh/afterTrading/"
                       + "TWTC7U?"
-                      + odd_params
+                      + common_params
                   ),
 
                   (
                       TWSE_WEB
                       + "/exchangeReport/"
                       + "TWTC7U?"
-                      + odd_params
+                      + common_params
                   )
-
               ],
 
-              volume_fields=[
+              [
                   "成交股數"
-              ],
-
-              minimum_records=1
+              ]
           )
 
 
+          # ==================================================
+          # 6. TWSE After-hours Odd Lot
+          # ==================================================
+
           (
-              twse_after_odd_map,
+              twse_after_odd,
               twse_after_odd_source
           ) = fetch_twse_report(
 
@@ -1554,96 +1526,118 @@ jobs:
 
                   (
                       TWSE_WEB
-                      + "/rwd/zh/"
-                      + "afterTrading/"
+                      + "/rwd/zh/afterTrading/"
                       + "TWT53U?"
-                      + odd_params
+                      + common_params
                   ),
 
                   (
                       TWSE_WEB
                       + "/exchangeReport/"
                       + "TWT53U?"
-                      + odd_params
+                      + common_params
                   )
-
               ],
 
-              volume_fields=[
+              [
                   "成交股數"
-              ],
-
-              minimum_records=1
+              ]
           )
 
 
           # ==================================================
-          # 7. TWSE after-hours fixed
+          # 7. TWSE After-hours Fixed Price
           #
-          # Observation only.
-          # NOT deducted.
+          # BFT41U 股票成交數量單位 = 千股
+          # 所以 × 1000
           # ==================================================
 
-          try:
+          (
+              twse_fixed,
+              twse_fixed_source
+          ) = fetch_twse_report(
 
-              (
-                  twse_fixed_map,
-                  twse_fixed_source
-              ) = fetch_twse_report(
+              [
 
-                  [
+                  (
+                      TWSE_WEB
+                      + "/rwd/zh/afterTrading/"
+                      + "BFT41U?"
+                      + common_params
+                  ),
 
-                      (
-                          TWSE_WEB
-                          + "/rwd/zh/"
-                          + "afterTrading/"
-                          + "BFT41U?"
-                          + odd_params
-                      ),
+                  (
+                      TWSE_WEB
+                      + "/exchangeReport/"
+                      + "BFT41U?"
+                      + common_params
+                  )
+              ],
 
-                      (
-                          TWSE_WEB
-                          + "/exchangeReport/"
-                          + "BFT41U?"
-                          + odd_params
-                      )
+              [
+                  "成交數量"
+              ],
 
-                  ],
-
-                  volume_fields=[
-                      "成交數量"
-                  ],
-
-                  multiplier=1000,
-
-                  minimum_records=1
-              )
-
-
-          except Exception as error:
-
-              print(
-                  "TWSE fixed-price optional error:",
-                  error
-              )
-
-
-              twse_fixed_map = {}
-              twse_fixed_source = ""
+              multiplier=1000
+          )
 
 
           # ==================================================
-          # 8. TWSE adjusted volume
+          # 8. TWSE Block
           #
-          # MI_INDEX
-          # - intraday odd lot
-          # - after-hours odd lot
-          #
-          # Fixed-price is NOT deducted.
+          # BFIAUU
+          # 單位：股
+          # 同股票多筆交易全部加總
           # ==================================================
 
-          missing_twse_volume = []
+          block_params = (
+              urllib.parse.urlencode({
 
+                  "date":
+                      gregorian_date,
+
+                  "response":
+                      "json",
+
+                  "selectType":
+                      "S"
+              })
+          )
+
+
+          (
+              twse_block,
+              twse_block_source
+          ) = fetch_twse_report(
+
+              [
+
+                  (
+                      TWSE_WEB
+                      + "/block/BFIAUU?"
+                      + block_params
+                  )
+              ],
+
+              [
+                  "成交股數"
+              ],
+
+              multiplier=1,
+
+              required=False
+          )
+
+
+          # ==================================================
+          # 9. TWSE Regular Session Volume
+          #
+          # STOCK_DAY_ALL
+          # - intraday odd
+          # - after-hours odd
+          # - fixed price
+          # - block
+          # ==================================================
 
           for stock in twse_stocks:
 
@@ -1652,33 +1646,16 @@ jobs:
               ]
 
 
-              if code not in (
-                  twse_market_volume_map
-              ):
-
-                  missing_twse_volume.append(
-                      code
+              total_volume = to_int(
+                  stock.get(
+                      "TradeVolume",
+                      0
                   )
-
-
-                  market_volume = to_int(
-                      stock.get(
-                          "TradeVolume",
-                          0
-                      )
-                  )
-
-              else:
-
-                  market_volume = (
-                      twse_market_volume_map[
-                          code
-                      ]
-                  )
+              )
 
 
               intraday_odd = (
-                  twse_intraday_odd_map.get(
+                  twse_intraday_odd.get(
                       code,
                       0
                   )
@@ -1686,7 +1663,23 @@ jobs:
 
 
               after_odd = (
-                  twse_after_odd_map.get(
+                  twse_after_odd.get(
+                      code,
+                      0
+                  )
+              )
+
+
+              fixed_volume = (
+                  twse_fixed.get(
+                      code,
+                      0
+                  )
+              )
+
+
+              block_volume = (
+                  twse_block.get(
                       code,
                       0
                   )
@@ -1700,74 +1693,111 @@ jobs:
               )
 
 
-              adjusted_volume = max(
+              regular_volume = max(
 
                   0,
 
-                  market_volume
+                  total_volume
+
                   -
+                  odd_total
+
+                  -
+                  fixed_volume
+
+                  -
+                  block_volume
+              )
+
+
+              stock[
+                  "TotalTradeVolume"
+              ] = (
+                  total_volume
+              )
+
+
+              stock[
+                  "IntradayOddLotVolume"
+              ] = (
+                  intraday_odd
+              )
+
+
+              stock[
+                  "AfterHoursOddLotVolume"
+              ] = (
+                  after_odd
+              )
+
+
+              stock[
+                  "OddLotVolume"
+              ] = (
                   odd_total
               )
 
 
               stock[
-                  "VolumeBasis"
-              ] = market_volume
-
-
-              stock[
-                  "IntradayOddLotVolume"
-              ] = intraday_odd
-
-
-              stock[
-                  "AfterHoursOddLotVolume"
-              ] = after_odd
-
-
-              stock[
-                  "OddLotVolume"
-              ] = odd_total
-
-
-              stock[
                   "AfterHoursFixedVolume"
               ] = (
-                  twse_fixed_map.get(
-                      code,
-                      0
-                  )
+                  fixed_volume
               )
 
 
               stock[
+                  "BlockTradeVolume"
+              ] = (
+                  block_volume
+              )
+
+
+              stock[
+                  "RegularSessionVolume"
+              ] = (
+                  regular_volume
+              )
+
+
+              # index.html 相容
+              stock[
                   "AdjustedTradeVolume"
-              ] = adjusted_volume
+              ] = (
+                  regular_volume
+              )
 
 
-              # Backward compatibility
               stock[
                   "RegularTradeVolume"
-              ] = adjusted_volume
+              ] = (
+                  regular_volume
+              )
 
 
           # ==================================================
-          # 9. TPEx
+          #
+          # TPEx
+          #
           # ==================================================
 
           print("")
           print(
-              "===== TPEx ====="
+              "=============================="
+          )
+          print(
+              "TPEx"
+          )
+          print(
+              "=============================="
           )
 
+
+          # ==================================================
+          # 10. TPEx Market
+          # ==================================================
 
           tpex_market_payload = fetch_json(
               TPEX_MARKET_API
-          )
-
-
-          tpex_company_payload = fetch_json(
-              TPEX_COMPANY_API
           )
 
 
@@ -1775,6 +1805,11 @@ jobs:
               unwrap_records(
                   tpex_market_payload
               )
+          )
+
+
+          tpex_company_payload = fetch_json(
+              TPEX_COMPANY_API
           )
 
 
@@ -1804,23 +1839,15 @@ jobs:
 
 
           print(
-              "TPEx market records:",
+              "TPEx market:",
               len(
                   tpex_market_data
               )
           )
 
 
-          print(
-              "TPEx company records:",
-              len(
-                  tpex_company_data
-              )
-          )
-
-
           # ==================================================
-          # 10. TPEx company whitelist
+          # 11. TPEx company whitelist
           # ==================================================
 
           tpex_company_info = {}
@@ -1848,7 +1875,9 @@ jobs:
                           "SecuritiesCompanyCode",
                           "StockCode",
                           "Code"
-                      ]
+                      ],
+
+                      ""
                   )
               )
 
@@ -1858,24 +1887,24 @@ jobs:
                   continue
 
 
-              raw_industry = pick_value(
-
-                  company,
-
-                  [
-                      "產業別",
-                      "Industry",
-                      "IndustryCode",
-                      "產業類別"
-                  ]
-              )
-
-
               (
                   industry_code,
                   industry_name
-              ) = get_industry_name(
-                  raw_industry
+              ) = get_industry(
+
+                  pick_value(
+
+                      company,
+
+                      [
+                          "產業別",
+                          "Industry",
+                          "IndustryCode",
+                          "產業類別"
+                      ],
+
+                      ""
+                  )
               )
 
 
@@ -1891,63 +1920,72 @@ jobs:
               }
 
 
-          if len(
-              tpex_company_info
-          ) < 500:
-
-              raise RuntimeError(
-                  "Too few TPEx company codes"
-              )
-
-
           # ==================================================
-          # 11. TPEx odd lot
+          # 12. TPEx components
           # ==================================================
 
           tpex_odd_payload = fetch_json(
-              TPEX_ODD_API
+              TPEX_ODD_API,
+              required=False
           )
 
 
-          tpex_odd_map = (
-              extract_tpex_volume_map(
-                  tpex_odd_payload
+          tpex_fixed_payload = fetch_json(
+              TPEX_FIXED_API,
+              required=False
+          )
+
+
+          tpex_block_payload = fetch_json(
+              TPEX_BLOCK_API,
+              required=False
+          )
+
+
+          tpex_odd = extract_tpex_volume_map(
+
+              tpex_odd_payload,
+
+              trade_date
+          )
+
+
+          tpex_fixed = extract_tpex_volume_map(
+
+              tpex_fixed_payload,
+
+              trade_date
+          )
+
+
+          tpex_block = extract_tpex_volume_map(
+
+              tpex_block_payload,
+
+              trade_date
+          )
+
+
+          print(
+              "TPEx odd:",
+              len(
+                  tpex_odd
               )
           )
 
 
           print(
-              "TPEx odd-lot records:",
+              "TPEx fixed:",
               len(
-                  tpex_odd_map
+                  tpex_fixed
               )
           )
 
 
-          if len(
-              tpex_odd_map
-          ) < 1:
-
-              raise RuntimeError(
-                  "TPEx odd-lot data could not be parsed"
-              )
-
-
-          # ==================================================
-          # 12. TPEx fixed price
-          #
-          # Observation only.
-          # ==================================================
-
-          tpex_off_payload = fetch_json(
-              TPEX_OFF_MARKET_API,
-              required=False
-          )
-
-
-          tpex_off_map = (
-              extract_tpex_volume_map(
-                  tpex_off_payload
+          print(
+              "TPEx block:",
+              len(
+                  tpex_block
               )
           )
 
@@ -1959,9 +1997,10 @@ jobs:
           tpex_stocks = []
 
 
-          for row in (
-              tpex_market_data
-          ):
+          seen_tpex = set()
+
+
+          for row in tpex_market_data:
 
               if not isinstance(
                   row,
@@ -1971,10 +2010,19 @@ jobs:
                   continue
 
 
+              if not row_matches_date(
+                  row,
+                  trade_date
+              ):
+
+                  continue
+
+
               code = normalize_code(
                   pick_value(
                       row,
-                      TPEX_CODE_KEYS
+                      TPEX_CODE_KEYS,
+                      ""
                   )
               )
 
@@ -1988,20 +2036,22 @@ jobs:
                   continue
 
 
+              # 防止 API 多筆歷史資料
+              if code in seen_tpex:
+
+                  continue
+
+
+              seen_tpex.add(
+                  code
+              )
+
+
               name = clean_text(
                   pick_value(
-
                       row,
-
-                      [
-                          "CompanyName",
-                          "SecuritiesCompanyName",
-                          "StockName",
-                          "Name",
-                          "名稱",
-                          "證券名稱",
-                          "公司簡稱"
-                      ]
+                      TPEX_NAME_KEYS,
+                      ""
                   )
               )
 
@@ -2016,7 +2066,9 @@ jobs:
                           "ClosingPrice",
                           "收盤",
                           "收盤價"
-                      ]
+                      ],
+
+                      ""
                   )
               )
 
@@ -2031,28 +2083,53 @@ jobs:
                   continue
 
 
-              raw_volume, _ = (
-                  find_tpex_volume_value(
-                      row
+              total_volume = to_int(
+                  pick_value(
+                      row,
+                      VOLUME_KEYS,
+                      0
                   )
               )
 
 
               odd_volume = (
-                  tpex_odd_map.get(
+                  tpex_odd.get(
                       code,
                       0
                   )
               )
 
 
-              adjusted_volume = max(
+              fixed_volume = (
+                  tpex_fixed.get(
+                      code,
+                      0
+                  )
+              )
+
+
+              block_volume = (
+                  tpex_block.get(
+                      code,
+                      0
+                  )
+              )
+
+
+              regular_volume = max(
 
                   0,
 
-                  raw_volume
+                  total_volume
+
                   -
                   odd_volume
+
+                  -
+                  fixed_volume
+
+                  -
+                  block_volume
               )
 
 
@@ -2069,7 +2146,7 @@ jobs:
 
                   "TradeVolume":
                       str(
-                          raw_volume
+                          total_volume
                       ),
 
                   "TradeValue":
@@ -2085,7 +2162,28 @@ jobs:
                                       "TradeValue",
                                       "成交金額",
                                       "成交金額(元)"
-                                  ]
+                                  ],
+
+                                  0
+                              )
+                          )
+                      ),
+
+                  "Transaction":
+                      str(
+                          to_int(
+                              pick_value(
+
+                                  row,
+
+                                  [
+                                      "TransactionNumber",
+                                      "Transactions",
+                                      "Transaction",
+                                      "成交筆數"
+                                  ],
+
+                                  0
                               )
                           )
                       ),
@@ -2101,7 +2199,9 @@ jobs:
                                   "OpeningPrice",
                                   "開盤",
                                   "開盤價"
-                              ]
+                              ],
+
+                              ""
                           )
                       ),
 
@@ -2116,7 +2216,9 @@ jobs:
                                   "HighestPrice",
                                   "最高",
                                   "最高價"
-                              ]
+                              ],
+
+                              ""
                           )
                       ),
 
@@ -2131,7 +2233,9 @@ jobs:
                                   "LowestPrice",
                                   "最低",
                                   "最低價"
-                              ]
+                              ],
+
+                              ""
                           )
                       ),
 
@@ -2155,40 +2259,19 @@ jobs:
                           )
                       ),
 
-                  "Transaction":
-                      str(
-                          to_int(
-                              pick_value(
-
-                                  row,
-
-                                  [
-                                      "TransactionNumber",
-                                      "Transactions",
-                                      "Transaction",
-                                      "成交筆數"
-                                  ]
-                              )
-                          )
-                      ),
-
                   "IndustryCode":
-                      (
-                          tpex_company_info[
-                              code
-                          ][
-                              "IndustryCode"
-                          ]
-                      ),
+                      tpex_company_info[
+                          code
+                      ][
+                          "IndustryCode"
+                      ],
 
                   "Industry":
-                      (
-                          tpex_company_info[
-                              code
-                          ][
-                              "Industry"
-                          ]
-                      ),
+                      tpex_company_info[
+                          code
+                      ][
+                          "Industry"
+                      ],
 
                   "Market":
                       "TPEX",
@@ -2196,8 +2279,8 @@ jobs:
                   "MarketName":
                       "上櫃",
 
-                  "VolumeBasis":
-                      raw_volume,
+                  "TotalTradeVolume":
+                      total_volume,
 
                   "IntradayOddLotVolume":
                       0,
@@ -2209,19 +2292,20 @@ jobs:
                       odd_volume,
 
                   "AfterHoursFixedVolume":
-                      (
-                          tpex_off_map.get(
-                              code,
-                              0
-                          )
-                      ),
+                      fixed_volume,
 
+                  "BlockTradeVolume":
+                      block_volume,
+
+                  "RegularSessionVolume":
+                      regular_volume,
+
+                  # index.html 相容
                   "AdjustedTradeVolume":
-                      adjusted_volume,
+                      regular_volume,
 
-                  # Backward compatibility
                   "RegularTradeVolume":
-                      adjusted_volume
+                      regular_volume
               }
 
 
@@ -2235,7 +2319,13 @@ jobs:
           ) < 500:
 
               raise RuntimeError(
-                  "Too few normalized TPEx stocks"
+                  "Too few TPEx stocks after normalization: "
+                  +
+                  str(
+                      len(
+                          tpex_stocks
+                      )
+                  )
               )
 
 
@@ -2250,12 +2340,29 @@ jobs:
           )
 
 
+          if len(
+              all_stocks
+          ) < 1400:
+
+              raise RuntimeError(
+                  "Combined stock count too small: "
+                  +
+                  str(
+                      len(
+                          all_stocks
+                      )
+                  )
+              )
+
+
           all_stocks.sort(
               key=lambda stock: (
+
                   stock.get(
                       "Market",
                       ""
                   ),
+
                   stock.get(
                       "Code",
                       ""
@@ -2265,62 +2372,7 @@ jobs:
 
 
           # ==================================================
-          # 15. Sanity check
-          # ==================================================
-
-          duplicate_keys = set()
-          seen_keys = set()
-
-
-          for stock in all_stocks:
-
-              key = (
-                  stock.get(
-                      "Market"
-                  ),
-                  stock.get(
-                      "Code"
-                  )
-              )
-
-
-              if key in seen_keys:
-
-                  duplicate_keys.add(
-                      key
-                  )
-
-
-              seen_keys.add(
-                  key
-              )
-
-
-          if duplicate_keys:
-
-              raise RuntimeError(
-                  "Duplicate stocks detected: "
-                  +
-                  str(
-                      list(
-                          duplicate_keys
-                      )[:20]
-                  )
-              )
-
-
-          if len(
-              all_stocks
-          ) < 1200:
-
-              raise RuntimeError(
-                  "Combined TWSE + TPEx "
-                  "stock count is unexpectedly low"
-              )
-
-
-          # ==================================================
-          # 16. Candidate Preview
+          # 15. TOP 10 preview
           # ==================================================
 
           candidate_preview = sorted(
@@ -2330,7 +2382,7 @@ jobs:
               key=lambda stock:
                   to_int(
                       stock.get(
-                          "AdjustedTradeVolume",
+                          "RegularSessionVolume",
                           0
                       )
                   ),
@@ -2342,7 +2394,13 @@ jobs:
 
           print("")
           print(
-              "===== Candidate TOP 10 ====="
+              "=============================="
+          )
+          print(
+              "Regular Session Volume TOP 10"
+          )
+          print(
+              "=============================="
           )
 
 
@@ -2370,7 +2428,7 @@ jobs:
                   round(
                       to_int(
                           stock.get(
-                              "AdjustedTradeVolume",
+                              "RegularSessionVolume",
                               0
                           )
                       )
@@ -2378,7 +2436,114 @@ jobs:
                       1000
                   ),
 
-                  "lots"
+                  "張"
+              )
+
+
+          # ==================================================
+          # 16. Debug
+          #
+          # 2344 / 6770 只用來看 Actions Log
+          # 不影響計算
+          # ==================================================
+
+          verify_codes = {
+
+              "2344",
+              "6770"
+          }
+
+
+          print("")
+          print(
+              "=============================="
+          )
+          print(
+              "Volume Verification"
+          )
+          print(
+              "=============================="
+          )
+
+
+          for stock in all_stocks:
+
+              if (
+                  stock.get(
+                      "Code"
+                  )
+                  not in verify_codes
+              ):
+
+                  continue
+
+
+              print("")
+              print(
+                  stock.get(
+                      "MarketName"
+                  ),
+                  stock.get(
+                      "Code"
+                  ),
+                  stock.get(
+                      "Name"
+                  )
+              )
+
+
+              print(
+                  "Total:",
+                  stock.get(
+                      "TotalTradeVolume"
+                  )
+              )
+
+
+              print(
+                  "Odd:",
+                  stock.get(
+                      "OddLotVolume"
+                  )
+              )
+
+
+              print(
+                  "Fixed:",
+                  stock.get(
+                      "AfterHoursFixedVolume"
+                  )
+              )
+
+
+              print(
+                  "Block:",
+                  stock.get(
+                      "BlockTradeVolume"
+                  )
+              )
+
+
+              print(
+                  "Regular:",
+                  stock.get(
+                      "RegularSessionVolume"
+                  )
+              )
+
+
+              print(
+                  "Regular lots:",
+                  round(
+                      to_int(
+                          stock.get(
+                              "RegularSessionVolume"
+                          )
+                      )
+                      /
+                      1000,
+                      3
+                  )
               )
 
 
@@ -2405,19 +2570,21 @@ jobs:
 
               "source":
                   (
-                      "TWSE + TPEx official APIs"
+                      "TWSE + TPEx official data"
                   ),
 
               "type":
                   "TWSE_TPEX_STOCK_ONLY",
 
               "volumeMode":
-                  "EXCLUDE_ODD_LOT",
+                  "REGULAR_SESSION_ONLY",
 
               "volumeFormula":
                   (
-                      "Market volume "
-                      "- odd-lot volume"
+                      "TotalTradeVolume "
+                      "- OddLotVolume "
+                      "- AfterHoursFixedVolume "
+                      "- BlockTradeVolume"
                   ),
 
               "count":
@@ -2458,26 +2625,26 @@ jobs:
 
 
           # ==================================================
-          # 18. Log
+          # 18. Final log
           # ==================================================
 
           print("")
           print(
-              "================================"
+              "=============================="
           )
-
           print(
               "stocks.json updated"
           )
-
           print(
-              "================================"
+              "=============================="
           )
 
+
           print(
-              "Trade date:",
+              "Trade Date:",
               trade_date
           )
+
 
           print(
               "TWSE:",
@@ -2486,12 +2653,14 @@ jobs:
               )
           )
 
+
           print(
               "TPEx:",
               len(
                   tpex_stocks
               )
           )
+
 
           print(
               "Total:",
@@ -2500,66 +2669,56 @@ jobs:
               )
           )
 
+
+          print("")
           print(
-              "TWSE missing MI_INDEX:",
-              len(
-                  missing_twse_volume
-              )
+              "Volume formula:"
+          )
+
+
+          print(
+              "Total"
+              " - Odd"
+              " - Fixed"
+              " - Block"
+              " = RegularSessionVolume"
+          )
+
+
+          print("")
+          print(
+              "TWSE sources:"
           )
 
           print(
-              "TWSE MI_INDEX:",
-              twse_mi_source
-          )
-
-          print(
-              "TWSE intraday odd:",
+              "Intraday odd:",
               twse_intraday_source
           )
 
           print(
-              "TWSE after odd:",
+              "After-hours odd:",
               twse_after_odd_source
           )
 
           print(
-              "TWSE fixed:",
+              "Fixed:",
               twse_fixed_source
           )
 
           print(
-              "TPEx odd records:",
-              len(
-                  tpex_odd_map
-              )
-          )
-
-          print(
-              "TPEx fixed records:",
-              len(
-                  tpex_off_map
-              )
+              "Block:",
+              twse_block_source
           )
 
           PY
 
 
       # =======================================
-      # 4. Check output
+      # 4. Validate stocks.json
       # =======================================
 
-      - name: Show stocks.json info
+      - name: Validate stocks.json
         run: |
-
-          echo "stocks.json:"
-          ls -lh stocks.json
-
-          echo ""
-
-          echo "Header:"
-          head -n 30 stocks.json
-
-          echo ""
 
           python <<'PY'
 
@@ -2571,30 +2730,108 @@ jobs:
               encoding="utf-8"
           ) as file:
 
-              data = json.load(
+              payload = json.load(
                   file
+              )
+
+
+          stocks = payload.get(
+              "data",
+              []
+          )
+
+
+          if not stocks:
+
+              raise SystemExit(
+                  "stocks.json is empty"
               )
 
 
           print(
               "Total:",
-              data.get(
+              payload.get(
                   "count"
               )
           )
 
 
           print(
-              "Market counts:",
-              data.get(
+              "Markets:",
+              payload.get(
                   "marketCounts"
               )
           )
 
 
-          stocks = data.get(
-              "data",
-              []
+          print(
+              "Volume mode:",
+              payload.get(
+                  "volumeMode"
+              )
+          )
+
+
+          print(
+              "Formula:",
+              payload.get(
+                  "volumeFormula"
+              )
+          )
+
+
+          invalid = []
+
+
+          for stock in stocks:
+
+              total = int(
+                  stock.get(
+                      "TotalTradeVolume",
+                      0
+                  )
+                  or
+                  0
+              )
+
+
+              regular = int(
+                  stock.get(
+                      "RegularSessionVolume",
+                      0
+                  )
+                  or
+                  0
+              )
+
+
+              if (
+                  regular < 0
+                  or
+                  regular > total
+              ):
+
+                  invalid.append(
+                      stock.get(
+                          "Code"
+                      )
+                  )
+
+
+          if invalid:
+
+              raise SystemExit(
+                  "Invalid volume values: "
+                  +
+                  ", ".join(
+                      invalid[:20]
+                  )
+              )
+
+
+          print("")
+          print(
+              "Validation OK"
           )
 
 
@@ -2605,7 +2842,7 @@ jobs:
               key=lambda stock:
                   int(
                       stock.get(
-                          "AdjustedTradeVolume",
+                          "RegularSessionVolume",
                           0
                       )
                       or
@@ -2619,26 +2856,35 @@ jobs:
 
           print("")
           print(
-              "TOP 10:"
+              "TOP 10"
           )
 
 
-          for stock in top10:
+          for index, stock in enumerate(
+              top10,
+              1
+          ):
 
               print(
+
+                  index,
+
                   stock.get(
                       "MarketName"
                   ),
+
                   stock.get(
                       "Code"
                   ),
+
                   stock.get(
                       "Name"
                   ),
+
                   round(
                       int(
                           stock.get(
-                              "AdjustedTradeVolume",
+                              "RegularSessionVolume",
                               0
                           )
                           or
@@ -2646,14 +2892,30 @@ jobs:
                       )
                       /
                       1000
-                  )
+                  ),
+
+                  "張"
               )
 
           PY
 
 
       # =======================================
-      # 5. Commit
+      # 5. stocks.json info
+      # =======================================
+
+      - name: Show stocks.json info
+        run: |
+
+          ls -lh stocks.json
+
+          echo ""
+
+          head -n 35 stocks.json
+
+
+      # =======================================
+      # 6. Commit
       # =======================================
 
       - name: Commit stock data
@@ -2681,7 +2943,7 @@ jobs:
           else
 
             git commit \
-              -m "chore: update TWSE and TPEx stock data"
+              -m "chore: update regular-session TWSE and TPEx volumes"
 
             git push
 
