@@ -2,7 +2,6 @@
 <html lang="zh-Hant">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -17,15 +16,12 @@
 
   <title>台股隔日當沖候選系統</title>
 
-
   <style>
-
     :root {
       --bg: #0f1115;
       --surface: #171a20;
       --surface-2: #1d2129;
       --surface-3: #242933;
-
       --border: #2b313d;
 
       --text: #f3f5f7;
@@ -34,15 +30,14 @@
 
       --up: #ff5a67;
       --down: #35c98b;
-
       --accent: #7c8cff;
 
-      --radius-lg: 18px;
+      --radius-lg: 16px;
       --radius-md: 12px;
       --radius-sm: 8px;
 
       --shadow:
-        0 12px 30px rgba(0, 0, 0, 0.22);
+        0 10px 28px rgba(0, 0, 0, 0.2);
     }
 
 
@@ -88,10 +83,7 @@
 
 
     .app {
-      width: min(
-        1500px,
-        96%
-      );
+      width: min(1500px, 96%);
 
       margin: 0 auto;
 
@@ -102,9 +94,9 @@
     }
 
 
-    /* =========================================
+    /* =========================
        Header
-    ========================================= */
+    ========================= */
 
     .header {
       display: flex;
@@ -168,18 +160,6 @@
       color: var(--text);
 
       cursor: pointer;
-
-      transition:
-        border-color 0.15s,
-        background 0.15s,
-        transform 0.15s;
-    }
-
-
-    .reload-btn:hover {
-      background: var(--surface-3);
-
-      border-color: #414958;
     }
 
 
@@ -188,9 +168,9 @@
     }
 
 
-    /* =========================================
+    /* =========================
        Summary
-    ========================================= */
+    ========================= */
 
     .summary {
       display: grid;
@@ -214,8 +194,7 @@
           var(--surface)
         );
 
-      border:
-        1px solid var(--border);
+      border: 1px solid var(--border);
 
       border-radius: var(--radius-md);
     }
@@ -241,9 +220,9 @@
     }
 
 
-    /* =========================================
+    /* =========================
        Controls
-    ========================================= */
+    ========================= */
 
     .controls {
       display: flex;
@@ -284,8 +263,7 @@
     .sort-select {
       width: 100%;
 
-      border:
-        1px solid var(--border);
+      border: 1px solid var(--border);
 
       border-radius: 10px;
 
@@ -303,15 +281,14 @@
     }
 
 
-    /* =========================================
+    /* =========================
        Desktop Table
-    ========================================= */
+    ========================= */
 
     .desktop-table {
       overflow: hidden;
 
-      border:
-        1px solid var(--border);
+      border: 1px solid var(--border);
 
       border-radius: var(--radius-lg);
 
@@ -347,12 +324,9 @@
 
       z-index: 2;
 
-      padding:
-        13px
-        12px;
+      padding: 13px 12px;
 
-      border-bottom:
-        1px solid var(--border);
+      border-bottom: 1px solid var(--border);
 
       color: var(--text-secondary);
 
@@ -370,9 +344,7 @@
 
 
     td {
-      padding:
-        13px
-        12px;
+      padding: 13px 12px;
 
       border-bottom:
         1px solid rgba(43, 49, 61, 0.75);
@@ -384,12 +356,6 @@
       text-align: right;
 
       white-space: nowrap;
-    }
-
-
-    tbody tr {
-      transition:
-        background 0.12s;
     }
 
 
@@ -414,31 +380,8 @@
     }
 
 
-    .code {
-      color: var(--text-secondary);
-
-      font-variant-numeric: tabular-nums;
-    }
-
-
-    .stock-name {
-      color: var(--text);
-
-      font-weight: 650;
-    }
-
-
-    .industry {
-      color: #aeb5c0;
-    }
-
-
     .sortable {
       cursor: pointer;
-
-      transition:
-        color 0.15s,
-        background 0.15s;
     }
 
 
@@ -467,217 +410,22 @@
     }
 
 
-    /* =========================================
-       Mobile Cards
-    ========================================= */
-
-    .mobile-list {
-      display: none;
+    .code {
+      color: var(--text-secondary);
     }
 
 
-    .stock-card {
-      margin-bottom: 12px;
-
-      padding: 16px;
-
-      border:
-        1px solid var(--border);
-
-      border-radius: var(--radius-lg);
-
-      background:
-        linear-gradient(
-          145deg,
-          #1b1f26,
-          #16191f
-        );
-
-      box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.18);
-    }
-
-
-    .stock-card-header {
-      display: flex;
-
-      align-items: flex-start;
-      justify-content: space-between;
-
-      gap: 12px;
-
-      margin-bottom: 14px;
-    }
-
-
-    .stock-identity {
-      min-width: 0;
-    }
-
-
-    .stock-title-row {
-      display: flex;
-
-      align-items: baseline;
-
-      gap: 8px;
-
-      min-width: 0;
-    }
-
-
-    .mobile-stock-name {
-      overflow: hidden;
-
-      max-width: 180px;
-
+    .stock-name {
       color: var(--text);
 
-      font-size: 17px;
-      font-weight: 700;
-
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-
-    .mobile-stock-code {
-      color: var(--text-muted);
-
-      font-size: 12px;
-      font-variant-numeric: tabular-nums;
-    }
-
-
-    .mobile-industry {
-      margin-top: 5px;
-
-      color: var(--text-secondary);
-
-      font-size: 12px;
-    }
-
-
-    .change-box {
-      flex-shrink: 0;
-
-      text-align: right;
-    }
-
-
-    .change-value {
-      font-size: 17px;
-      font-weight: 750;
-
-      font-variant-numeric: tabular-nums;
-    }
-
-
-    .amplitude-value {
-      margin-top: 4px;
-
-      color: var(--text-secondary);
-
-      font-size: 11px;
-    }
-
-
-    .metrics {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-      gap: 8px;
-
-      margin-bottom: 10px;
-    }
-
-
-    .metric {
-      min-width: 0;
-
-      padding: 11px 12px;
-
-      border:
-        1px solid rgba(43, 49, 61, 0.8);
-
-      border-radius: 11px;
-
-      background:
-        rgba(255, 255, 255, 0.025);
-    }
-
-
-    .metric-label {
-      margin-bottom: 5px;
-
-      color: var(--text-muted);
-
-      font-size: 10px;
-
-      letter-spacing: 0.03em;
-    }
-
-
-    .metric-value {
-      overflow: hidden;
-
-      color: #e9ecf0;
-
-      font-size: 14px;
       font-weight: 650;
-
-      font-variant-numeric: tabular-nums;
-
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
 
-    .ohlc {
-      display: grid;
-
-      grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
-      gap: 6px;
-
-      padding-top: 11px;
-
-      border-top:
-        1px solid rgba(43, 49, 61, 0.85);
+    .industry {
+      color: #aeb5c0;
     }
 
-
-    .ohlc-item {
-      text-align: center;
-    }
-
-
-    .ohlc-label {
-      display: block;
-
-      margin-bottom: 4px;
-
-      color: var(--text-muted);
-
-      font-size: 10px;
-    }
-
-
-    .ohlc-value {
-      color: #cfd4db;
-
-      font-size: 12px;
-
-      font-variant-numeric: tabular-nums;
-    }
-
-
-    /* =========================================
-       Up / Down
-    ========================================= */
 
     .up {
       color: var(--up);
@@ -694,24 +442,313 @@
     }
 
 
-    /* =========================================
+    /* =========================
+       Mobile
+    ========================= */
+
+    .mobile-list {
+      display: none;
+    }
+
+
+    .mobile-stock-card {
+      position: relative;
+
+      margin-bottom: 8px;
+
+      border: 1px solid var(--border);
+
+      border-radius: 14px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #1a1e25,
+          #16191f
+        );
+
+      overflow: hidden;
+
+      cursor: pointer;
+
+      transition:
+        border-color 0.15s,
+        background 0.15s;
+    }
+
+
+    .mobile-stock-card:active {
+      background: #1d2129;
+    }
+
+
+    /* =========================
+       Collapsed Area
+    ========================= */
+
+    .mobile-card-summary {
+      padding:
+        13px
+        38px
+        13px
+        14px;
+    }
+
+
+    .mobile-line {
+      display: flex;
+
+      align-items: center;
+
+      min-width: 0;
+
+      line-height: 1.45;
+    }
+
+
+    .mobile-line + .mobile-line {
+      margin-top: 7px;
+    }
+
+
+    /* 第一行 */
+
+    .mobile-line-primary {
+      gap: 7px;
+    }
+
+
+    .mobile-name {
+      flex-shrink: 0;
+
+      color: var(--text);
+
+      font-size: 16px;
+      font-weight: 750;
+    }
+
+
+    .mobile-code {
+      flex-shrink: 0;
+
+      color: var(--text-muted);
+
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+
+    .mobile-divider {
+      flex-shrink: 0;
+
+      color: #3e4552;
+
+      font-size: 11px;
+    }
+
+
+    .mobile-change-percent {
+      flex-shrink: 0;
+
+      font-size: 14px;
+      font-weight: 750;
+
+      font-variant-numeric:
+        tabular-nums;
+    }
+
+
+    .mobile-ohlc-inline {
+      min-width: 0;
+
+      margin-left: auto;
+
+      color: var(--text-secondary);
+
+      font-size: 10px;
+
+      font-variant-numeric:
+        tabular-nums;
+
+      white-space: nowrap;
+    }
+
+
+    /* 第二行 */
+
+    .mobile-line-secondary {
+      gap: 7px;
+
+      color: var(--text-secondary);
+
+      font-size: 11px;
+    }
+
+
+    .mobile-industry-inline {
+      flex-shrink: 1;
+
+      min-width: 0;
+
+      overflow: hidden;
+
+      max-width: 105px;
+
+      color: #aeb5c0;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+
+    .mobile-stat-inline {
+      flex-shrink: 0;
+
+      white-space: nowrap;
+
+      font-variant-numeric:
+        tabular-nums;
+    }
+
+
+    /* Arrow */
+
+    .mobile-arrow {
+      position: absolute;
+
+      top: 50%;
+      right: 14px;
+
+      width: 10px;
+      height: 10px;
+
+      border-right:
+        2px solid var(--text-muted);
+
+      border-bottom:
+        2px solid var(--text-muted);
+
+      transform:
+        translateY(-65%)
+        rotate(45deg);
+
+      transition:
+        transform 0.2s;
+    }
+
+
+    .mobile-stock-card.expanded
+    .mobile-arrow {
+      transform:
+        translateY(-30%)
+        rotate(225deg);
+    }
+
+
+    /* =========================
+       Expanded Area
+    ========================= */
+
+    .mobile-card-details {
+      max-height: 0;
+
+      overflow: hidden;
+
+      opacity: 0;
+
+      border-top:
+        1px solid transparent;
+
+      transition:
+        max-height 0.25s ease,
+        opacity 0.2s ease,
+        padding 0.25s ease,
+        border-color 0.25s ease;
+    }
+
+
+    .mobile-stock-card.expanded
+    .mobile-card-details {
+      max-height: 300px;
+
+      padding:
+        12px
+        14px
+        14px;
+
+      opacity: 1;
+
+      border-top:
+        1px solid var(--border);
+    }
+
+
+    .detail-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+      gap: 8px;
+    }
+
+
+    .detail-item {
+      min-width: 0;
+
+      padding: 9px 10px;
+
+      border:
+        1px solid rgba(43, 49, 61, 0.8);
+
+      border-radius: 9px;
+
+      background:
+        rgba(255, 255, 255, 0.025);
+    }
+
+
+    .detail-label {
+      margin-bottom: 4px;
+
+      color: var(--text-muted);
+
+      font-size: 9px;
+    }
+
+
+    .detail-value {
+      overflow: hidden;
+
+      color: #e1e5ea;
+
+      font-size: 12px;
+      font-weight: 650;
+
+      font-variant-numeric:
+        tabular-nums;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+
+    /* =========================
        Loading
-    ========================================= */
+    ========================= */
 
     .loading {
       padding: 50px 20px;
 
       color: var(--text-secondary);
 
-      font-size: 14px;
-
       text-align: center;
     }
 
 
-    /* =========================================
+    /* =========================
        Mobile 9:16
-    ========================================= */
+    ========================= */
 
     @media (
       max-width: 720px
@@ -732,7 +769,7 @@
           )
           14px
           calc(
-            30px
+            32px
             +
             env(safe-area-inset-bottom)
           );
@@ -764,9 +801,7 @@
 
 
       .reload-btn {
-        padding:
-          9px
-          12px;
+        padding: 9px 12px;
 
         font-size: 12px;
       }
@@ -783,9 +818,7 @@
 
 
       .summary-card {
-        padding:
-          12px
-          13px;
+        padding: 12px 13px;
       }
 
 
@@ -843,12 +876,42 @@
     }
 
 
+    /* very small phones */
+
     @media (
-      min-width: 721px
+      max-width: 390px
     ) {
 
-      .mobile-list {
-        display: none !important;
+      .mobile-card-summary {
+        padding-left: 12px;
+        padding-right: 32px;
+      }
+
+
+      .mobile-name {
+        font-size: 15px;
+      }
+
+
+      .mobile-change-percent {
+        font-size: 13px;
+      }
+
+
+      .mobile-ohlc-inline {
+        font-size: 9px;
+      }
+
+
+      .mobile-line-secondary {
+        gap: 5px;
+
+        font-size: 10px;
+      }
+
+
+      .mobile-industry-inline {
+        max-width: 90px;
       }
 
     }
@@ -860,13 +923,9 @@
 
 <body>
 
-
   <main class="app">
 
-
-    <!-- ======================================
-         Header
-    ======================================= -->
+    <!-- Header -->
 
     <header class="header">
 
@@ -898,9 +957,7 @@
 
 
 
-    <!-- ======================================
-         Summary
-    ======================================= -->
+    <!-- Summary -->
 
     <section class="summary">
 
@@ -955,9 +1012,7 @@
 
 
 
-    <!-- ======================================
-         Controls
-    ======================================= -->
+    <!-- Controls -->
 
     <section class="controls">
 
@@ -1005,12 +1060,16 @@
             成交筆數｜大 → 小
           </option>
 
-          <option value="Change:desc">
-            漲跌｜高 → 低
+          <option value="Transaction:asc">
+            成交筆數｜小 → 大
           </option>
 
-          <option value="Change:asc">
-            漲跌｜低 → 高
+          <option value="ChangePercent:desc">
+            漲跌幅｜高 → 低
+          </option>
+
+          <option value="ChangePercent:asc">
+            漲跌幅｜低 → 高
           </option>
 
           <option value="Amplitude:desc">
@@ -1033,9 +1092,7 @@
 
 
 
-    <!-- ======================================
-         Desktop Table
-    ======================================= -->
+    <!-- Desktop Table -->
 
     <section class="desktop-table">
 
@@ -1139,10 +1196,10 @@
 
               <th
                 class="sortable"
-                data-key="Change"
+                data-key="ChangePercent"
                 data-type="number"
               >
-                漲跌
+                漲跌幅
                 <span class="sort-icon"></span>
               </th>
 
@@ -1161,7 +1218,6 @@
 
 
           <tbody id="stockTableBody">
-
           </tbody>
 
         </table>
@@ -1172,9 +1228,7 @@
 
 
 
-    <!-- ======================================
-         Mobile List
-    ======================================= -->
+    <!-- Mobile List -->
 
     <section
       id="mobileStockList"
@@ -1186,7 +1240,6 @@
       </div>
 
     </section>
-
 
   </main>
 
@@ -1255,9 +1308,9 @@
 
 
 
-    /* =========================================
+    /* =========================
        Number
-    ========================================= */
+    ========================= */
 
     function toNumber(
       value
@@ -1306,9 +1359,9 @@
 
 
 
-    /* =========================================
+    /* =========================
        Escape
-    ========================================= */
+    ========================= */
 
     function escapeHtml(
       value
@@ -1347,73 +1400,18 @@
 
 
 
-    /* =========================================
-       Formatting
-    ========================================= */
+    /* =========================
+       Format
+    ========================= */
 
     function formatNumber(
       value
     ) {
 
       return Number(
-        value || 0
+        toNumber(value)
       ).toLocaleString(
         "zh-TW"
-      );
-
-    }
-
-
-    function formatCompactNumber(
-      value
-    ) {
-
-      const number =
-        toNumber(
-          value
-        );
-
-
-      if (
-        number >= 100000000
-      ) {
-
-        return (
-          number
-          /
-          100000000
-        ).toFixed(
-          number >= 1000000000
-            ? 1
-            : 2
-        )
-        +
-        " 億";
-
-      }
-
-
-      if (
-        number >= 10000
-      ) {
-
-        return (
-          number
-          /
-          10000
-        ).toFixed(
-          number >= 1000000
-            ? 0
-            : 1
-        )
-        +
-        " 萬";
-
-      }
-
-
-      return formatNumber(
-        number
       );
 
     }
@@ -1453,9 +1451,103 @@
 
 
 
-    /* =========================================
-       ROC Date
-    ========================================= */
+    /* =========================
+       Compact Number
+
+       成交量：
+       429,000,000
+       → 4.29億
+
+       成交金額：
+       31,070,000,000
+       → 310.7億
+    ========================= */
+
+    function formatCompactNumber(
+      value
+    ) {
+
+      const number =
+        toNumber(
+          value
+        );
+
+
+      if (
+        number >= 100000000
+      ) {
+
+        const result =
+          number
+          /
+          100000000;
+
+
+        if (
+          result >= 100
+        ) {
+
+          return (
+            result.toFixed(1)
+            +
+            "億"
+          );
+
+        }
+
+
+        return (
+          result.toFixed(2)
+          +
+          "億"
+        );
+
+      }
+
+
+      if (
+        number >= 10000
+      ) {
+
+        const result =
+          number
+          /
+          10000;
+
+
+        if (
+          result >= 100
+        ) {
+
+          return (
+            result.toFixed(0)
+            +
+            "萬"
+          );
+
+        }
+
+
+        return (
+          result.toFixed(1)
+          +
+          "萬"
+        );
+
+      }
+
+
+      return formatNumber(
+        number
+      );
+
+    }
+
+
+
+    /* =========================
+       Trade Date
+    ========================= */
 
     function formatTradeDate(
       value
@@ -1510,36 +1602,30 @@
       }
 
 
-      const year =
-        rocYear
-        +
-        1911;
-
-
       return (
-        `${year}/${month}/${day}`
+        `${rocYear + 1911}/${month}/${day}`
       );
 
     }
 
 
 
-    /* =========================================
+    /* =========================
        Change
-    ========================================= */
+    ========================= */
 
     function getChangeClass(
       value
     ) {
 
-      const change =
+      const number =
         toNumber(
           value
         );
 
 
       if (
-        change > 0
+        number > 0
       ) {
 
         return "up";
@@ -1548,7 +1634,7 @@
 
 
       if (
-        change < 0
+        number < 0
       ) {
 
         return "down";
@@ -1561,30 +1647,26 @@
     }
 
 
-    function formatChange(
-      value
+
+    function calculatePreviousClose(
+      stock
     ) {
+
+      const close =
+        toNumber(
+          stock.ClosingPrice
+        );
+
 
       const change =
         toNumber(
-          value
+          stock.Change
         );
 
 
-      if (
-        change > 0
-      ) {
-
-        return (
-          "+"
-          +
-          change
-        );
-
-      }
-
-
-      return String(
+      return (
+        close
+        -
         change
       );
 
@@ -1592,9 +1674,102 @@
 
 
 
-    /* =========================================
+    function calculateChangePercent(
+      stock
+    ) {
+
+      const previousClose =
+        calculatePreviousClose(
+          stock
+        );
+
+
+      const change =
+        toNumber(
+          stock.Change
+        );
+
+
+      if (
+        previousClose <= 0
+      ) {
+
+        return 0;
+
+      }
+
+
+      return (
+        change
+        /
+        previousClose
+        *
+        100
+      );
+
+    }
+
+
+
+    function formatChangePercent(
+      stock
+    ) {
+
+      const percent =
+        calculateChangePercent(
+          stock
+        );
+
+
+      const prefix =
+        percent > 0
+          ? "+"
+          : "";
+
+
+      return (
+        prefix
+        +
+        percent.toFixed(
+          2
+        )
+        +
+        "%"
+      );
+
+    }
+
+
+
+    function formatPriceChange(
+      stock
+    ) {
+
+      const change =
+        toNumber(
+          stock.Change
+        );
+
+
+      const prefix =
+        change > 0
+          ? "+"
+          : "";
+
+
+      return (
+        prefix
+        +
+        change
+      );
+
+    }
+
+
+
+    /* =========================
        Amplitude
-    ========================================= */
+    ========================= */
 
     function calculateAmplitude(
       stock
@@ -1643,9 +1818,9 @@
 
 
 
-    /* =========================================
+    /* =========================
        Desktop Render
-    ========================================= */
+    ========================= */
 
     function renderDesktopTable(
       data
@@ -1669,15 +1844,15 @@
             );
 
 
-          const amplitude =
-            calculateAmplitude(
+          const changePercent =
+            calculateChangePercent(
               stock
             );
 
 
-          const change =
-            toNumber(
-              stock.Change
+          const amplitude =
+            calculateAmplitude(
+              stock
             );
 
 
@@ -1748,12 +1923,12 @@
             <td
               class="
                 ${getChangeClass(
-                  change
+                  changePercent
                 )}
               "
             >
-              ${formatChange(
-                change
+              ${formatChangePercent(
+                stock
               )}
             </td>
 
@@ -1782,9 +1957,9 @@
 
 
 
-    /* =========================================
+    /* =========================
        Mobile Render
-    ========================================= */
+    ========================= */
 
     function renderMobileCards(
       data
@@ -1809,7 +1984,23 @@
 
 
           card.className =
-            "stock-card";
+            "mobile-stock-card";
+
+
+          card.tabIndex =
+            0;
+
+
+          const changePercent =
+            calculateChangePercent(
+              stock
+            );
+
+
+          const changeClass =
+            getChangeClass(
+              changePercent
+            );
 
 
           const amplitude =
@@ -1818,42 +2009,95 @@
             );
 
 
-          const change =
-            toNumber(
-              stock.Change
-            );
-
-
-          const changeClass =
+          const priceChangeClass =
             getChangeClass(
-              change
+              stock.Change
             );
 
 
           card.innerHTML = `
 
-            <div class="stock-card-header">
+            <div class="mobile-card-summary">
 
-              <div class="stock-identity">
+              <!-- 第一行 -->
 
-                <div class="stock-title-row">
+              <div
+                class="
+                  mobile-line
+                  mobile-line-primary
+                "
+              >
 
-                  <div class="mobile-stock-name">
-                    ${escapeHtml(
-                      stock.Name || ""
-                    )}
-                  </div>
+                <span class="mobile-name">
+                  ${escapeHtml(
+                    stock.Name || ""
+                  )}
+                </span>
 
-                  <div class="mobile-stock-code">
-                    ${escapeHtml(
-                      stock.Code || ""
-                    )}
-                  </div>
+                <span class="mobile-code">
+                  ${escapeHtml(
+                    stock.Code || ""
+                  )}
+                </span>
 
-                </div>
+                <span class="mobile-divider">
+                  |
+                </span>
+
+                <span
+                  class="
+                    mobile-change-percent
+                    ${changeClass}
+                  "
+                >
+                  ${formatChangePercent(
+                    stock
+                  )}
+                </span>
 
 
-                <div class="mobile-industry">
+                <span class="mobile-divider">
+                  |
+                </span>
+
+
+                <span class="mobile-ohlc-inline">
+
+                  開
+                  ${formatPrice(
+                    stock.OpeningPrice
+                  )}
+
+                  ・高
+                  ${formatPrice(
+                    stock.HighestPrice
+                  )}
+
+                  ・低
+                  ${formatPrice(
+                    stock.LowestPrice
+                  )}
+
+                  ・收
+                  ${formatPrice(
+                    stock.ClosingPrice
+                  )}
+
+                </span>
+
+              </div>
+
+
+              <!-- 第二行 -->
+
+              <div
+                class="
+                  mobile-line
+                  mobile-line-secondary
+                "
+              >
+
+                <span class="mobile-industry-inline">
 
                   ${escapeHtml(
                     stock.Industry
@@ -1861,164 +2105,194 @@
                     "未分類"
                   )}
 
-                </div>
-
-              </div>
+                </span>
 
 
-              <div class="change-box">
-
-                <div
-                  class="
-                    change-value
-                    ${changeClass}
-                  "
-                >
-                  ${formatChange(
-                    change
-                  )}
-                </div>
-
-                <div class="amplitude-value">
-                  振幅
-                  ${amplitude.toFixed(
-                    2
-                  )}%
-                </div>
-
-              </div>
-
-            </div>
+                <span class="mobile-divider">
+                  |
+                </span>
 
 
-            <div class="metrics">
+                <span class="mobile-stat-inline">
 
-              <div class="metric">
-
-                <div class="metric-label">
                   成交量
-                </div>
-
-                <div class="metric-value">
                   ${formatCompactNumber(
                     stock.TradeVolume
                   )}
-                </div>
 
-              </div>
+                </span>
 
 
-              <div class="metric">
+                <span class="mobile-divider">
+                  |
+                </span>
 
-                <div class="metric-label">
+
+                <span class="mobile-stat-inline">
+
                   成交金額
-                </div>
-
-                <div class="metric-value">
                   ${formatCompactNumber(
                     stock.TradeValue
                   )}
-                </div>
 
-              </div>
-
-
-              <div class="metric">
-
-                <div class="metric-label">
-                  成交筆數
-                </div>
-
-                <div class="metric-value">
-                  ${formatNumber(
-                    stock.Transaction
-                  )}
-                </div>
-
-              </div>
-
-
-              <div class="metric">
-
-                <div class="metric-label">
-                  收盤
-                </div>
-
-                <div class="metric-value">
-                  ${formatPrice(
-                    stock.ClosingPrice
-                  )}
-                </div>
+                </span>
 
               </div>
 
             </div>
 
 
-            <div class="ohlc">
-
-              <div class="ohlc-item">
-
-                <span class="ohlc-label">
-                  開
-                </span>
-
-                <span class="ohlc-value">
-                  ${formatPrice(
-                    stock.OpeningPrice
-                  )}
-                </span>
-
-              </div>
+            <span class="mobile-arrow">
+            </span>
 
 
-              <div class="ohlc-item">
+            <!-- 展開內容 -->
 
-                <span class="ohlc-label">
-                  高
-                </span>
+            <div class="mobile-card-details">
 
-                <span class="ohlc-value">
-                  ${formatPrice(
-                    stock.HighestPrice
-                  )}
-                </span>
+              <div class="detail-grid">
 
-              </div>
+                <div class="detail-item">
 
+                  <div class="detail-label">
+                    成交筆數
+                  </div>
 
-              <div class="ohlc-item">
+                  <div class="detail-value">
+                    ${formatNumber(
+                      stock.Transaction
+                    )}
+                  </div>
 
-                <span class="ohlc-label">
-                  低
-                </span>
-
-                <span class="ohlc-value">
-                  ${formatPrice(
-                    stock.LowestPrice
-                  )}
-                </span>
-
-              </div>
+                </div>
 
 
-              <div class="ohlc-item">
+                <div class="detail-item">
 
-                <span class="ohlc-label">
-                  收
-                </span>
+                  <div class="detail-label">
+                    漲跌價差
+                  </div>
 
-                <span class="ohlc-value">
-                  ${formatPrice(
-                    stock.ClosingPrice
-                  )}
-                </span>
+                  <div
+                    class="
+                      detail-value
+                      ${priceChangeClass}
+                    "
+                  >
+                    ${formatPriceChange(
+                      stock
+                    )}
+                  </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    振幅
+                  </div>
+
+                  <div class="detail-value">
+                    ${amplitude.toFixed(
+                      2
+                    )}%
+                  </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    昨收
+                  </div>
+
+                  <div class="detail-value">
+                    ${formatPrice(
+                      calculatePreviousClose(
+                        stock
+                      )
+                    )}
+                  </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    成交量
+                  </div>
+
+                  <div class="detail-value">
+                    ${formatNumber(
+                      stock.TradeVolume
+                    )}
+                  </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    成交金額
+                  </div>
+
+                  <div class="detail-value">
+                    ${formatNumber(
+                      stock.TradeValue
+                    )}
+                  </div>
+
+                </div>
 
               </div>
 
             </div>
 
           `;
+
+
+
+          /* Click toggle */
+
+          card.addEventListener(
+            "click",
+            () => {
+
+              card.classList.toggle(
+                "expanded"
+              );
+
+            }
+          );
+
+
+
+          /* Keyboard */
+
+          card.addEventListener(
+            "keydown",
+            event => {
+
+              if (
+                event.key === "Enter"
+                ||
+                event.key === " "
+              ) {
+
+                event.preventDefault();
+
+                card.classList.toggle(
+                  "expanded"
+                );
+
+              }
+
+            }
+          );
 
 
           fragment.appendChild(
@@ -2037,9 +2311,9 @@
 
 
 
-    /* =========================================
-       Render All
-    ========================================= */
+    /* =========================
+       Render
+    ========================= */
 
     function renderAll() {
 
@@ -2056,9 +2330,9 @@
 
 
 
-    /* =========================================
+    /* =========================
        Sorting
-    ========================================= */
+    ========================= */
 
     function getSortValue(
       stock,
@@ -2071,6 +2345,17 @@
       ) {
 
         return calculateAmplitude(
+          stock
+        );
+
+      }
+
+
+      if (
+        key === "ChangePercent"
+      ) {
+
+        return calculateChangePercent(
           stock
         );
 
@@ -2099,6 +2384,7 @@
       );
 
     }
+
 
 
     function applySort(
@@ -2185,9 +2471,9 @@
 
 
 
-    /* =========================================
+    /* =========================
        Desktop Sort
-    ========================================= */
+    ========================= */
 
     function sortFromHeader(
       th
@@ -2235,6 +2521,7 @@
       );
 
     }
+
 
 
     function updateDesktopSortIcons() {
@@ -2287,9 +2574,9 @@
 
 
 
-    /* =========================================
-       Load Data
-    ========================================= */
+    /* =========================
+       Load
+    ========================= */
 
     async function loadStocks() {
 
@@ -2498,9 +2785,9 @@
 
 
 
-    /* =========================================
+    /* =========================
        Events
-    ========================================= */
+    ========================= */
 
     document
       .querySelectorAll(
@@ -2522,6 +2809,7 @@
 
         }
       );
+
 
 
     mobileSortSelect
@@ -2594,6 +2882,7 @@
       );
 
 
+
     document
       .getElementById(
         "reloadBtn"
@@ -2605,9 +2894,9 @@
 
 
 
-    /* =========================================
+    /* =========================
        Init
-    ========================================= */
+    ========================= */
 
     loadStocks();
 
