@@ -5,9 +5,9 @@ on:
   # 手動執行
   workflow_dispatch:
 
-  # 台灣時間週一～週五約 14:40
+  # 台灣時間週一～週五 14:40
   # GitHub Actions cron 使用 UTC
-  # 06:40 UTC = 14:40 UTC+8
+  # 06:40 UTC = 台灣 14:40
   schedule:
     - cron: "40 6 * * 1-5"
 
@@ -22,10 +22,11 @@ jobs:
 
     runs-on: ubuntu-latest
 
+
     steps:
 
       # ---------------------------------------
-      # 1. Checkout Repository
+      # 1. Checkout
       # ---------------------------------------
 
       - name: Checkout repository
@@ -44,41 +45,55 @@ jobs:
 
 
       # ---------------------------------------
-      # 3. Download TWSE data
+      # 3. 抓 TWSE 資料 + 過濾純個股
       # ---------------------------------------
 
-      - name: Download TWSE stock data
+      - name: Download and filter TWSE stock data
         run: |
 
           python <<'PY'
 
           import json
           import urllib.request
+
           from datetime import datetime
           from zoneinfo import ZoneInfo
 
 
-          API_URL = (
-              "https://openapi.twse.com.tw/"
-              "v1/exchangeReport/STOCK_DAY_ALL"
+          BASE_URL = "https://openapi.twse.com.tw/v1"
+
+
+          MARKET_API = (
+              BASE_URL
+              + "/exchangeReport/STOCK_DAY_ALL"
           )
 
 
-          print("Downloading TWSE data...")
-
-          request = urllib.request.Request(
-              API_URL,
-              headers={
-                  "User-Agent": (
-                      "Mozilla/5.0 "
-                      "TWSE-GitHub-Stock-Dashboard"
-                  ),
-                  "Accept": "application/json"
-              }
+          COMPANY_API = (
+              BASE_URL
+              + "/opendata/t187ap03_L"
           )
 
 
-          try:
+          # -----------------------------------
+          # 共用 API 讀取函式
+          # -----------------------------------
+
+          def fetch_json(url):
+
+              print(f"Fetching: {url}")
+
+              request = urllib.request.Request(
+                  url,
+                  headers={
+                      "User-Agent":
+                          "Mozilla/5.0 TWSE-GitHub-Dashboard",
+
+                      "Accept":
+                          "application/json"
+                  }
+              )
+
 
               with urllib.request.urlopen(
                   request,
@@ -87,43 +102,131 @@ jobs:
 
                   raw = response.read()
 
-                  data = json.loads(
-                      raw.decode("utf-8-sig")
+
+              data = json.loads(
+                  raw.decode("utf-8-sig")
+              )
+
+
+              if not isinstance(data, list):
+
+                  raise RuntimeError(
+                      f"API did not return array: {url}"
                   )
 
 
-          except Exception as error:
-
-              print(
-                  "TWSE API request failed:",
-                  error
-              )
-
-              raise
+              return data
 
 
-          if not isinstance(data, list):
+          # -----------------------------------
+          # 4. 抓每日成交資訊
+          # -----------------------------------
+
+          market_data = fetch_json(
+              MARKET_API
+          )
+
+
+          print(
+              "Market records:",
+              len(market_data)
+          )
+
+
+          if len(market_data) < 100:
 
               raise RuntimeError(
-                  "TWSE API did not return a JSON array"
+                  "Market API returned too few records."
+              )
+
+
+          # -----------------------------------
+          # 5. 抓上市公司基本資料
+          # -----------------------------------
+
+          company_data = fetch_json(
+              COMPANY_API
+          )
+
+
+          print(
+              "Company records:",
+              len(company_data)
+          )
+
+
+          if len(company_data) < 100:
+
+              raise RuntimeError(
+                  "Company API returned too few records."
+              )
+
+
+          # -----------------------------------
+          # 6. 建立「真正上市公司」白名單
+          #
+          # t187ap03_L 使用：
+          #
+          # 公司代號
+          # 公司簡稱
+          # -----------------------------------
+
+          company_codes = set()
+
+
+          for company in company_data:
+
+              if not isinstance(
+                  company,
+                  dict
+              ):
+                  continue
+
+
+              code = str(
+                  company.get(
+                      "公司代號",
+                      ""
+                  )
+              ).strip()
+
+
+              if not code:
+                  continue
+
+
+              company_codes.add(
+                  code
               )
 
 
           print(
-              f"TWSE returned {len(data)} records"
+              "Listed company codes:",
+              len(company_codes)
           )
 
 
+          if len(company_codes) < 500:
+
+              raise RuntimeError(
+                  "Too few listed company codes."
+              )
+
+
           # -----------------------------------
-          # 基本資料檢查
+          # 7. STOCK_DAY_ALL
+          #    與公司白名單取交集
           # -----------------------------------
 
-          valid_data = []
+          stock_data = []
 
 
-          for stock in data:
+          for stock in market_data:
 
-              if not isinstance(stock, dict):
+              if not isinstance(
+                  stock,
+                  dict
+              ):
                   continue
 
 
@@ -143,56 +246,106 @@ jobs:
               ).strip()
 
 
+              # 沒有代號
               if not code:
                   continue
 
 
+              # 非上市公司
+              # ETF / ETN / 權證等會在這裡被排除
+              if code not in company_codes:
+                  continue
+
+
+              # 沒有有效收盤價
               if close in (
                   "",
                   "--",
-                  "---"
+                  "---",
+                  "-"
               ):
                   continue
 
 
-              valid_data.append(stock)
+              stock_data.append(
+                  stock
+              )
 
 
           print(
-              f"Valid records: {len(valid_data)}"
+              "Pure listed stocks:",
+              len(stock_data)
           )
 
 
-          # API 如果異常只回傳極少資料，
-          # 不要把正常 stocks.json 覆蓋掉。
+          # -----------------------------------
+          # 保護機制
+          #
+          # 如果只剩異常少的股票
+          # 就不要覆蓋原本資料
+          # -----------------------------------
 
-          if len(valid_data) < 100:
+          if len(stock_data) < 500:
 
               raise RuntimeError(
-                  "Too few stock records returned. "
+                  "Too few pure stock records. "
                   "Abort update."
               )
 
 
+          # -----------------------------------
+          # 8. 找資料交易日期
+          # -----------------------------------
+
+          trade_date = ""
+
+
+          if stock_data:
+
+              trade_date = str(
+                  stock_data[0].get(
+                      "Date",
+                      ""
+                  )
+              ).strip()
+
+
+          # -----------------------------------
+          # 9. 更新時間
+          # -----------------------------------
+
           taipei_now = datetime.now(
-              ZoneInfo("Asia/Taipei")
+              ZoneInfo(
+                  "Asia/Taipei"
+              )
           )
 
 
+          # -----------------------------------
+          # 10. 輸出 stocks.json
+          # -----------------------------------
+
           output = {
+
               "updatedAt":
                   taipei_now.strftime(
                       "%Y-%m-%d %H:%M:%S"
                   ),
 
+              "tradeDate":
+                  trade_date,
+
               "source":
-                  "TWSE STOCK_DAY_ALL",
+                  "TWSE STOCK_DAY_ALL + t187ap03_L",
+
+              "type":
+                  "TWSE_LISTED_STOCK_ONLY",
 
               "count":
-                  len(valid_data),
+                  len(stock_data),
 
               "data":
-                  valid_data
+                  stock_data
           }
 
 
@@ -210,33 +363,42 @@ jobs:
               )
 
 
+          print("")
+          print("-------------------------")
+          print("stocks.json updated")
+          print("-------------------------")
+
           print(
-              "stocks.json updated successfully."
+              "Trade date:",
+              trade_date
+          )
+
+          print(
+              "Pure stocks:",
+              len(stock_data)
           )
 
           PY
 
 
       # ---------------------------------------
-      # 4. 顯示資料狀態
+      # 11. 檢查輸出
       # ---------------------------------------
 
       - name: Show stocks.json info
         run: |
 
           echo "stocks.json size:"
-
           ls -lh stocks.json
 
           echo ""
 
-          echo "First 20 lines:"
-
-          head -n 20 stocks.json
+          echo "First 25 lines:"
+          head -n 25 stocks.json
 
 
       # ---------------------------------------
-      # 5. Commit
+      # 12. Commit
       # ---------------------------------------
 
       - name: Commit stock data
@@ -264,7 +426,7 @@ jobs:
           else
 
             git commit \
-              -m "chore: update TWSE stock data"
+              -m "chore: update TWSE listed stocks only"
 
             git push
 
