@@ -12,7 +12,6 @@ on:
 permissions:
   contents: write
 
-
 jobs:
 
   update-stock-data:
@@ -35,7 +34,6 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v5
-
         with:
           python-version: "3.x"
 
@@ -93,9 +91,6 @@ jobs:
 
           # --------------------------------------------------
           # TPEx
-          #
-          # 改用 latest quotes
-          # 不再使用 daily_close_quotes 當主資料
           # --------------------------------------------------
 
           TPEX_MARKET_API = (
@@ -113,6 +108,8 @@ jobs:
               + "/tpex_odd_stock"
           )
 
+          # 盤後定價：
+          # 僅保留觀察資料，不參與券商成交量扣除
           TPEX_FIXED_API = (
               TPEX_OPENAPI
               + "/tpex_off_market"
@@ -556,7 +553,6 @@ jobs:
                   return default
 
 
-              # Exact match
               for candidate in candidates:
 
                   if candidate in row:
@@ -649,9 +645,6 @@ jobs:
 
           # ==================================================
           # Date matching
-          #
-          # 避免 API 一次回傳多日資料後
-          # 被全部加總
           # ==================================================
 
           DATE_KEYS = [
@@ -685,8 +678,6 @@ jobs:
               )
 
 
-              # endpoint 沒有日期欄位
-              # 視為 latest snapshot
               if not raw_date:
 
                   return True
@@ -950,7 +941,6 @@ jobs:
                       )
 
 
-                      # 排除合計
                       if (
                           not code
                           or
@@ -1172,54 +1162,75 @@ jobs:
                       continue
 
 
+                  matched_key = None
+                  volume_value = 0
+
+
+                  for candidate in VOLUME_KEYS:
+
+                      if candidate in row:
+
+                          matched_key = candidate
+
+                          volume_value = row.get(
+                              candidate,
+                              0
+                          )
+
+                          break
+
+
+                  if matched_key is None:
+
+                      normalized_volume_keys = {
+
+                          normalize_key(
+                              key
+                          )
+
+                          for key
+                          in VOLUME_KEYS
+                      }
+
+
+                      for key, value in row.items():
+
+                          if (
+                              normalize_key(
+                                  key
+                              )
+                              in
+                              normalized_volume_keys
+                          ):
+
+                              matched_key = key
+
+                              volume_value = value
+
+                              break
+
+
                   volume = to_int(
-                      pick_value(
-                          row,
-                          VOLUME_KEYS,
-                          0
-                      )
+                      volume_value
                   )
 
 
-                  # 部分欄位若明確標示「張」
-                  # 自動轉成股
-                  for key in row.keys():
+                  if matched_key:
 
-                      key_normalized = (
-                          normalize_key(
-                              key
-                          )
+                      key_text = clean_text(
+                          matched_key
                       )
 
+
                       if (
-                          normalize_key(
-                              key
-                          )
-                          in
-                          {
-                              normalize_key(
-                                  item
-                              )
-                              for item
-                              in VOLUME_KEYS
-                          }
+                          "張"
+                          in key_text
+                          or
+                          "千股"
+                          in key_text
                       ):
 
-                          if (
-                              "張"
-                              in clean_text(
-                                  key
-                              )
-                              or
-                              "千股"
-                              in clean_text(
-                                  key
-                              )
-                          ):
-
-                              volume *= 1000
-
-                          break
+                          volume *= 1000
 
 
                   volume *= multiplier
@@ -1548,8 +1559,10 @@ jobs:
           # ==================================================
           # 7. TWSE After-hours Fixed Price
           #
+          # 僅保留觀察資料
+          # 不參與 BrokerDisplayVolume 扣除
+          #
           # BFT41U 股票成交數量單位 = 千股
-          # 所以 × 1000
           # ==================================================
 
           (
@@ -1584,10 +1597,6 @@ jobs:
 
           # ==================================================
           # 8. TWSE Block
-          #
-          # BFIAUU
-          # 單位：股
-          # 同股票多筆交易全部加總
           # ==================================================
 
           block_params = (
@@ -1630,13 +1639,14 @@ jobs:
 
 
           # ==================================================
-          # 9. TWSE Regular Session Volume
+          # 9. TWSE Broker Display Volume
           #
-          # STOCK_DAY_ALL
-          # - intraday odd
-          # - after-hours odd
-          # - fixed price
-          # - block
+          # Total
+          # - Odd Lot
+          # - Block Trade
+          #
+          # IMPORTANT:
+          # After-hours fixed-price volume is NOT deducted.
           # ==================================================
 
           for stock in twse_stocks:
@@ -1693,7 +1703,7 @@ jobs:
               )
 
 
-              regular_volume = max(
+              broker_volume = max(
 
                   0,
 
@@ -1703,75 +1713,60 @@ jobs:
                   odd_total
 
                   -
-                  fixed_volume
-
-                  -
                   block_volume
               )
 
 
               stock[
                   "TotalTradeVolume"
-              ] = (
-                  total_volume
-              )
+              ] = total_volume
 
 
               stock[
                   "IntradayOddLotVolume"
-              ] = (
-                  intraday_odd
-              )
+              ] = intraday_odd
 
 
               stock[
                   "AfterHoursOddLotVolume"
-              ] = (
-                  after_odd
-              )
+              ] = after_odd
 
 
               stock[
                   "OddLotVolume"
-              ] = (
-                  odd_total
-              )
+              ] = odd_total
 
 
+              # 保留，但不扣
               stock[
                   "AfterHoursFixedVolume"
-              ] = (
-                  fixed_volume
-              )
+              ] = fixed_volume
 
 
               stock[
                   "BlockTradeVolume"
-              ] = (
-                  block_volume
-              )
+              ] = block_volume
 
 
+              stock[
+                  "BrokerDisplayVolume"
+              ] = broker_volume
+
+
+              # index.html backward compatibility
               stock[
                   "RegularSessionVolume"
-              ] = (
-                  regular_volume
-              )
+              ] = broker_volume
 
 
-              # index.html 相容
               stock[
                   "AdjustedTradeVolume"
-              ] = (
-                  regular_volume
-              )
+              ] = broker_volume
 
 
               stock[
                   "RegularTradeVolume"
-              ] = (
-                  regular_volume
-              )
+              ] = broker_volume
 
 
           # ==================================================
@@ -1950,6 +1945,7 @@ jobs:
           )
 
 
+          # 僅觀察，不參與成交量扣除
           tpex_fixed = extract_tpex_volume_map(
 
               tpex_fixed_payload,
@@ -1992,10 +1988,17 @@ jobs:
 
           # ==================================================
           # 13. TPEx normalize
+          #
+          # Broker volume:
+          #
+          # Total
+          # - Odd Lot
+          # - Block Trade
+          #
+          # After-hours fixed NOT deducted.
           # ==================================================
 
           tpex_stocks = []
-
 
           seen_tpex = set()
 
@@ -2036,7 +2039,6 @@ jobs:
                   continue
 
 
-              # 防止 API 多筆歷史資料
               if code in seen_tpex:
 
                   continue
@@ -2116,7 +2118,7 @@ jobs:
               )
 
 
-              regular_volume = max(
+              broker_volume = max(
 
                   0,
 
@@ -2124,9 +2126,6 @@ jobs:
 
                   -
                   odd_volume
-
-                  -
-                  fixed_volume
 
                   -
                   block_volume
@@ -2291,21 +2290,25 @@ jobs:
                   "OddLotVolume":
                       odd_volume,
 
+                  # 保留，但不扣
                   "AfterHoursFixedVolume":
                       fixed_volume,
 
                   "BlockTradeVolume":
                       block_volume,
 
-                  "RegularSessionVolume":
-                      regular_volume,
+                  "BrokerDisplayVolume":
+                      broker_volume,
 
-                  # index.html 相容
+                  # index.html backward compatibility
+                  "RegularSessionVolume":
+                      broker_volume,
+
                   "AdjustedTradeVolume":
-                      regular_volume,
+                      broker_volume,
 
                   "RegularTradeVolume":
-                      regular_volume
+                      broker_volume
               }
 
 
@@ -2382,7 +2385,7 @@ jobs:
               key=lambda stock:
                   to_int(
                       stock.get(
-                          "RegularSessionVolume",
+                          "AdjustedTradeVolume",
                           0
                       )
                   ),
@@ -2397,7 +2400,7 @@ jobs:
               "=============================="
           )
           print(
-              "Regular Session Volume TOP 10"
+              "Broker Volume TOP 10"
           )
           print(
               "=============================="
@@ -2428,7 +2431,7 @@ jobs:
                   round(
                       to_int(
                           stock.get(
-                              "RegularSessionVolume",
+                              "AdjustedTradeVolume",
                               0
                           )
                       )
@@ -2443,8 +2446,7 @@ jobs:
           # ==================================================
           # 16. Debug
           #
-          # 2344 / 6770 只用來看 Actions Log
-          # 不影響計算
+          # 驗證 2344 / 6770
           # ==================================================
 
           verify_codes = {
@@ -2509,7 +2511,7 @@ jobs:
 
 
               print(
-                  "Fixed:",
+                  "Fixed (NOT deducted):",
                   stock.get(
                       "AfterHoursFixedVolume"
                   )
@@ -2525,19 +2527,19 @@ jobs:
 
 
               print(
-                  "Regular:",
+                  "Broker Volume:",
                   stock.get(
-                      "RegularSessionVolume"
+                      "BrokerDisplayVolume"
                   )
               )
 
 
               print(
-                  "Regular lots:",
+                  "Broker lots:",
                   round(
                       to_int(
                           stock.get(
-                              "RegularSessionVolume"
+                              "BrokerDisplayVolume"
                           )
                       )
                       /
@@ -2577,13 +2579,12 @@ jobs:
                   "TWSE_TPEX_STOCK_ONLY",
 
               "volumeMode":
-                  "REGULAR_SESSION_ONLY",
+                  "BROKER_DISPLAY_MATCH",
 
               "volumeFormula":
                   (
                       "TotalTradeVolume "
                       "- OddLotVolume "
-                      "- AfterHoursFixedVolume "
                       "- BlockTradeVolume"
                   ),
 
@@ -2672,16 +2673,23 @@ jobs:
 
           print("")
           print(
-              "Volume formula:"
+              "Broker volume formula:"
           )
 
 
           print(
               "Total"
               " - Odd"
-              " - Fixed"
               " - Block"
-              " = RegularSessionVolume"
+              " = BrokerDisplayVolume"
+          )
+
+
+          print("")
+          print(
+              "After-hours fixed:"
+              " observation only,"
+              " NOT deducted"
           )
 
 
@@ -2690,20 +2698,24 @@ jobs:
               "TWSE sources:"
           )
 
+
           print(
               "Intraday odd:",
               twse_intraday_source
           )
+
 
           print(
               "After-hours odd:",
               twse_after_odd_source
           )
 
+
           print(
               "Fixed:",
               twse_fixed_source
           )
+
 
           print(
               "Block:",
@@ -2795,9 +2807,9 @@ jobs:
               )
 
 
-              regular = int(
+              broker = int(
                   stock.get(
-                      "RegularSessionVolume",
+                      "BrokerDisplayVolume",
                       0
                   )
                   or
@@ -2806,9 +2818,9 @@ jobs:
 
 
               if (
-                  regular < 0
+                  broker < 0
                   or
-                  regular > total
+                  broker > total
               ):
 
                   invalid.append(
@@ -2842,7 +2854,7 @@ jobs:
               key=lambda stock:
                   int(
                       stock.get(
-                          "RegularSessionVolume",
+                          "BrokerDisplayVolume",
                           0
                       )
                       or
@@ -2884,7 +2896,7 @@ jobs:
                   round(
                       int(
                           stock.get(
-                              "RegularSessionVolume",
+                              "BrokerDisplayVolume",
                               0
                           )
                           or
@@ -2943,7 +2955,7 @@ jobs:
           else
 
             git commit \
-              -m "chore: update regular-session TWSE and TPEx volumes"
+              -m "chore: update broker-matched TWSE and TPEx volumes"
 
             git push
 
