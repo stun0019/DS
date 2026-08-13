@@ -1,0 +1,271 @@
+name: Update TWSE Stock Data
+
+on:
+
+  # 手動執行
+  workflow_dispatch:
+
+  # 台灣時間週一～週五約 14:40
+  # GitHub Actions cron 使用 UTC
+  # 06:40 UTC = 14:40 UTC+8
+  schedule:
+    - cron: "40 6 * * 1-5"
+
+
+permissions:
+  contents: write
+
+
+jobs:
+
+  update-stock-data:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ---------------------------------------
+      # 1. Checkout Repository
+      # ---------------------------------------
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      # ---------------------------------------
+      # 2. Setup Python
+      # ---------------------------------------
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.x"
+
+
+      # ---------------------------------------
+      # 3. Download TWSE data
+      # ---------------------------------------
+
+      - name: Download TWSE stock data
+        run: |
+
+          python <<'PY'
+
+          import json
+          import urllib.request
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+
+          API_URL = (
+              "https://openapi.twse.com.tw/"
+              "v1/exchangeReport/STOCK_DAY_ALL"
+          )
+
+
+          print("Downloading TWSE data...")
+
+          request = urllib.request.Request(
+              API_URL,
+              headers={
+                  "User-Agent": (
+                      "Mozilla/5.0 "
+                      "TWSE-GitHub-Stock-Dashboard"
+                  ),
+                  "Accept": "application/json"
+              }
+          )
+
+
+          try:
+
+              with urllib.request.urlopen(
+                  request,
+                  timeout=30
+              ) as response:
+
+                  raw = response.read()
+
+                  data = json.loads(
+                      raw.decode("utf-8-sig")
+                  )
+
+
+          except Exception as error:
+
+              print(
+                  "TWSE API request failed:",
+                  error
+              )
+
+              raise
+
+
+          if not isinstance(data, list):
+
+              raise RuntimeError(
+                  "TWSE API did not return a JSON array"
+              )
+
+
+          print(
+              f"TWSE returned {len(data)} records"
+          )
+
+
+          # -----------------------------------
+          # 基本資料檢查
+          # -----------------------------------
+
+          valid_data = []
+
+
+          for stock in data:
+
+              if not isinstance(stock, dict):
+                  continue
+
+
+              code = str(
+                  stock.get(
+                      "Code",
+                      ""
+                  )
+              ).strip()
+
+
+              close = str(
+                  stock.get(
+                      "ClosingPrice",
+                      ""
+                  )
+              ).strip()
+
+
+              if not code:
+                  continue
+
+
+              if close in (
+                  "",
+                  "--",
+                  "---"
+              ):
+                  continue
+
+
+              valid_data.append(stock)
+
+
+          print(
+              f"Valid records: {len(valid_data)}"
+          )
+
+
+          # API 如果異常只回傳極少資料，
+          # 不要把正常 stocks.json 覆蓋掉。
+
+          if len(valid_data) < 100:
+
+              raise RuntimeError(
+                  "Too few stock records returned. "
+                  "Abort update."
+              )
+
+
+          taipei_now = datetime.now(
+              ZoneInfo("Asia/Taipei")
+          )
+
+
+          output = {
+              "updatedAt":
+                  taipei_now.strftime(
+                      "%Y-%m-%d %H:%M:%S"
+                  ),
+
+              "source":
+                  "TWSE STOCK_DAY_ALL",
+
+              "count":
+                  len(valid_data),
+
+              "data":
+                  valid_data
+          }
+
+
+          with open(
+              "stocks.json",
+              "w",
+              encoding="utf-8"
+          ) as file:
+
+              json.dump(
+                  output,
+                  file,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+
+          print(
+              "stocks.json updated successfully."
+          )
+
+          PY
+
+
+      # ---------------------------------------
+      # 4. 顯示資料狀態
+      # ---------------------------------------
+
+      - name: Show stocks.json info
+        run: |
+
+          echo "stocks.json size:"
+
+          ls -lh stocks.json
+
+          echo ""
+
+          echo "First 20 lines:"
+
+          head -n 20 stocks.json
+
+
+      # ---------------------------------------
+      # 5. Commit
+      # ---------------------------------------
+
+      - name: Commit stock data
+        run: |
+
+          git config \
+            user.name \
+            "github-actions[bot]"
+
+          git config \
+            user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+
+          git add stocks.json
+
+
+          if git diff \
+            --cached \
+            --quiet
+          then
+
+            echo "No changes."
+
+          else
+
+            git commit \
+              -m "chore: update TWSE stock data"
+
+            git push
+
+          fi
