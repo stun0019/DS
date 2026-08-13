@@ -511,8 +511,6 @@
     }
 
 
-    /* 第一行 */
-
     .mobile-line-primary {
       gap: 7px;
     }
@@ -573,8 +571,6 @@
       white-space: nowrap;
     }
 
-
-    /* 第二行 */
 
     .mobile-line-secondary {
       gap: 7px;
@@ -876,8 +872,6 @@
     }
 
 
-    /* very small phones */
-
     @media (
       max-width: 390px
     ) {
@@ -925,8 +919,6 @@
 
   <main class="app">
 
-    <!-- Header -->
-
     <header class="header">
 
       <div class="title-area">
@@ -956,8 +948,6 @@
     </header>
 
 
-
-    <!-- Summary -->
 
     <section class="summary">
 
@@ -1011,8 +1001,6 @@
     </section>
 
 
-
-    <!-- Controls -->
 
     <section class="controls">
 
@@ -1091,8 +1079,6 @@
     </section>
 
 
-
-    <!-- Desktop Table -->
 
     <section class="desktop-table">
 
@@ -1228,8 +1214,6 @@
 
 
 
-    <!-- Mobile List -->
-
     <section
       id="mobileStockList"
       class="mobile-list"
@@ -1308,10 +1292,6 @@
 
 
 
-    /* =========================
-       Number
-    ========================= */
-
     function toNumber(
       value
     ) {
@@ -1359,10 +1339,6 @@
 
 
 
-    /* =========================
-       Escape
-    ========================= */
-
     function escapeHtml(
       value
     ) {
@@ -1399,10 +1375,6 @@
     }
 
 
-
-    /* =========================
-       Format
-    ========================= */
 
     function formatNumber(
       value
@@ -1450,18 +1422,6 @@
     }
 
 
-
-    /* =========================
-       Compact Number
-
-       成交量：
-       429,000,000
-       → 4.29億
-
-       成交金額：
-       31,070,000,000
-       → 310.7億
-    ========================= */
 
     function formatCompactNumber(
       value
@@ -1545,10 +1505,6 @@
 
 
 
-    /* =========================
-       Trade Date
-    ========================= */
-
     function formatTradeDate(
       value
     ) {
@@ -1609,10 +1565,6 @@
     }
 
 
-
-    /* =========================
-       Change
-    ========================= */
 
     function getChangeClass(
       value
@@ -1767,10 +1719,6 @@
 
 
 
-    /* =========================
-       Amplitude
-    ========================= */
-
     function calculateAmplitude(
       stock
     ) {
@@ -1817,10 +1765,6 @@
     }
 
 
-
-    /* =========================
-       Desktop Render
-    ========================= */
 
     function renderDesktopTable(
       data
@@ -1957,10 +1901,6 @@
 
 
 
-    /* =========================
-       Mobile Render
-    ========================= */
-
     function renderMobileCards(
       data
     ) {
@@ -2019,8 +1959,6 @@
 
             <div class="mobile-card-summary">
 
-              <!-- 第一行 -->
-
               <div
                 class="
                   mobile-line
@@ -2055,40 +1993,19 @@
                   )}
                 </span>
 
-
                 <span class="mobile-divider">
                   |
                 </span>
 
-
                 <span class="mobile-ohlc-inline">
-
-                  開
-                  ${formatPrice(
-                    stock.OpeningPrice
-                  )}
-
-                  ・高
-                  ${formatPrice(
-                    stock.HighestPrice
-                  )}
-
-                  ・低
-                  ${formatPrice(
-                    stock.LowestPrice
-                  )}
-
-                  ・收
-                  ${formatPrice(
-                    stock.ClosingPrice
-                  )}
-
+                  開 ${formatPrice(stock.OpeningPrice)}
+                  ｜高 ${formatPrice(stock.HighestPrice)}
+                  ｜低 ${formatPrice(stock.LowestPrice)}
+                  ｜收 ${formatPrice(stock.ClosingPrice)}
                 </span>
 
               </div>
 
-
-              <!-- 第二行 -->
 
               <div
                 class="
@@ -2145,8 +2062,6 @@
             <span class="mobile-arrow">
             </span>
 
-
-            <!-- 展開內容 -->
 
             <div class="mobile-card-details">
 
@@ -2255,9 +2170,6 @@
           `;
 
 
-
-          /* Click toggle */
-
           card.addEventListener(
             "click",
             () => {
@@ -2269,9 +2181,6 @@
             }
           );
 
-
-
-          /* Keyboard */
 
           card.addEventListener(
             "keydown",
@@ -2311,10 +2220,6 @@
 
 
 
-    /* =========================
-       Render
-    ========================= */
-
     function renderAll() {
 
       renderDesktopTable(
@@ -2329,10 +2234,6 @@
     }
 
 
-
-    /* =========================
-       Sorting
-    ========================= */
 
     function getSortValue(
       stock,
@@ -2471,10 +2372,6 @@
 
 
 
-    /* =========================
-       Desktop Sort
-    ========================= */
-
     function sortFromHeader(
       th
     ) {
@@ -2573,10 +2470,6 @@
     }
 
 
-
-    /* =========================
-       Load
-    ========================= */
 
     async function loadStocks() {
 
@@ -2785,10 +2678,6 @@
 
 
 
-    /* =========================
-       Events
-    ========================= */
-
     document
       .querySelectorAll(
         "th.sortable"
@@ -2892,11 +2781,6 @@
         loadStocks
       );
 
-
-
-    /* =========================
-       Init
-    ========================= */
 
     loadStocks();
 
