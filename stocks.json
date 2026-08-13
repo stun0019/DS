@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-08-13 12:55:57",
+  "updatedAt": "2026-08-13 13:02:11",
   "tradeDate": "1150812",
   "source": "TWSE STOCK_DAY_ALL + t187ap03_L + MI_INDEX + TWTC7U + TWT53U + BFT41U",
   "type": "TWSE_LISTED_STOCK_ONLY",
   "volumeMode": "REGULAR_TRADING_ONLY",
-  "volumeFormula": "MI_INDEX - IntradayOddLotVolume - AfterHoursOddLotVolume - AfterHoursFixedVolume",
+  "volumeFormula": "MI_INDEX - IntradayOddLotVolume - AfterHoursOddLotVolume",
   "count": 1094,
   "data": [
     {
@@ -26,7 +26,7 @@
       "AfterHoursOddLotVolume": 8540,
       "OddLotVolume": 96587,
       "AfterHoursFixedVolume": 27000,
-      "RegularTradeVolume": 13875000
+      "RegularTradeVolume": 13902000
     },
     {
       "Date": "1150812",
@@ -47,7 +47,7 @@
       "AfterHoursOddLotVolume": 1498,
       "OddLotVolume": 27395,
       "AfterHoursFixedVolume": 17000,
-      "RegularTradeVolume": 7067000
+      "RegularTradeVolume": 7084000
     },
     {
       "Date": "1150812",
@@ -68,7 +68,7 @@
       "AfterHoursOddLotVolume": 1455,
       "OddLotVolume": 5554,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 271000
+      "RegularTradeVolume": 273000
     },
     {
       "Date": "1150812",
@@ -89,7 +89,7 @@
       "AfterHoursOddLotVolume": 1665,
       "OddLotVolume": 6116,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 671000
+      "RegularTradeVolume": 672000
     },
     {
       "Date": "1150812",
@@ -110,7 +110,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 6055,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 699000
+      "RegularTradeVolume": 700000
     },
     {
       "Date": "1150812",
@@ -215,7 +215,7 @@
       "AfterHoursOddLotVolume": 1291,
       "OddLotVolume": 59052,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 4958000
+      "RegularTradeVolume": 4967000
     },
     {
       "Date": "1150812",
@@ -278,7 +278,7 @@
       "AfterHoursOddLotVolume": 2419,
       "OddLotVolume": 46093,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 9897000
+      "RegularTradeVolume": 9899000
     },
     {
       "Date": "1150812",
@@ -341,7 +341,7 @@
       "AfterHoursOddLotVolume": 413,
       "OddLotVolume": 4815,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 489000
+      "RegularTradeVolume": 491000
     },
     {
       "Date": "1150812",
@@ -425,7 +425,7 @@
       "AfterHoursOddLotVolume": 6556,
       "OddLotVolume": 80371,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1687000
+      "RegularTradeVolume": 1689000
     },
     {
       "Date": "1150812",
@@ -593,7 +593,7 @@
       "AfterHoursOddLotVolume": 5311,
       "OddLotVolume": 93997,
       "AfterHoursFixedVolume": 28000,
-      "RegularTradeVolume": 14591000
+      "RegularTradeVolume": 14619000
     },
     {
       "Date": "1150812",
@@ -614,7 +614,7 @@
       "AfterHoursOddLotVolume": 14716,
       "OddLotVolume": 618931,
       "AfterHoursFixedVolume": 219000,
-      "RegularTradeVolume": 77481000
+      "RegularTradeVolume": 77700000
     },
     {
       "Date": "1150812",
@@ -635,7 +635,7 @@
       "AfterHoursOddLotVolume": 709,
       "OddLotVolume": 7278,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1921000
+      "RegularTradeVolume": 1923000
     },
     {
       "Date": "1150812",
@@ -677,7 +677,7 @@
       "AfterHoursOddLotVolume": 100,
       "OddLotVolume": 6442,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 589000
+      "RegularTradeVolume": 590000
     },
     {
       "Date": "1150812",
@@ -719,7 +719,7 @@
       "AfterHoursOddLotVolume": 368,
       "OddLotVolume": 11420,
       "AfterHoursFixedVolume": 11000,
-      "RegularTradeVolume": 1327000
+      "RegularTradeVolume": 1338000
     },
     {
       "Date": "1150812",
@@ -740,7 +740,7 @@
       "AfterHoursOddLotVolume": 1035,
       "OddLotVolume": 13167,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 2160000
+      "RegularTradeVolume": 2165000
     },
     {
       "Date": "1150812",
@@ -761,7 +761,7 @@
       "AfterHoursOddLotVolume": 973,
       "OddLotVolume": 25000,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 3942000
+      "RegularTradeVolume": 3952000
     },
     {
       "Date": "1150812",
@@ -803,7 +803,7 @@
       "AfterHoursOddLotVolume": 6110,
       "OddLotVolume": 52763,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 18685000
+      "RegularTradeVolume": 18692000
     },
     {
       "Date": "1150812",
@@ -845,7 +845,7 @@
       "AfterHoursOddLotVolume": 2030,
       "OddLotVolume": 10399,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 1870000
+      "RegularTradeVolume": 1876000
     },
     {
       "Date": "1150812",
@@ -866,7 +866,7 @@
       "AfterHoursOddLotVolume": 277,
       "OddLotVolume": 20025,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 3276000
+      "RegularTradeVolume": 3279000
     },
     {
       "Date": "1150812",
@@ -887,7 +887,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 13,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 142000
+      "RegularTradeVolume": 145000
     },
     {
       "Date": "1150812",
@@ -950,7 +950,7 @@
       "AfterHoursOddLotVolume": 65,
       "OddLotVolume": 2304,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 323000
+      "RegularTradeVolume": 324000
     },
     {
       "Date": "1150812",
@@ -971,7 +971,7 @@
       "AfterHoursOddLotVolume": 2890,
       "OddLotVolume": 103286,
       "AfterHoursFixedVolume": 33000,
-      "RegularTradeVolume": 20006000
+      "RegularTradeVolume": 20039000
     },
     {
       "Date": "1150812",
@@ -1118,7 +1118,7 @@
       "AfterHoursOddLotVolume": 885,
       "OddLotVolume": 35881,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 23480000
+      "RegularTradeVolume": 23483000
     },
     {
       "Date": "1150812",
@@ -1139,7 +1139,7 @@
       "AfterHoursOddLotVolume": 1561,
       "OddLotVolume": 69378,
       "AfterHoursFixedVolume": 24000,
-      "RegularTradeVolume": 14351000
+      "RegularTradeVolume": 14375000
     },
     {
       "Date": "1150812",
@@ -1223,7 +1223,7 @@
       "AfterHoursOddLotVolume": 500,
       "OddLotVolume": 12505,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 4608000
+      "RegularTradeVolume": 4609000
     },
     {
       "Date": "1150812",
@@ -1475,7 +1475,7 @@
       "AfterHoursOddLotVolume": 123,
       "OddLotVolume": 7411,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2334000
+      "RegularTradeVolume": 2335000
     },
     {
       "Date": "1150812",
@@ -1559,7 +1559,7 @@
       "AfterHoursOddLotVolume": 680,
       "OddLotVolume": 14073,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1610000
+      "RegularTradeVolume": 1613000
     },
     {
       "Date": "1150812",
@@ -1748,7 +1748,7 @@
       "AfterHoursOddLotVolume": 130,
       "OddLotVolume": 12617,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 2061000
+      "RegularTradeVolume": 2064000
     },
     {
       "Date": "1150812",
@@ -2126,7 +2126,7 @@
       "AfterHoursOddLotVolume": 1126,
       "OddLotVolume": 33163,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 2472000
+      "RegularTradeVolume": 2474000
     },
     {
       "Date": "1150812",
@@ -2147,7 +2147,7 @@
       "AfterHoursOddLotVolume": 488,
       "OddLotVolume": 41095,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1299000
+      "RegularTradeVolume": 1300000
     },
     {
       "Date": "1150812",
@@ -2168,7 +2168,7 @@
       "AfterHoursOddLotVolume": 1015,
       "OddLotVolume": 52546,
       "AfterHoursFixedVolume": 12000,
-      "RegularTradeVolume": 5774000
+      "RegularTradeVolume": 5786000
     },
     {
       "Date": "1150812",
@@ -2231,7 +2231,7 @@
       "AfterHoursOddLotVolume": 3272,
       "OddLotVolume": 207301,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 7045000
+      "RegularTradeVolume": 7055000
     },
     {
       "Date": "1150812",
@@ -2252,7 +2252,7 @@
       "AfterHoursOddLotVolume": 1419,
       "OddLotVolume": 31957,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 1903000
+      "RegularTradeVolume": 1908000
     },
     {
       "Date": "1150812",
@@ -2336,7 +2336,7 @@
       "AfterHoursOddLotVolume": 1911,
       "OddLotVolume": 115336,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 2214000
+      "RegularTradeVolume": 2216000
     },
     {
       "Date": "1150812",
@@ -2399,7 +2399,7 @@
       "AfterHoursOddLotVolume": 300,
       "OddLotVolume": 2990,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 222000
+      "RegularTradeVolume": 223000
     },
     {
       "Date": "1150812",
@@ -2441,7 +2441,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 1211,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 738000
+      "RegularTradeVolume": 739000
     },
     {
       "Date": "1150812",
@@ -2567,7 +2567,7 @@
       "AfterHoursOddLotVolume": 130,
       "OddLotVolume": 3254,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 271000
+      "RegularTradeVolume": 273000
     },
     {
       "Date": "1150812",
@@ -2777,7 +2777,7 @@
       "AfterHoursOddLotVolume": 1211,
       "OddLotVolume": 127658,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 3180000
+      "RegularTradeVolume": 3181000
     },
     {
       "Date": "1150812",
@@ -2798,7 +2798,7 @@
       "AfterHoursOddLotVolume": 195,
       "OddLotVolume": 16014,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 3093000
+      "RegularTradeVolume": 3098000
     },
     {
       "Date": "1150812",
@@ -2819,7 +2819,7 @@
       "AfterHoursOddLotVolume": 157,
       "OddLotVolume": 2843,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 315000
+      "RegularTradeVolume": 316000
     },
     {
       "Date": "1150812",
@@ -2882,7 +2882,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 1465,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 200000
+      "RegularTradeVolume": 203000
     },
     {
       "Date": "1150812",
@@ -2945,7 +2945,7 @@
       "AfterHoursOddLotVolume": 419,
       "OddLotVolume": 2178,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 254000
+      "RegularTradeVolume": 255000
     },
     {
       "Date": "1150812",
@@ -3008,7 +3008,7 @@
       "AfterHoursOddLotVolume": 11852,
       "OddLotVolume": 516185,
       "AfterHoursFixedVolume": 133000,
-      "RegularTradeVolume": 93713000
+      "RegularTradeVolume": 93846000
     },
     {
       "Date": "1150812",
@@ -3029,7 +3029,7 @@
       "AfterHoursOddLotVolume": 2974,
       "OddLotVolume": 117525,
       "AfterHoursFixedVolume": 17000,
-      "RegularTradeVolume": 19433000
+      "RegularTradeVolume": 19450000
     },
     {
       "Date": "1150812",
@@ -3050,7 +3050,7 @@
       "AfterHoursOddLotVolume": 4546,
       "OddLotVolume": 53953,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 5181000
+      "RegularTradeVolume": 5191000
     },
     {
       "Date": "1150812",
@@ -3071,7 +3071,7 @@
       "AfterHoursOddLotVolume": 423,
       "OddLotVolume": 5115,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 299000
+      "RegularTradeVolume": 300000
     },
     {
       "Date": "1150812",
@@ -3092,7 +3092,7 @@
       "AfterHoursOddLotVolume": 210,
       "OddLotVolume": 13197,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 2288000
+      "RegularTradeVolume": 2292000
     },
     {
       "Date": "1150812",
@@ -3197,7 +3197,7 @@
       "AfterHoursOddLotVolume": 645,
       "OddLotVolume": 13439,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 1056000
+      "RegularTradeVolume": 1061000
     },
     {
       "Date": "1150812",
@@ -3302,7 +3302,7 @@
       "AfterHoursOddLotVolume": 920,
       "OddLotVolume": 24033,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 2237000
+      "RegularTradeVolume": 2240000
     },
     {
       "Date": "1150812",
@@ -3323,7 +3323,7 @@
       "AfterHoursOddLotVolume": 2610,
       "OddLotVolume": 28239,
       "AfterHoursFixedVolume": 19000,
-      "RegularTradeVolume": 5115000
+      "RegularTradeVolume": 5134000
     },
     {
       "Date": "1150812",
@@ -3344,7 +3344,7 @@
       "AfterHoursOddLotVolume": 1044,
       "OddLotVolume": 17086,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 4825000
+      "RegularTradeVolume": 4833000
     },
     {
       "Date": "1150812",
@@ -3365,7 +3365,7 @@
       "AfterHoursOddLotVolume": 246,
       "OddLotVolume": 53394,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 10084000
+      "RegularTradeVolume": 10099000
     },
     {
       "Date": "1150812",
@@ -3428,7 +3428,7 @@
       "AfterHoursOddLotVolume": 10585,
       "OddLotVolume": 89527,
       "AfterHoursFixedVolume": 59000,
-      "RegularTradeVolume": 24639000
+      "RegularTradeVolume": 24698000
     },
     {
       "Date": "1150812",
@@ -3449,7 +3449,7 @@
       "AfterHoursOddLotVolume": 8130,
       "OddLotVolume": 483735,
       "AfterHoursFixedVolume": 42000,
-      "RegularTradeVolume": 44133000
+      "RegularTradeVolume": 44175000
     },
     {
       "Date": "1150812",
@@ -3470,7 +3470,7 @@
       "AfterHoursOddLotVolume": 11639,
       "OddLotVolume": 168816,
       "AfterHoursFixedVolume": 26000,
-      "RegularTradeVolume": 43127000
+      "RegularTradeVolume": 43153000
     },
     {
       "Date": "1150812",
@@ -3512,7 +3512,7 @@
       "AfterHoursOddLotVolume": 84,
       "OddLotVolume": 5689,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 827000
+      "RegularTradeVolume": 828000
     },
     {
       "Date": "1150812",
@@ -3554,7 +3554,7 @@
       "AfterHoursOddLotVolume": 731,
       "OddLotVolume": 4919,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 282000
+      "RegularTradeVolume": 284000
     },
     {
       "Date": "1150812",
@@ -3617,7 +3617,7 @@
       "AfterHoursOddLotVolume": 8,
       "OddLotVolume": 32059,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 3125000
+      "RegularTradeVolume": 3129000
     },
     {
       "Date": "1150812",
@@ -3764,7 +3764,7 @@
       "AfterHoursOddLotVolume": 308,
       "OddLotVolume": 11736,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 1471000
+      "RegularTradeVolume": 1477000
     },
     {
       "Date": "1150812",
@@ -3848,7 +3848,7 @@
       "AfterHoursOddLotVolume": 100,
       "OddLotVolume": 3944,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 243000
+      "RegularTradeVolume": 244000
     },
     {
       "Date": "1150812",
@@ -3869,7 +3869,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 11037,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 474000
+      "RegularTradeVolume": 475000
     },
     {
       "Date": "1150812",
@@ -3953,7 +3953,7 @@
       "AfterHoursOddLotVolume": 873,
       "OddLotVolume": 3458,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 302000
+      "RegularTradeVolume": 303000
     },
     {
       "Date": "1150812",
@@ -3974,7 +3974,7 @@
       "AfterHoursOddLotVolume": 600,
       "OddLotVolume": 21467,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 705000
+      "RegularTradeVolume": 706000
     },
     {
       "Date": "1150812",
@@ -3995,7 +3995,7 @@
       "AfterHoursOddLotVolume": 3416,
       "OddLotVolume": 248984,
       "AfterHoursFixedVolume": 44000,
-      "RegularTradeVolume": 37820000
+      "RegularTradeVolume": 37864000
     },
     {
       "Date": "1150812",
@@ -4058,7 +4058,7 @@
       "AfterHoursOddLotVolume": 523,
       "OddLotVolume": 12372,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 843000
+      "RegularTradeVolume": 844000
     },
     {
       "Date": "1150812",
@@ -4079,7 +4079,7 @@
       "AfterHoursOddLotVolume": 214,
       "OddLotVolume": 25240,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2168000
+      "RegularTradeVolume": 2169000
     },
     {
       "Date": "1150812",
@@ -4100,7 +4100,7 @@
       "AfterHoursOddLotVolume": 48,
       "OddLotVolume": 17238,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 3654000
+      "RegularTradeVolume": 3660000
     },
     {
       "Date": "1150812",
@@ -4121,7 +4121,7 @@
       "AfterHoursOddLotVolume": 4,
       "OddLotVolume": 2725,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 327000
+      "RegularTradeVolume": 328000
     },
     {
       "Date": "1150812",
@@ -4163,7 +4163,7 @@
       "AfterHoursOddLotVolume": 4852,
       "OddLotVolume": 73742,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 6100000
+      "RegularTradeVolume": 6105000
     },
     {
       "Date": "1150812",
@@ -4184,7 +4184,7 @@
       "AfterHoursOddLotVolume": 1006,
       "OddLotVolume": 22689,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2895000
+      "RegularTradeVolume": 2896000
     },
     {
       "Date": "1150812",
@@ -4226,7 +4226,7 @@
       "AfterHoursOddLotVolume": 1401,
       "OddLotVolume": 11836,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1152000
+      "RegularTradeVolume": 1153000
     },
     {
       "Date": "1150812",
@@ -4268,7 +4268,7 @@
       "AfterHoursOddLotVolume": 28328,
       "OddLotVolume": 231308,
       "AfterHoursFixedVolume": 73000,
-      "RegularTradeVolume": 44265000
+      "RegularTradeVolume": 44338000
     },
     {
       "Date": "1150812",
@@ -4289,7 +4289,7 @@
       "AfterHoursOddLotVolume": 2128,
       "OddLotVolume": 68686,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 3158000
+      "RegularTradeVolume": 3159000
     },
     {
       "Date": "1150812",
@@ -4352,7 +4352,7 @@
       "AfterHoursOddLotVolume": 1330,
       "OddLotVolume": 72506,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 6292000
+      "RegularTradeVolume": 6297000
     },
     {
       "Date": "1150812",
@@ -4373,7 +4373,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 8405,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1207000
+      "RegularTradeVolume": 1208000
     },
     {
       "Date": "1150812",
@@ -4436,7 +4436,7 @@
       "AfterHoursOddLotVolume": 280,
       "OddLotVolume": 13367,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 2088000
+      "RegularTradeVolume": 2093000
     },
     {
       "Date": "1150812",
@@ -4457,7 +4457,7 @@
       "AfterHoursOddLotVolume": 60,
       "OddLotVolume": 3196,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 291000
+      "RegularTradeVolume": 292000
     },
     {
       "Date": "1150812",
@@ -4583,7 +4583,7 @@
       "AfterHoursOddLotVolume": 230,
       "OddLotVolume": 2173,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 436000
+      "RegularTradeVolume": 440000
     },
     {
       "Date": "1150812",
@@ -4604,7 +4604,7 @@
       "AfterHoursOddLotVolume": 8614,
       "OddLotVolume": 99686,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 9999000
+      "RegularTradeVolume": 10008000
     },
     {
       "Date": "1150812",
@@ -4667,7 +4667,7 @@
       "AfterHoursOddLotVolume": 800,
       "OddLotVolume": 20495,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 5322000
+      "RegularTradeVolume": 5330000
     },
     {
       "Date": "1150812",
@@ -4688,7 +4688,7 @@
       "AfterHoursOddLotVolume": 241,
       "OddLotVolume": 16354,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1654000
+      "RegularTradeVolume": 1657000
     },
     {
       "Date": "1150812",
@@ -4730,7 +4730,7 @@
       "AfterHoursOddLotVolume": 137,
       "OddLotVolume": 7303,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 2259000
+      "RegularTradeVolume": 2262000
     },
     {
       "Date": "1150812",
@@ -4793,7 +4793,7 @@
       "AfterHoursOddLotVolume": 1681,
       "OddLotVolume": 100951,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 3324000
+      "RegularTradeVolume": 3326000
     },
     {
       "Date": "1150812",
@@ -4814,7 +4814,7 @@
       "AfterHoursOddLotVolume": 1056,
       "OddLotVolume": 40021,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 309000
+      "RegularTradeVolume": 310000
     },
     {
       "Date": "1150812",
@@ -4835,7 +4835,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 578,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 91000
+      "RegularTradeVolume": 92000
     },
     {
       "Date": "1150812",
@@ -4898,7 +4898,7 @@
       "AfterHoursOddLotVolume": 2504,
       "OddLotVolume": 16979,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1373000
+      "RegularTradeVolume": 1374000
     },
     {
       "Date": "1150812",
@@ -4940,7 +4940,7 @@
       "AfterHoursOddLotVolume": 1832,
       "OddLotVolume": 49653,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 16189000
+      "RegularTradeVolume": 16199000
     },
     {
       "Date": "1150812",
@@ -4961,7 +4961,7 @@
       "AfterHoursOddLotVolume": 652,
       "OddLotVolume": 8530,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 2384000
+      "RegularTradeVolume": 2394000
     },
     {
       "Date": "1150812",
@@ -4982,7 +4982,7 @@
       "AfterHoursOddLotVolume": 1246,
       "OddLotVolume": 28904,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 5025000
+      "RegularTradeVolume": 5035000
     },
     {
       "Date": "1150812",
@@ -5045,7 +5045,7 @@
       "AfterHoursOddLotVolume": 733,
       "OddLotVolume": 21437,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 2553000
+      "RegularTradeVolume": 2562000
     },
     {
       "Date": "1150812",
@@ -5129,7 +5129,7 @@
       "AfterHoursOddLotVolume": 3608,
       "OddLotVolume": 31559,
       "AfterHoursFixedVolume": 12000,
-      "RegularTradeVolume": 3788000
+      "RegularTradeVolume": 3800000
     },
     {
       "Date": "1150812",
@@ -5171,7 +5171,7 @@
       "AfterHoursOddLotVolume": 417,
       "OddLotVolume": 8665,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1006000
+      "RegularTradeVolume": 1008000
     },
     {
       "Date": "1150812",
@@ -5339,7 +5339,7 @@
       "AfterHoursOddLotVolume": 48,
       "OddLotVolume": 4341,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 281000
+      "RegularTradeVolume": 283000
     },
     {
       "Date": "1150812",
@@ -5360,7 +5360,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 2250,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 596000
+      "RegularTradeVolume": 597000
     },
     {
       "Date": "1150812",
@@ -5402,7 +5402,7 @@
       "AfterHoursOddLotVolume": 21,
       "OddLotVolume": 1300,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 276000
+      "RegularTradeVolume": 279000
     },
     {
       "Date": "1150812",
@@ -5549,7 +5549,7 @@
       "AfterHoursOddLotVolume": 7459,
       "OddLotVolume": 755145,
       "AfterHoursFixedVolume": 41000,
-      "RegularTradeVolume": 36152000
+      "RegularTradeVolume": 36193000
     },
     {
       "Date": "1150812",
@@ -5570,7 +5570,7 @@
       "AfterHoursOddLotVolume": 469,
       "OddLotVolume": 39725,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 6509000
+      "RegularTradeVolume": 6516000
     },
     {
       "Date": "1150812",
@@ -5591,7 +5591,7 @@
       "AfterHoursOddLotVolume": 29306,
       "OddLotVolume": 1167712,
       "AfterHoursFixedVolume": 97000,
-      "RegularTradeVolume": 91861000
+      "RegularTradeVolume": 91958000
     },
     {
       "Date": "1150812",
@@ -5612,7 +5612,7 @@
       "AfterHoursOddLotVolume": 436,
       "OddLotVolume": 16617,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 4077000
+      "RegularTradeVolume": 4082000
     },
     {
       "Date": "1150812",
@@ -5633,7 +5633,7 @@
       "AfterHoursOddLotVolume": 10235,
       "OddLotVolume": 491777,
       "AfterHoursFixedVolume": 35000,
-      "RegularTradeVolume": 8571000
+      "RegularTradeVolume": 8606000
     },
     {
       "Date": "1150812",
@@ -5654,7 +5654,7 @@
       "AfterHoursOddLotVolume": 5471,
       "OddLotVolume": 107023,
       "AfterHoursFixedVolume": 101000,
-      "RegularTradeVolume": 21629000
+      "RegularTradeVolume": 21730000
     },
     {
       "Date": "1150812",
@@ -5675,7 +5675,7 @@
       "AfterHoursOddLotVolume": 5926,
       "OddLotVolume": 308852,
       "AfterHoursFixedVolume": 30000,
-      "RegularTradeVolume": 13252000
+      "RegularTradeVolume": 13282000
     },
     {
       "Date": "1150812",
@@ -5717,7 +5717,7 @@
       "AfterHoursOddLotVolume": 3419,
       "OddLotVolume": 92921,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 3495000
+      "RegularTradeVolume": 3499000
     },
     {
       "Date": "1150812",
@@ -5738,7 +5738,7 @@
       "AfterHoursOddLotVolume": 92203,
       "OddLotVolume": 2380168,
       "AfterHoursFixedVolume": 478000,
-      "RegularTradeVolume": 57458000
+      "RegularTradeVolume": 57936000
     },
     {
       "Date": "1150812",
@@ -5780,7 +5780,7 @@
       "AfterHoursOddLotVolume": 5491,
       "OddLotVolume": 16331,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2691000
+      "RegularTradeVolume": 2692000
     },
     {
       "Date": "1150812",
@@ -5801,7 +5801,7 @@
       "AfterHoursOddLotVolume": 21085,
       "OddLotVolume": 1334289,
       "AfterHoursFixedVolume": 44000,
-      "RegularTradeVolume": 170369000
+      "RegularTradeVolume": 170413000
     },
     {
       "Date": "1150812",
@@ -5822,7 +5822,7 @@
       "AfterHoursOddLotVolume": 17549,
       "OddLotVolume": 1964841,
       "AfterHoursFixedVolume": 77000,
-      "RegularTradeVolume": 54025000
+      "RegularTradeVolume": 54102000
     },
     {
       "Date": "1150812",
@@ -5843,7 +5843,7 @@
       "AfterHoursOddLotVolume": 772,
       "OddLotVolume": 14385,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1632000
+      "RegularTradeVolume": 1633000
     },
     {
       "Date": "1150812",
@@ -5864,7 +5864,7 @@
       "AfterHoursOddLotVolume": 1544,
       "OddLotVolume": 20044,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 1863000
+      "RegularTradeVolume": 1867000
     },
     {
       "Date": "1150812",
@@ -5885,7 +5885,7 @@
       "AfterHoursOddLotVolume": 53219,
       "OddLotVolume": 1591153,
       "AfterHoursFixedVolume": 61000,
-      "RegularTradeVolume": 17796000
+      "RegularTradeVolume": 17857000
     },
     {
       "Date": "1150812",
@@ -5927,7 +5927,7 @@
       "AfterHoursOddLotVolume": 1810,
       "OddLotVolume": 47893,
       "AfterHoursFixedVolume": 31000,
-      "RegularTradeVolume": 21057000
+      "RegularTradeVolume": 21088000
     },
     {
       "Date": "1150812",
@@ -5948,7 +5948,7 @@
       "AfterHoursOddLotVolume": 12646,
       "OddLotVolume": 685549,
       "AfterHoursFixedVolume": 153000,
-      "RegularTradeVolume": 103579000
+      "RegularTradeVolume": 103732000
     },
     {
       "Date": "1150812",
@@ -5969,7 +5969,7 @@
       "AfterHoursOddLotVolume": 489,
       "OddLotVolume": 13568,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1055000
+      "RegularTradeVolume": 1057000
     },
     {
       "Date": "1150812",
@@ -5990,7 +5990,7 @@
       "AfterHoursOddLotVolume": 753,
       "OddLotVolume": 10068,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1981000
+      "RegularTradeVolume": 1982000
     },
     {
       "Date": "1150812",
@@ -6011,7 +6011,7 @@
       "AfterHoursOddLotVolume": 1160,
       "OddLotVolume": 19240,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 2662000
+      "RegularTradeVolume": 2668000
     },
     {
       "Date": "1150812",
@@ -6032,7 +6032,7 @@
       "AfterHoursOddLotVolume": 24570,
       "OddLotVolume": 2260220,
       "AfterHoursFixedVolume": 275000,
-      "RegularTradeVolume": 204828626
+      "RegularTradeVolume": 205103626
     },
     {
       "Date": "1150812",
@@ -6116,7 +6116,7 @@
       "AfterHoursOddLotVolume": 827,
       "OddLotVolume": 8681,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1166000
+      "RegularTradeVolume": 1169000
     },
     {
       "Date": "1150812",
@@ -6137,7 +6137,7 @@
       "AfterHoursOddLotVolume": 1065,
       "OddLotVolume": 23360,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1448000
+      "RegularTradeVolume": 1449000
     },
     {
       "Date": "1150812",
@@ -6158,7 +6158,7 @@
       "AfterHoursOddLotVolume": 7085,
       "OddLotVolume": 43571,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 4671000
+      "RegularTradeVolume": 4673000
     },
     {
       "Date": "1150812",
@@ -6179,7 +6179,7 @@
       "AfterHoursOddLotVolume": 6140,
       "OddLotVolume": 140900,
       "AfterHoursFixedVolume": 37000,
-      "RegularTradeVolume": 24803000
+      "RegularTradeVolume": 24840000
     },
     {
       "Date": "1150812",
@@ -6200,7 +6200,7 @@
       "AfterHoursOddLotVolume": 2054,
       "OddLotVolume": 136293,
       "AfterHoursFixedVolume": 32000,
-      "RegularTradeVolume": 16499000
+      "RegularTradeVolume": 16531000
     },
     {
       "Date": "1150812",
@@ -6221,7 +6221,7 @@
       "AfterHoursOddLotVolume": 410,
       "OddLotVolume": 22600,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 1622000
+      "RegularTradeVolume": 1628000
     },
     {
       "Date": "1150812",
@@ -6242,7 +6242,7 @@
       "AfterHoursOddLotVolume": 12006,
       "OddLotVolume": 744257,
       "AfterHoursFixedVolume": 105000,
-      "RegularTradeVolume": 78948000
+      "RegularTradeVolume": 79053000
     },
     {
       "Date": "1150812",
@@ -6263,7 +6263,7 @@
       "AfterHoursOddLotVolume": 3554,
       "OddLotVolume": 167043,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 2924000
+      "RegularTradeVolume": 2926000
     },
     {
       "Date": "1150812",
@@ -6284,7 +6284,7 @@
       "AfterHoursOddLotVolume": 1423,
       "OddLotVolume": 60704,
       "AfterHoursFixedVolume": 23000,
-      "RegularTradeVolume": 4291000
+      "RegularTradeVolume": 4314000
     },
     {
       "Date": "1150812",
@@ -6305,7 +6305,7 @@
       "AfterHoursOddLotVolume": 523,
       "OddLotVolume": 126846,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2580000
+      "RegularTradeVolume": 2581000
     },
     {
       "Date": "1150812",
@@ -6326,7 +6326,7 @@
       "AfterHoursOddLotVolume": 1668,
       "OddLotVolume": 26358,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 3366000
+      "RegularTradeVolume": 3371000
     },
     {
       "Date": "1150812",
@@ -6347,7 +6347,7 @@
       "AfterHoursOddLotVolume": 5948,
       "OddLotVolume": 101052,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 7505000
+      "RegularTradeVolume": 7513000
     },
     {
       "Date": "1150812",
@@ -6368,7 +6368,7 @@
       "AfterHoursOddLotVolume": 400,
       "OddLotVolume": 18839,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1014000
+      "RegularTradeVolume": 1015000
     },
     {
       "Date": "1150812",
@@ -6410,7 +6410,7 @@
       "AfterHoursOddLotVolume": 1963,
       "OddLotVolume": 64238,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 6401000
+      "RegularTradeVolume": 6416000
     },
     {
       "Date": "1150812",
@@ -6431,7 +6431,7 @@
       "AfterHoursOddLotVolume": 2665,
       "OddLotVolume": 472143,
       "AfterHoursFixedVolume": 18000,
-      "RegularTradeVolume": 19399000
+      "RegularTradeVolume": 19417000
     },
     {
       "Date": "1150812",
@@ -6452,7 +6452,7 @@
       "AfterHoursOddLotVolume": 1335,
       "OddLotVolume": 26329,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 4437000
+      "RegularTradeVolume": 4444000
     },
     {
       "Date": "1150812",
@@ -6473,7 +6473,7 @@
       "AfterHoursOddLotVolume": 4478,
       "OddLotVolume": 51212,
       "AfterHoursFixedVolume": 24000,
-      "RegularTradeVolume": 9331000
+      "RegularTradeVolume": 9355000
     },
     {
       "Date": "1150812",
@@ -6515,7 +6515,7 @@
       "AfterHoursOddLotVolume": 1930,
       "OddLotVolume": 32576,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 2179000
+      "RegularTradeVolume": 2185000
     },
     {
       "Date": "1150812",
@@ -6536,7 +6536,7 @@
       "AfterHoursOddLotVolume": 592,
       "OddLotVolume": 91324,
       "AfterHoursFixedVolume": 14000,
-      "RegularTradeVolume": 6479000
+      "RegularTradeVolume": 6493000
     },
     {
       "Date": "1150812",
@@ -6557,7 +6557,7 @@
       "AfterHoursOddLotVolume": 5455,
       "OddLotVolume": 593451,
       "AfterHoursFixedVolume": 20000,
-      "RegularTradeVolume": 17379000
+      "RegularTradeVolume": 17399000
     },
     {
       "Date": "1150812",
@@ -6578,7 +6578,7 @@
       "AfterHoursOddLotVolume": 3064,
       "OddLotVolume": 654297,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 45456000
+      "RegularTradeVolume": 45458000
     },
     {
       "Date": "1150812",
@@ -6599,7 +6599,7 @@
       "AfterHoursOddLotVolume": 614,
       "OddLotVolume": 51017,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1436000
+      "RegularTradeVolume": 1437000
     },
     {
       "Date": "1150812",
@@ -6641,7 +6641,7 @@
       "AfterHoursOddLotVolume": 8850,
       "OddLotVolume": 469089,
       "AfterHoursFixedVolume": 44000,
-      "RegularTradeVolume": 28344000
+      "RegularTradeVolume": 28388000
     },
     {
       "Date": "1150812",
@@ -6662,7 +6662,7 @@
       "AfterHoursOddLotVolume": 2375,
       "OddLotVolume": 166510,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1467000
+      "RegularTradeVolume": 1469000
     },
     {
       "Date": "1150812",
@@ -6683,7 +6683,7 @@
       "AfterHoursOddLotVolume": 736,
       "OddLotVolume": 29819,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2990000
+      "RegularTradeVolume": 2991000
     },
     {
       "Date": "1150812",
@@ -6704,7 +6704,7 @@
       "AfterHoursOddLotVolume": 120,
       "OddLotVolume": 7713,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 604000
+      "RegularTradeVolume": 607000
     },
     {
       "Date": "1150812",
@@ -6725,7 +6725,7 @@
       "AfterHoursOddLotVolume": 979,
       "OddLotVolume": 55904,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 4895000
+      "RegularTradeVolume": 4901000
     },
     {
       "Date": "1150812",
@@ -6746,7 +6746,7 @@
       "AfterHoursOddLotVolume": 1500,
       "OddLotVolume": 9666,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 523000
+      "RegularTradeVolume": 524000
     },
     {
       "Date": "1150812",
@@ -6767,7 +6767,7 @@
       "AfterHoursOddLotVolume": 2614,
       "OddLotVolume": 29016,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 3085000
+      "RegularTradeVolume": 3093000
     },
     {
       "Date": "1150812",
@@ -6788,7 +6788,7 @@
       "AfterHoursOddLotVolume": 309,
       "OddLotVolume": 30749,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 5447000
+      "RegularTradeVolume": 5449000
     },
     {
       "Date": "1150812",
@@ -6809,7 +6809,7 @@
       "AfterHoursOddLotVolume": 929,
       "OddLotVolume": 119172,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 5881000
+      "RegularTradeVolume": 5882000
     },
     {
       "Date": "1150812",
@@ -6830,7 +6830,7 @@
       "AfterHoursOddLotVolume": 98,
       "OddLotVolume": 6161,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1075000
+      "RegularTradeVolume": 1076000
     },
     {
       "Date": "1150812",
@@ -6851,7 +6851,7 @@
       "AfterHoursOddLotVolume": 1269,
       "OddLotVolume": 58531,
       "AfterHoursFixedVolume": 14000,
-      "RegularTradeVolume": 11498000
+      "RegularTradeVolume": 11512000
     },
     {
       "Date": "1150812",
@@ -6872,7 +6872,7 @@
       "AfterHoursOddLotVolume": 577,
       "OddLotVolume": 11660,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 3927000
+      "RegularTradeVolume": 3937000
     },
     {
       "Date": "1150812",
@@ -6893,7 +6893,7 @@
       "AfterHoursOddLotVolume": 468,
       "OddLotVolume": 34287,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 1906000
+      "RegularTradeVolume": 1913000
     },
     {
       "Date": "1150812",
@@ -6914,7 +6914,7 @@
       "AfterHoursOddLotVolume": 1062,
       "OddLotVolume": 53103,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1108000
+      "RegularTradeVolume": 1110000
     },
     {
       "Date": "1150812",
@@ -6956,7 +6956,7 @@
       "AfterHoursOddLotVolume": 1519,
       "OddLotVolume": 24523,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 4243000
+      "RegularTradeVolume": 4247000
     },
     {
       "Date": "1150812",
@@ -6977,7 +6977,7 @@
       "AfterHoursOddLotVolume": 21821,
       "OddLotVolume": 1764951,
       "AfterHoursFixedVolume": 160000,
-      "RegularTradeVolume": 91724000
+      "RegularTradeVolume": 91884000
     },
     {
       "Date": "1150812",
@@ -6998,7 +6998,7 @@
       "AfterHoursOddLotVolume": 31261,
       "OddLotVolume": 395323,
       "AfterHoursFixedVolume": 436000,
-      "RegularTradeVolume": 169295000
+      "RegularTradeVolume": 169731000
     },
     {
       "Date": "1150812",
@@ -7019,7 +7019,7 @@
       "AfterHoursOddLotVolume": 8593,
       "OddLotVolume": 119753,
       "AfterHoursFixedVolume": 30000,
-      "RegularTradeVolume": 8740000
+      "RegularTradeVolume": 8770000
     },
     {
       "Date": "1150812",
@@ -7040,7 +7040,7 @@
       "AfterHoursOddLotVolume": 211,
       "OddLotVolume": 15791,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 1418000
+      "RegularTradeVolume": 1423000
     },
     {
       "Date": "1150812",
@@ -7103,7 +7103,7 @@
       "AfterHoursOddLotVolume": 2100,
       "OddLotVolume": 28996,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 5822000
+      "RegularTradeVolume": 5823000
     },
     {
       "Date": "1150812",
@@ -7166,7 +7166,7 @@
       "AfterHoursOddLotVolume": 664,
       "OddLotVolume": 36753,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1707000
+      "RegularTradeVolume": 1710000
     },
     {
       "Date": "1150812",
@@ -7229,7 +7229,7 @@
       "AfterHoursOddLotVolume": 245,
       "OddLotVolume": 55294,
       "AfterHoursFixedVolume": 26000,
-      "RegularTradeVolume": 11480000
+      "RegularTradeVolume": 11506000
     },
     {
       "Date": "1150812",
@@ -7250,7 +7250,7 @@
       "AfterHoursOddLotVolume": 1358,
       "OddLotVolume": 110815,
       "AfterHoursFixedVolume": 35000,
-      "RegularTradeVolume": 17247000
+      "RegularTradeVolume": 17282000
     },
     {
       "Date": "1150812",
@@ -7292,7 +7292,7 @@
       "AfterHoursOddLotVolume": 425,
       "OddLotVolume": 49406,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2239000
+      "RegularTradeVolume": 2240000
     },
     {
       "Date": "1150812",
@@ -7313,7 +7313,7 @@
       "AfterHoursOddLotVolume": 102,
       "OddLotVolume": 5235,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 318000
+      "RegularTradeVolume": 320000
     },
     {
       "Date": "1150812",
@@ -7418,7 +7418,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 9183,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 886000
+      "RegularTradeVolume": 888000
     },
     {
       "Date": "1150812",
@@ -7439,7 +7439,7 @@
       "AfterHoursOddLotVolume": 1444,
       "OddLotVolume": 45275,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 5382000
+      "RegularTradeVolume": 5391000
     },
     {
       "Date": "1150812",
@@ -7460,7 +7460,7 @@
       "AfterHoursOddLotVolume": 122,
       "OddLotVolume": 3312,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 261000
+      "RegularTradeVolume": 262000
     },
     {
       "Date": "1150812",
@@ -7523,7 +7523,7 @@
       "AfterHoursOddLotVolume": 1560,
       "OddLotVolume": 135826,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 9309000
+      "RegularTradeVolume": 9316000
     },
     {
       "Date": "1150812",
@@ -7544,7 +7544,7 @@
       "AfterHoursOddLotVolume": 749,
       "OddLotVolume": 5945,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1450000
+      "RegularTradeVolume": 1453000
     },
     {
       "Date": "1150812",
@@ -7586,7 +7586,7 @@
       "AfterHoursOddLotVolume": 9570,
       "OddLotVolume": 539887,
       "AfterHoursFixedVolume": 36000,
-      "RegularTradeVolume": 21152000
+      "RegularTradeVolume": 21188000
     },
     {
       "Date": "1150812",
@@ -7628,7 +7628,7 @@
       "AfterHoursOddLotVolume": 1179,
       "OddLotVolume": 124658,
       "AfterHoursFixedVolume": 24000,
-      "RegularTradeVolume": 6850000
+      "RegularTradeVolume": 6874000
     },
     {
       "Date": "1150812",
@@ -7670,7 +7670,7 @@
       "AfterHoursOddLotVolume": 3694,
       "OddLotVolume": 340155,
       "AfterHoursFixedVolume": 12000,
-      "RegularTradeVolume": 5666000
+      "RegularTradeVolume": 5678000
     },
     {
       "Date": "1150812",
@@ -7691,7 +7691,7 @@
       "AfterHoursOddLotVolume": 3131,
       "OddLotVolume": 188047,
       "AfterHoursFixedVolume": 29000,
-      "RegularTradeVolume": 3753000
+      "RegularTradeVolume": 3782000
     },
     {
       "Date": "1150812",
@@ -7712,7 +7712,7 @@
       "AfterHoursOddLotVolume": 411,
       "OddLotVolume": 5950,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 943000
+      "RegularTradeVolume": 944000
     },
     {
       "Date": "1150812",
@@ -7733,7 +7733,7 @@
       "AfterHoursOddLotVolume": 1184,
       "OddLotVolume": 24158,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 2637000
+      "RegularTradeVolume": 2640000
     },
     {
       "Date": "1150812",
@@ -7754,7 +7754,7 @@
       "AfterHoursOddLotVolume": 36,
       "OddLotVolume": 1520,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 97000
+      "RegularTradeVolume": 98000
     },
     {
       "Date": "1150812",
@@ -7796,7 +7796,7 @@
       "AfterHoursOddLotVolume": 480,
       "OddLotVolume": 10999,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 3111000
+      "RegularTradeVolume": 3116000
     },
     {
       "Date": "1150812",
@@ -7838,7 +7838,7 @@
       "AfterHoursOddLotVolume": 5823,
       "OddLotVolume": 439273,
       "AfterHoursFixedVolume": 24000,
-      "RegularTradeVolume": 28555000
+      "RegularTradeVolume": 28579000
     },
     {
       "Date": "1150812",
@@ -7859,7 +7859,7 @@
       "AfterHoursOddLotVolume": 6339,
       "OddLotVolume": 95219,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 8772000
+      "RegularTradeVolume": 8775000
     },
     {
       "Date": "1150812",
@@ -7880,7 +7880,7 @@
       "AfterHoursOddLotVolume": 5,
       "OddLotVolume": 9714,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 830000
+      "RegularTradeVolume": 833000
     },
     {
       "Date": "1150812",
@@ -7901,7 +7901,7 @@
       "AfterHoursOddLotVolume": 655,
       "OddLotVolume": 52423,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1638000
+      "RegularTradeVolume": 1640000
     },
     {
       "Date": "1150812",
@@ -7964,7 +7964,7 @@
       "AfterHoursOddLotVolume": 2195,
       "OddLotVolume": 74172,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 4379000
+      "RegularTradeVolume": 4384000
     },
     {
       "Date": "1150812",
@@ -7985,7 +7985,7 @@
       "AfterHoursOddLotVolume": 1173,
       "OddLotVolume": 81933,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 3561000
+      "RegularTradeVolume": 3565000
     },
     {
       "Date": "1150812",
@@ -8006,7 +8006,7 @@
       "AfterHoursOddLotVolume": 1742,
       "OddLotVolume": 28083,
       "AfterHoursFixedVolume": 17000,
-      "RegularTradeVolume": 2190000
+      "RegularTradeVolume": 2207000
     },
     {
       "Date": "1150812",
@@ -8048,7 +8048,7 @@
       "AfterHoursOddLotVolume": 1576,
       "OddLotVolume": 84360,
       "AfterHoursFixedVolume": 14000,
-      "RegularTradeVolume": 14341000
+      "RegularTradeVolume": 14355000
     },
     {
       "Date": "1150812",
@@ -8090,7 +8090,7 @@
       "AfterHoursOddLotVolume": 1942,
       "OddLotVolume": 185465,
       "AfterHoursFixedVolume": 51000,
-      "RegularTradeVolume": 15034000
+      "RegularTradeVolume": 15085000
     },
     {
       "Date": "1150812",
@@ -8153,7 +8153,7 @@
       "AfterHoursOddLotVolume": 2100,
       "OddLotVolume": 59237,
       "AfterHoursFixedVolume": 19000,
-      "RegularTradeVolume": 10589000
+      "RegularTradeVolume": 10608000
     },
     {
       "Date": "1150812",
@@ -8174,7 +8174,7 @@
       "AfterHoursOddLotVolume": 1087,
       "OddLotVolume": 38990,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 3399000
+      "RegularTradeVolume": 3412000
     },
     {
       "Date": "1150812",
@@ -8195,7 +8195,7 @@
       "AfterHoursOddLotVolume": 2029,
       "OddLotVolume": 42206,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 3629000
+      "RegularTradeVolume": 3637000
     },
     {
       "Date": "1150812",
@@ -8237,7 +8237,7 @@
       "AfterHoursOddLotVolume": 2657,
       "OddLotVolume": 45475,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 6848000
+      "RegularTradeVolume": 6863000
     },
     {
       "Date": "1150812",
@@ -8258,7 +8258,7 @@
       "AfterHoursOddLotVolume": 844,
       "OddLotVolume": 3083,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 328000
+      "RegularTradeVolume": 335000
     },
     {
       "Date": "1150812",
@@ -8279,7 +8279,7 @@
       "AfterHoursOddLotVolume": 4796,
       "OddLotVolume": 1077986,
       "AfterHoursFixedVolume": 84000,
-      "RegularTradeVolume": 65754000
+      "RegularTradeVolume": 65838000
     },
     {
       "Date": "1150812",
@@ -8300,7 +8300,7 @@
       "AfterHoursOddLotVolume": 1057,
       "OddLotVolume": 52893,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 5309000
+      "RegularTradeVolume": 5315000
     },
     {
       "Date": "1150812",
@@ -8321,7 +8321,7 @@
       "AfterHoursOddLotVolume": 1516,
       "OddLotVolume": 22404,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1867000
+      "RegularTradeVolume": 1870000
     },
     {
       "Date": "1150812",
@@ -8363,7 +8363,7 @@
       "AfterHoursOddLotVolume": 125,
       "OddLotVolume": 2706,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 378000
+      "RegularTradeVolume": 380000
     },
     {
       "Date": "1150812",
@@ -8384,7 +8384,7 @@
       "AfterHoursOddLotVolume": 157,
       "OddLotVolume": 21995,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2528000
+      "RegularTradeVolume": 2529000
     },
     {
       "Date": "1150812",
@@ -8405,7 +8405,7 @@
       "AfterHoursOddLotVolume": 1628,
       "OddLotVolume": 21312,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 3154000
+      "RegularTradeVolume": 3156000
     },
     {
       "Date": "1150812",
@@ -8594,7 +8594,7 @@
       "AfterHoursOddLotVolume": 575,
       "OddLotVolume": 23544,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1875000
+      "RegularTradeVolume": 1877000
     },
     {
       "Date": "1150812",
@@ -8825,7 +8825,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 27759,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 4259000
+      "RegularTradeVolume": 4261000
     },
     {
       "Date": "1150812",
@@ -8846,7 +8846,7 @@
       "AfterHoursOddLotVolume": 5630,
       "OddLotVolume": 69986,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 6276000
+      "RegularTradeVolume": 6286000
     },
     {
       "Date": "1150812",
@@ -8867,7 +8867,7 @@
       "AfterHoursOddLotVolume": 450,
       "OddLotVolume": 17047,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 2067000
+      "RegularTradeVolume": 2071000
     },
     {
       "Date": "1150812",
@@ -8930,7 +8930,7 @@
       "AfterHoursOddLotVolume": 848,
       "OddLotVolume": 21336,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 8185000
+      "RegularTradeVolume": 8191000
     },
     {
       "Date": "1150812",
@@ -9014,7 +9014,7 @@
       "AfterHoursOddLotVolume": 5371,
       "OddLotVolume": 172184,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 9362000
+      "RegularTradeVolume": 9375000
     },
     {
       "Date": "1150812",
@@ -9035,7 +9035,7 @@
       "AfterHoursOddLotVolume": 2141,
       "OddLotVolume": 21074,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 3699000
+      "RegularTradeVolume": 3701000
     },
     {
       "Date": "1150812",
@@ -9056,7 +9056,7 @@
       "AfterHoursOddLotVolume": 1254,
       "OddLotVolume": 23315,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 3820000
+      "RegularTradeVolume": 3821000
     },
     {
       "Date": "1150812",
@@ -9077,7 +9077,7 @@
       "AfterHoursOddLotVolume": 2433,
       "OddLotVolume": 25137,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1266000
+      "RegularTradeVolume": 1267000
     },
     {
       "Date": "1150812",
@@ -9119,7 +9119,7 @@
       "AfterHoursOddLotVolume": 2160,
       "OddLotVolume": 108883,
       "AfterHoursFixedVolume": 39000,
-      "RegularTradeVolume": 10261000
+      "RegularTradeVolume": 10300000
     },
     {
       "Date": "1150812",
@@ -9140,7 +9140,7 @@
       "AfterHoursOddLotVolume": 7207,
       "OddLotVolume": 83627,
       "AfterHoursFixedVolume": 52000,
-      "RegularTradeVolume": 25444000
+      "RegularTradeVolume": 25496000
     },
     {
       "Date": "1150812",
@@ -9203,7 +9203,7 @@
       "AfterHoursOddLotVolume": 560,
       "OddLotVolume": 2383,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 95000
+      "RegularTradeVolume": 97000
     },
     {
       "Date": "1150812",
@@ -9245,7 +9245,7 @@
       "AfterHoursOddLotVolume": 4001,
       "OddLotVolume": 71905,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 7040000
+      "RegularTradeVolume": 7053000
     },
     {
       "Date": "1150812",
@@ -9308,7 +9308,7 @@
       "AfterHoursOddLotVolume": 5225,
       "OddLotVolume": 79760,
       "AfterHoursFixedVolume": 16000,
-      "RegularTradeVolume": 22070000
+      "RegularTradeVolume": 22086000
     },
     {
       "Date": "1150812",
@@ -9329,7 +9329,7 @@
       "AfterHoursOddLotVolume": 797,
       "OddLotVolume": 17336,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1659000
+      "RegularTradeVolume": 1660000
     },
     {
       "Date": "1150812",
@@ -9350,7 +9350,7 @@
       "AfterHoursOddLotVolume": 1502,
       "OddLotVolume": 14083,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 3199000
+      "RegularTradeVolume": 3203000
     },
     {
       "Date": "1150812",
@@ -9371,7 +9371,7 @@
       "AfterHoursOddLotVolume": 1515,
       "OddLotVolume": 108669,
       "AfterHoursFixedVolume": 35000,
-      "RegularTradeVolume": 13006000
+      "RegularTradeVolume": 13041000
     },
     {
       "Date": "1150812",
@@ -9413,7 +9413,7 @@
       "AfterHoursOddLotVolume": 1561,
       "OddLotVolume": 17773,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1468000
+      "RegularTradeVolume": 1470000
     },
     {
       "Date": "1150812",
@@ -9455,7 +9455,7 @@
       "AfterHoursOddLotVolume": 1873,
       "OddLotVolume": 91853,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 3482000
+      "RegularTradeVolume": 3485000
     },
     {
       "Date": "1150812",
@@ -9476,7 +9476,7 @@
       "AfterHoursOddLotVolume": 1905,
       "OddLotVolume": 80409,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 5870000
+      "RegularTradeVolume": 5874000
     },
     {
       "Date": "1150812",
@@ -9812,7 +9812,7 @@
       "AfterHoursOddLotVolume": 9744,
       "OddLotVolume": 89757,
       "AfterHoursFixedVolume": 20000,
-      "RegularTradeVolume": 24629000
+      "RegularTradeVolume": 24649000
     },
     {
       "Date": "1150812",
@@ -9833,7 +9833,7 @@
       "AfterHoursOddLotVolume": 6195,
       "OddLotVolume": 185480,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 10318000
+      "RegularTradeVolume": 10327000
     },
     {
       "Date": "1150812",
@@ -9875,7 +9875,7 @@
       "AfterHoursOddLotVolume": 2196,
       "OddLotVolume": 7850,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 2578000
+      "RegularTradeVolume": 2587000
     },
     {
       "Date": "1150812",
@@ -9896,7 +9896,7 @@
       "AfterHoursOddLotVolume": 10,
       "OddLotVolume": 2624,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 45000
+      "RegularTradeVolume": 46000
     },
     {
       "Date": "1150812",
@@ -9917,7 +9917,7 @@
       "AfterHoursOddLotVolume": 12012,
       "OddLotVolume": 128875,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 20032000
+      "RegularTradeVolume": 20039000
     },
     {
       "Date": "1150812",
@@ -9938,7 +9938,7 @@
       "AfterHoursOddLotVolume": 105,
       "OddLotVolume": 7631,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 975000
+      "RegularTradeVolume": 981000
     },
     {
       "Date": "1150812",
@@ -9959,7 +9959,7 @@
       "AfterHoursOddLotVolume": 1277,
       "OddLotVolume": 26708,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1873000
+      "RegularTradeVolume": 1874000
     },
     {
       "Date": "1150812",
@@ -9980,7 +9980,7 @@
       "AfterHoursOddLotVolume": 2567,
       "OddLotVolume": 25495,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 6087000
+      "RegularTradeVolume": 6088000
     },
     {
       "Date": "1150812",
@@ -10022,7 +10022,7 @@
       "AfterHoursOddLotVolume": 163,
       "OddLotVolume": 5789,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 205000
+      "RegularTradeVolume": 206000
     },
     {
       "Date": "1150812",
@@ -10085,7 +10085,7 @@
       "AfterHoursOddLotVolume": 2536,
       "OddLotVolume": 46656,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 5861000
+      "RegularTradeVolume": 5865000
     },
     {
       "Date": "1150812",
@@ -10106,7 +10106,7 @@
       "AfterHoursOddLotVolume": 11220,
       "OddLotVolume": 72760,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 12420000
+      "RegularTradeVolume": 12433000
     },
     {
       "Date": "1150812",
@@ -10127,7 +10127,7 @@
       "AfterHoursOddLotVolume": 12290,
       "OddLotVolume": 178400,
       "AfterHoursFixedVolume": 53000,
-      "RegularTradeVolume": 30073000
+      "RegularTradeVolume": 30126000
     },
     {
       "Date": "1150812",
@@ -10148,7 +10148,7 @@
       "AfterHoursOddLotVolume": 9621,
       "OddLotVolume": 111394,
       "AfterHoursFixedVolume": 16000,
-      "RegularTradeVolume": 9054000
+      "RegularTradeVolume": 9070000
     },
     {
       "Date": "1150812",
@@ -10169,7 +10169,7 @@
       "AfterHoursOddLotVolume": 6705,
       "OddLotVolume": 125454,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 17313000
+      "RegularTradeVolume": 17314000
     },
     {
       "Date": "1150812",
@@ -10190,7 +10190,7 @@
       "AfterHoursOddLotVolume": 27678,
       "OddLotVolume": 135840,
       "AfterHoursFixedVolume": 69000,
-      "RegularTradeVolume": 28996000
+      "RegularTradeVolume": 29065000
     },
     {
       "Date": "1150812",
@@ -10211,7 +10211,7 @@
       "AfterHoursOddLotVolume": 15719,
       "OddLotVolume": 328028,
       "AfterHoursFixedVolume": 41000,
-      "RegularTradeVolume": 27765000
+      "RegularTradeVolume": 27806000
     },
     {
       "Date": "1150812",
@@ -10232,7 +10232,7 @@
       "AfterHoursOddLotVolume": 9063,
       "OddLotVolume": 129826,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 12097000
+      "RegularTradeVolume": 12106000
     },
     {
       "Date": "1150812",
@@ -10253,7 +10253,7 @@
       "AfterHoursOddLotVolume": 19082,
       "OddLotVolume": 358725,
       "AfterHoursFixedVolume": 117000,
-      "RegularTradeVolume": 31126000
+      "RegularTradeVolume": 31243000
     },
     {
       "Date": "1150812",
@@ -10274,7 +10274,7 @@
       "AfterHoursOddLotVolume": 15339,
       "OddLotVolume": 136423,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 35094000
+      "RegularTradeVolume": 35100000
     },
     {
       "Date": "1150812",
@@ -10295,7 +10295,7 @@
       "AfterHoursOddLotVolume": 7807,
       "OddLotVolume": 43742,
       "AfterHoursFixedVolume": 11000,
-      "RegularTradeVolume": 4279000
+      "RegularTradeVolume": 4290000
     },
     {
       "Date": "1150812",
@@ -10316,7 +10316,7 @@
       "AfterHoursOddLotVolume": 8915,
       "OddLotVolume": 99517,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 19182000
+      "RegularTradeVolume": 19191000
     },
     {
       "Date": "1150812",
@@ -10337,7 +10337,7 @@
       "AfterHoursOddLotVolume": 16555,
       "OddLotVolume": 237639,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 39097000
+      "RegularTradeVolume": 39110000
     },
     {
       "Date": "1150812",
@@ -10358,7 +10358,7 @@
       "AfterHoursOddLotVolume": 22691,
       "OddLotVolume": 174191,
       "AfterHoursFixedVolume": 66000,
-      "RegularTradeVolume": 42736000
+      "RegularTradeVolume": 42802000
     },
     {
       "Date": "1150812",
@@ -10463,7 +10463,7 @@
       "AfterHoursOddLotVolume": 1861,
       "OddLotVolume": 7803,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 471000
+      "RegularTradeVolume": 472000
     },
     {
       "Date": "1150812",
@@ -10589,7 +10589,7 @@
       "AfterHoursOddLotVolume": 3195,
       "OddLotVolume": 8172,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1065000
+      "RegularTradeVolume": 1066000
     },
     {
       "Date": "1150812",
@@ -10610,7 +10610,7 @@
       "AfterHoursOddLotVolume": 2381,
       "OddLotVolume": 28208,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 3480000
+      "RegularTradeVolume": 3483000
     },
     {
       "Date": "1150812",
@@ -10652,7 +10652,7 @@
       "AfterHoursOddLotVolume": 85,
       "OddLotVolume": 2250,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 505000
+      "RegularTradeVolume": 507000
     },
     {
       "Date": "1150812",
@@ -10736,7 +10736,7 @@
       "AfterHoursOddLotVolume": 602,
       "OddLotVolume": 30218,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1774000
+      "RegularTradeVolume": 1776000
     },
     {
       "Date": "1150812",
@@ -10757,7 +10757,7 @@
       "AfterHoursOddLotVolume": 408,
       "OddLotVolume": 4802,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 174000
+      "RegularTradeVolume": 175000
     },
     {
       "Date": "1150812",
@@ -10778,7 +10778,7 @@
       "AfterHoursOddLotVolume": 940,
       "OddLotVolume": 35916,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 2102000
+      "RegularTradeVolume": 2108000
     },
     {
       "Date": "1150812",
@@ -10799,7 +10799,7 @@
       "AfterHoursOddLotVolume": 4319,
       "OddLotVolume": 104397,
       "AfterHoursFixedVolume": 18000,
-      "RegularTradeVolume": 3550000
+      "RegularTradeVolume": 3568000
     },
     {
       "Date": "1150812",
@@ -10820,7 +10820,7 @@
       "AfterHoursOddLotVolume": 1488,
       "OddLotVolume": 210833,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1942000
+      "RegularTradeVolume": 1944000
     },
     {
       "Date": "1150812",
@@ -10841,7 +10841,7 @@
       "AfterHoursOddLotVolume": 1007,
       "OddLotVolume": 70904,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 3891000
+      "RegularTradeVolume": 3894000
     },
     {
       "Date": "1150812",
@@ -10883,7 +10883,7 @@
       "AfterHoursOddLotVolume": 100,
       "OddLotVolume": 29636,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1072000
+      "RegularTradeVolume": 1075000
     },
     {
       "Date": "1150812",
@@ -10925,7 +10925,7 @@
       "AfterHoursOddLotVolume": 66,
       "OddLotVolume": 10620,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 800000
+      "RegularTradeVolume": 801000
     },
     {
       "Date": "1150812",
@@ -10946,7 +10946,7 @@
       "AfterHoursOddLotVolume": 273,
       "OddLotVolume": 44062,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 8321000
+      "RegularTradeVolume": 8329000
     },
     {
       "Date": "1150812",
@@ -10967,7 +10967,7 @@
       "AfterHoursOddLotVolume": 2950,
       "OddLotVolume": 317037,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 3888000
+      "RegularTradeVolume": 3901000
     },
     {
       "Date": "1150812",
@@ -11009,7 +11009,7 @@
       "AfterHoursOddLotVolume": 933,
       "OddLotVolume": 49088,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 3148000
+      "RegularTradeVolume": 3158000
     },
     {
       "Date": "1150812",
@@ -11030,7 +11030,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 947,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 128000
+      "RegularTradeVolume": 129000
     },
     {
       "Date": "1150812",
@@ -11051,7 +11051,7 @@
       "AfterHoursOddLotVolume": 1435,
       "OddLotVolume": 43326,
       "AfterHoursFixedVolume": 14000,
-      "RegularTradeVolume": 3505000
+      "RegularTradeVolume": 3519000
     },
     {
       "Date": "1150812",
@@ -11093,7 +11093,7 @@
       "AfterHoursOddLotVolume": 1330,
       "OddLotVolume": 4031,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1202000
+      "RegularTradeVolume": 1204000
     },
     {
       "Date": "1150812",
@@ -11135,7 +11135,7 @@
       "AfterHoursOddLotVolume": 3795,
       "OddLotVolume": 435223,
       "AfterHoursFixedVolume": 25000,
-      "RegularTradeVolume": 23702000
+      "RegularTradeVolume": 23727000
     },
     {
       "Date": "1150812",
@@ -11177,7 +11177,7 @@
       "AfterHoursOddLotVolume": 99,
       "OddLotVolume": 15169,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1485000
+      "RegularTradeVolume": 1486000
     },
     {
       "Date": "1150812",
@@ -11198,7 +11198,7 @@
       "AfterHoursOddLotVolume": 476,
       "OddLotVolume": 21885,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 743000
+      "RegularTradeVolume": 745000
     },
     {
       "Date": "1150812",
@@ -11219,7 +11219,7 @@
       "AfterHoursOddLotVolume": 912,
       "OddLotVolume": 49434,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 1641000
+      "RegularTradeVolume": 1650000
     },
     {
       "Date": "1150812",
@@ -11261,7 +11261,7 @@
       "AfterHoursOddLotVolume": 176,
       "OddLotVolume": 4757,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 594000
+      "RegularTradeVolume": 596000
     },
     {
       "Date": "1150812",
@@ -11282,7 +11282,7 @@
       "AfterHoursOddLotVolume": 1254,
       "OddLotVolume": 56589,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 8623000
+      "RegularTradeVolume": 8631000
     },
     {
       "Date": "1150812",
@@ -11303,7 +11303,7 @@
       "AfterHoursOddLotVolume": 1746,
       "OddLotVolume": 65823,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 2982000
+      "RegularTradeVolume": 2985000
     },
     {
       "Date": "1150812",
@@ -11324,7 +11324,7 @@
       "AfterHoursOddLotVolume": 1778,
       "OddLotVolume": 51829,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 2317000
+      "RegularTradeVolume": 2332000
     },
     {
       "Date": "1150812",
@@ -11345,7 +11345,7 @@
       "AfterHoursOddLotVolume": 2271,
       "OddLotVolume": 153957,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 10061000
+      "RegularTradeVolume": 10070000
     },
     {
       "Date": "1150812",
@@ -11366,7 +11366,7 @@
       "AfterHoursOddLotVolume": 9742,
       "OddLotVolume": 998771,
       "AfterHoursFixedVolume": 28000,
-      "RegularTradeVolume": 7170000
+      "RegularTradeVolume": 7198000
     },
     {
       "Date": "1150812",
@@ -11408,7 +11408,7 @@
       "AfterHoursOddLotVolume": 341,
       "OddLotVolume": 3937,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 67000
+      "RegularTradeVolume": 69000
     },
     {
       "Date": "1150812",
@@ -11450,7 +11450,7 @@
       "AfterHoursOddLotVolume": 1023,
       "OddLotVolume": 100133,
       "AfterHoursFixedVolume": 11000,
-      "RegularTradeVolume": 13353000
+      "RegularTradeVolume": 13364000
     },
     {
       "Date": "1150812",
@@ -11513,7 +11513,7 @@
       "AfterHoursOddLotVolume": 1034,
       "OddLotVolume": 33107,
       "AfterHoursFixedVolume": 17000,
-      "RegularTradeVolume": 6631000
+      "RegularTradeVolume": 6648000
     },
     {
       "Date": "1150812",
@@ -11534,7 +11534,7 @@
       "AfterHoursOddLotVolume": 1547,
       "OddLotVolume": 11823,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1093000
+      "RegularTradeVolume": 1095000
     },
     {
       "Date": "1150812",
@@ -11555,7 +11555,7 @@
       "AfterHoursOddLotVolume": 1,
       "OddLotVolume": 1751,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 369000
+      "RegularTradeVolume": 370000
     },
     {
       "Date": "1150812",
@@ -11576,7 +11576,7 @@
       "AfterHoursOddLotVolume": 1180,
       "OddLotVolume": 68279,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 9739000
+      "RegularTradeVolume": 9752000
     },
     {
       "Date": "1150812",
@@ -11597,7 +11597,7 @@
       "AfterHoursOddLotVolume": 627,
       "OddLotVolume": 10242,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 1511000
+      "RegularTradeVolume": 1518000
     },
     {
       "Date": "1150812",
@@ -11618,7 +11618,7 @@
       "AfterHoursOddLotVolume": 65,
       "OddLotVolume": 2211,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 502000
+      "RegularTradeVolume": 504000
     },
     {
       "Date": "1150812",
@@ -11639,7 +11639,7 @@
       "AfterHoursOddLotVolume": 740,
       "OddLotVolume": 3605,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 393000
+      "RegularTradeVolume": 394000
     },
     {
       "Date": "1150812",
@@ -11786,7 +11786,7 @@
       "AfterHoursOddLotVolume": 632,
       "OddLotVolume": 17383,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 1866000
+      "RegularTradeVolume": 1873000
     },
     {
       "Date": "1150812",
@@ -11828,7 +11828,7 @@
       "AfterHoursOddLotVolume": 160,
       "OddLotVolume": 11482,
       "AfterHoursFixedVolume": 18000,
-      "RegularTradeVolume": 1421000
+      "RegularTradeVolume": 1439000
     },
     {
       "Date": "1150812",
@@ -11849,7 +11849,7 @@
       "AfterHoursOddLotVolume": 2439,
       "OddLotVolume": 272162,
       "AfterHoursFixedVolume": 32000,
-      "RegularTradeVolume": 20046000
+      "RegularTradeVolume": 20078000
     },
     {
       "Date": "1150812",
@@ -11933,7 +11933,7 @@
       "AfterHoursOddLotVolume": 581,
       "OddLotVolume": 37213,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 1896000
+      "RegularTradeVolume": 1900000
     },
     {
       "Date": "1150812",
@@ -11975,7 +11975,7 @@
       "AfterHoursOddLotVolume": 6283,
       "OddLotVolume": 169581,
       "AfterHoursFixedVolume": 24000,
-      "RegularTradeVolume": 25276000
+      "RegularTradeVolume": 25300000
     },
     {
       "Date": "1150812",
@@ -12080,7 +12080,7 @@
       "AfterHoursOddLotVolume": 3201,
       "OddLotVolume": 192257,
       "AfterHoursFixedVolume": 49000,
-      "RegularTradeVolume": 3247000
+      "RegularTradeVolume": 3296000
     },
     {
       "Date": "1150812",
@@ -12101,7 +12101,7 @@
       "AfterHoursOddLotVolume": 760,
       "OddLotVolume": 29645,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 2422000
+      "RegularTradeVolume": 2426000
     },
     {
       "Date": "1150812",
@@ -12122,7 +12122,7 @@
       "AfterHoursOddLotVolume": 3427,
       "OddLotVolume": 20125,
       "AfterHoursFixedVolume": 11000,
-      "RegularTradeVolume": 2427000
+      "RegularTradeVolume": 2438000
     },
     {
       "Date": "1150812",
@@ -12143,7 +12143,7 @@
       "AfterHoursOddLotVolume": 12592,
       "OddLotVolume": 576701,
       "AfterHoursFixedVolume": 97000,
-      "RegularTradeVolume": 42435000
+      "RegularTradeVolume": 42532000
     },
     {
       "Date": "1150812",
@@ -12227,7 +12227,7 @@
       "AfterHoursOddLotVolume": 648,
       "OddLotVolume": 27249,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 2554000
+      "RegularTradeVolume": 2557000
     },
     {
       "Date": "1150812",
@@ -12290,7 +12290,7 @@
       "AfterHoursOddLotVolume": 203,
       "OddLotVolume": 14916,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 1686000
+      "RegularTradeVolume": 1690000
     },
     {
       "Date": "1150812",
@@ -12374,7 +12374,7 @@
       "AfterHoursOddLotVolume": 1310,
       "OddLotVolume": 11106,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 664000
+      "RegularTradeVolume": 666000
     },
     {
       "Date": "1150812",
@@ -12395,7 +12395,7 @@
       "AfterHoursOddLotVolume": 305,
       "OddLotVolume": 62998,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 4177000
+      "RegularTradeVolume": 4178000
     },
     {
       "Date": "1150812",
@@ -12437,7 +12437,7 @@
       "AfterHoursOddLotVolume": 801,
       "OddLotVolume": 70054,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 2680000
+      "RegularTradeVolume": 2685000
     },
     {
       "Date": "1150812",
@@ -12458,7 +12458,7 @@
       "AfterHoursOddLotVolume": 557,
       "OddLotVolume": 46136,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 830000
+      "RegularTradeVolume": 831000
     },
     {
       "Date": "1150812",
@@ -12563,7 +12563,7 @@
       "AfterHoursOddLotVolume": 1770,
       "OddLotVolume": 182101,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 2520000
+      "RegularTradeVolume": 2530000
     },
     {
       "Date": "1150812",
@@ -12605,7 +12605,7 @@
       "AfterHoursOddLotVolume": 1622,
       "OddLotVolume": 58799,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1329000
+      "RegularTradeVolume": 1331000
     },
     {
       "Date": "1150812",
@@ -12626,7 +12626,7 @@
       "AfterHoursOddLotVolume": 35411,
       "OddLotVolume": 984471,
       "AfterHoursFixedVolume": 585000,
-      "RegularTradeVolume": 187621000
+      "RegularTradeVolume": 188206000
     },
     {
       "Date": "1150812",
@@ -12689,7 +12689,7 @@
       "AfterHoursOddLotVolume": 50,
       "OddLotVolume": 14471,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 1678000
+      "RegularTradeVolume": 1685000
     },
     {
       "Date": "1150812",
@@ -12731,7 +12731,7 @@
       "AfterHoursOddLotVolume": 410,
       "OddLotVolume": 1463,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 217000
+      "RegularTradeVolume": 218000
     },
     {
       "Date": "1150812",
@@ -12752,7 +12752,7 @@
       "AfterHoursOddLotVolume": 141,
       "OddLotVolume": 7617,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 594000
+      "RegularTradeVolume": 595000
     },
     {
       "Date": "1150812",
@@ -12794,7 +12794,7 @@
       "AfterHoursOddLotVolume": 735,
       "OddLotVolume": 158580,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 5839000
+      "RegularTradeVolume": 5840000
     },
     {
       "Date": "1150812",
@@ -12857,7 +12857,7 @@
       "AfterHoursOddLotVolume": 406,
       "OddLotVolume": 12013,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 2752000
+      "RegularTradeVolume": 2758000
     },
     {
       "Date": "1150812",
@@ -12899,7 +12899,7 @@
       "AfterHoursOddLotVolume": 24,
       "OddLotVolume": 6396,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 1808000
+      "RegularTradeVolume": 1821000
     },
     {
       "Date": "1150812",
@@ -12941,7 +12941,7 @@
       "AfterHoursOddLotVolume": 352,
       "OddLotVolume": 52876,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 833000
+      "RegularTradeVolume": 834000
     },
     {
       "Date": "1150812",
@@ -12962,7 +12962,7 @@
       "AfterHoursOddLotVolume": 1721,
       "OddLotVolume": 30613,
       "AfterHoursFixedVolume": 24000,
-      "RegularTradeVolume": 5670000
+      "RegularTradeVolume": 5694000
     },
     {
       "Date": "1150812",
@@ -12983,7 +12983,7 @@
       "AfterHoursOddLotVolume": 363,
       "OddLotVolume": 42269,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1116000
+      "RegularTradeVolume": 1117000
     },
     {
       "Date": "1150812",
@@ -13109,7 +13109,7 @@
       "AfterHoursOddLotVolume": 12936,
       "OddLotVolume": 150797,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 8271000
+      "RegularTradeVolume": 8272000
     },
     {
       "Date": "1150812",
@@ -13151,7 +13151,7 @@
       "AfterHoursOddLotVolume": 256,
       "OddLotVolume": 12739,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 406000
+      "RegularTradeVolume": 408000
     },
     {
       "Date": "1150812",
@@ -13193,7 +13193,7 @@
       "AfterHoursOddLotVolume": 143,
       "OddLotVolume": 18066,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 2131000
+      "RegularTradeVolume": 2135000
     },
     {
       "Date": "1150812",
@@ -13214,7 +13214,7 @@
       "AfterHoursOddLotVolume": 100,
       "OddLotVolume": 3573,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 3269000
+      "RegularTradeVolume": 3270000
     },
     {
       "Date": "1150812",
@@ -13256,7 +13256,7 @@
       "AfterHoursOddLotVolume": 1227,
       "OddLotVolume": 115574,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 1908000
+      "RegularTradeVolume": 1914000
     },
     {
       "Date": "1150812",
@@ -13277,7 +13277,7 @@
       "AfterHoursOddLotVolume": 323,
       "OddLotVolume": 95890,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 2886000
+      "RegularTradeVolume": 2888000
     },
     {
       "Date": "1150812",
@@ -13319,7 +13319,7 @@
       "AfterHoursOddLotVolume": 679,
       "OddLotVolume": 23948,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 2883000
+      "RegularTradeVolume": 2887000
     },
     {
       "Date": "1150812",
@@ -13382,7 +13382,7 @@
       "AfterHoursOddLotVolume": 400,
       "OddLotVolume": 9686,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 753000
+      "RegularTradeVolume": 758000
     },
     {
       "Date": "1150812",
@@ -13403,7 +13403,7 @@
       "AfterHoursOddLotVolume": 142,
       "OddLotVolume": 3740,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 510000
+      "RegularTradeVolume": 512000
     },
     {
       "Date": "1150812",
@@ -13424,7 +13424,7 @@
       "AfterHoursOddLotVolume": 3644,
       "OddLotVolume": 96285,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 14470000
+      "RegularTradeVolume": 14473000
     },
     {
       "Date": "1150812",
@@ -13445,7 +13445,7 @@
       "AfterHoursOddLotVolume": 200,
       "OddLotVolume": 5770,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1683000
+      "RegularTradeVolume": 1684000
     },
     {
       "Date": "1150812",
@@ -13466,7 +13466,7 @@
       "AfterHoursOddLotVolume": 802,
       "OddLotVolume": 47462,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 6488000
+      "RegularTradeVolume": 6496000
     },
     {
       "Date": "1150812",
@@ -13508,7 +13508,7 @@
       "AfterHoursOddLotVolume": 7291,
       "OddLotVolume": 180905,
       "AfterHoursFixedVolume": 55000,
-      "RegularTradeVolume": 17667000
+      "RegularTradeVolume": 17722000
     },
     {
       "Date": "1150812",
@@ -13529,7 +13529,7 @@
       "AfterHoursOddLotVolume": 78,
       "OddLotVolume": 5037,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 723000
+      "RegularTradeVolume": 727000
     },
     {
       "Date": "1150812",
@@ -13550,7 +13550,7 @@
       "AfterHoursOddLotVolume": 8253,
       "OddLotVolume": 506961,
       "AfterHoursFixedVolume": 70000,
-      "RegularTradeVolume": 16769000
+      "RegularTradeVolume": 16839000
     },
     {
       "Date": "1150812",
@@ -13571,7 +13571,7 @@
       "AfterHoursOddLotVolume": 1025,
       "OddLotVolume": 17427,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1248000
+      "RegularTradeVolume": 1250000
     },
     {
       "Date": "1150812",
@@ -13592,7 +13592,7 @@
       "AfterHoursOddLotVolume": 698,
       "OddLotVolume": 40308,
       "AfterHoursFixedVolume": 24000,
-      "RegularTradeVolume": 7150000
+      "RegularTradeVolume": 7174000
     },
     {
       "Date": "1150812",
@@ -13613,7 +13613,7 @@
       "AfterHoursOddLotVolume": 5598,
       "OddLotVolume": 129626,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 6945000
+      "RegularTradeVolume": 6953000
     },
     {
       "Date": "1150812",
@@ -13739,7 +13739,7 @@
       "AfterHoursOddLotVolume": 595,
       "OddLotVolume": 9881,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 491000
+      "RegularTradeVolume": 493000
     },
     {
       "Date": "1150812",
@@ -13970,7 +13970,7 @@
       "AfterHoursOddLotVolume": 1068,
       "OddLotVolume": 7411,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 760000
+      "RegularTradeVolume": 764000
     },
     {
       "Date": "1150812",
@@ -14012,7 +14012,7 @@
       "AfterHoursOddLotVolume": 387,
       "OddLotVolume": 1198,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 84000
+      "RegularTradeVolume": 86000
     },
     {
       "Date": "1150812",
@@ -14117,7 +14117,7 @@
       "AfterHoursOddLotVolume": 330,
       "OddLotVolume": 14241,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1992000
+      "RegularTradeVolume": 1995000
     },
     {
       "Date": "1150812",
@@ -14138,7 +14138,7 @@
       "AfterHoursOddLotVolume": 618,
       "OddLotVolume": 3702,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 478000
+      "RegularTradeVolume": 481000
     },
     {
       "Date": "1150812",
@@ -14180,7 +14180,7 @@
       "AfterHoursOddLotVolume": 1270,
       "OddLotVolume": 31117,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 4110000
+      "RegularTradeVolume": 4125000
     },
     {
       "Date": "1150812",
@@ -14264,7 +14264,7 @@
       "AfterHoursOddLotVolume": 122,
       "OddLotVolume": 3684,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 450000
+      "RegularTradeVolume": 452000
     },
     {
       "Date": "1150812",
@@ -14327,7 +14327,7 @@
       "AfterHoursOddLotVolume": 31,
       "OddLotVolume": 3423,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 547000
+      "RegularTradeVolume": 549000
     },
     {
       "Date": "1150812",
@@ -14348,7 +14348,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 2811,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 561000
+      "RegularTradeVolume": 563000
     },
     {
       "Date": "1150812",
@@ -14369,7 +14369,7 @@
       "AfterHoursOddLotVolume": 256,
       "OddLotVolume": 15999,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 2235000
+      "RegularTradeVolume": 2238000
     },
     {
       "Date": "1150812",
@@ -14411,7 +14411,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 3417,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 222000
+      "RegularTradeVolume": 223000
     },
     {
       "Date": "1150812",
@@ -14453,7 +14453,7 @@
       "AfterHoursOddLotVolume": 784,
       "OddLotVolume": 53864,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 2176000
+      "RegularTradeVolume": 2178000
     },
     {
       "Date": "1150812",
@@ -14495,7 +14495,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 5337,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 869000
+      "RegularTradeVolume": 870000
     },
     {
       "Date": "1150812",
@@ -14621,7 +14621,7 @@
       "AfterHoursOddLotVolume": 500,
       "OddLotVolume": 22577,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1363000
+      "RegularTradeVolume": 1365000
     },
     {
       "Date": "1150812",
@@ -14642,7 +14642,7 @@
       "AfterHoursOddLotVolume": 73,
       "OddLotVolume": 6985,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 297000
+      "RegularTradeVolume": 298000
     },
     {
       "Date": "1150812",
@@ -14705,7 +14705,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 14591,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 589000
+      "RegularTradeVolume": 590000
     },
     {
       "Date": "1150812",
@@ -14747,7 +14747,7 @@
       "AfterHoursOddLotVolume": 755,
       "OddLotVolume": 129651,
       "AfterHoursFixedVolume": 25000,
-      "RegularTradeVolume": 20304000
+      "RegularTradeVolume": 20329000
     },
     {
       "Date": "1150812",
@@ -14768,7 +14768,7 @@
       "AfterHoursOddLotVolume": 54,
       "OddLotVolume": 26927,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 1816000
+      "RegularTradeVolume": 1824000
     },
     {
       "Date": "1150812",
@@ -14873,7 +14873,7 @@
       "AfterHoursOddLotVolume": 1459,
       "OddLotVolume": 10593,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 4751000
+      "RegularTradeVolume": 4752000
     },
     {
       "Date": "1150812",
@@ -14894,7 +14894,7 @@
       "AfterHoursOddLotVolume": 267,
       "OddLotVolume": 27890,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 3299000
+      "RegularTradeVolume": 3302000
     },
     {
       "Date": "1150812",
@@ -14915,7 +14915,7 @@
       "AfterHoursOddLotVolume": 581,
       "OddLotVolume": 10068,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 644000
+      "RegularTradeVolume": 649000
     },
     {
       "Date": "1150812",
@@ -14936,7 +14936,7 @@
       "AfterHoursOddLotVolume": 1193,
       "OddLotVolume": 18091,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 3139000
+      "RegularTradeVolume": 3141000
     },
     {
       "Date": "1150812",
@@ -14957,7 +14957,7 @@
       "AfterHoursOddLotVolume": 939,
       "OddLotVolume": 40205,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 2703000
+      "RegularTradeVolume": 2707000
     },
     {
       "Date": "1150812",
@@ -14978,7 +14978,7 @@
       "AfterHoursOddLotVolume": 560,
       "OddLotVolume": 49862,
       "AfterHoursFixedVolume": 14000,
-      "RegularTradeVolume": 2261000
+      "RegularTradeVolume": 2275000
     },
     {
       "Date": "1150812",
@@ -14999,7 +14999,7 @@
       "AfterHoursOddLotVolume": 269,
       "OddLotVolume": 11549,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1864000
+      "RegularTradeVolume": 1866000
     },
     {
       "Date": "1150812",
@@ -15041,7 +15041,7 @@
       "AfterHoursOddLotVolume": 1020,
       "OddLotVolume": 3664,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 314000
+      "RegularTradeVolume": 315000
     },
     {
       "Date": "1150812",
@@ -15083,7 +15083,7 @@
       "AfterHoursOddLotVolume": 6088,
       "OddLotVolume": 199728,
       "AfterHoursFixedVolume": 57000,
-      "RegularTradeVolume": 15420000
+      "RegularTradeVolume": 15477000
     },
     {
       "Date": "1150812",
@@ -15188,7 +15188,7 @@
       "AfterHoursOddLotVolume": 153,
       "OddLotVolume": 4533,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 822000
+      "RegularTradeVolume": 825000
     },
     {
       "Date": "1150812",
@@ -15209,7 +15209,7 @@
       "AfterHoursOddLotVolume": 8886,
       "OddLotVolume": 1658517,
       "AfterHoursFixedVolume": 64000,
-      "RegularTradeVolume": 51110000
+      "RegularTradeVolume": 51174000
     },
     {
       "Date": "1150812",
@@ -15230,7 +15230,7 @@
       "AfterHoursOddLotVolume": 3022,
       "OddLotVolume": 46408,
       "AfterHoursFixedVolume": 16000,
-      "RegularTradeVolume": 8127000
+      "RegularTradeVolume": 8143000
     },
     {
       "Date": "1150812",
@@ -15272,7 +15272,7 @@
       "AfterHoursOddLotVolume": 1836,
       "OddLotVolume": 95957,
       "AfterHoursFixedVolume": 12000,
-      "RegularTradeVolume": 3579000
+      "RegularTradeVolume": 3591000
     },
     {
       "Date": "1150812",
@@ -15314,7 +15314,7 @@
       "AfterHoursOddLotVolume": 135,
       "OddLotVolume": 14382,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 2411000
+      "RegularTradeVolume": 2417000
     },
     {
       "Date": "1150812",
@@ -15335,7 +15335,7 @@
       "AfterHoursOddLotVolume": 482,
       "OddLotVolume": 64331,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 5249000
+      "RegularTradeVolume": 5252000
     },
     {
       "Date": "1150812",
@@ -15356,7 +15356,7 @@
       "AfterHoursOddLotVolume": 4199,
       "OddLotVolume": 102577,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 9088000
+      "RegularTradeVolume": 9101000
     },
     {
       "Date": "1150812",
@@ -15482,7 +15482,7 @@
       "AfterHoursOddLotVolume": 119,
       "OddLotVolume": 6881,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 193000
+      "RegularTradeVolume": 195000
     },
     {
       "Date": "1150812",
@@ -15566,7 +15566,7 @@
       "AfterHoursOddLotVolume": 700,
       "OddLotVolume": 22035,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1305000
+      "RegularTradeVolume": 1306000
     },
     {
       "Date": "1150812",
@@ -15629,7 +15629,7 @@
       "AfterHoursOddLotVolume": 853,
       "OddLotVolume": 38904,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 513000
+      "RegularTradeVolume": 515000
     },
     {
       "Date": "1150812",
@@ -15776,7 +15776,7 @@
       "AfterHoursOddLotVolume": 11994,
       "OddLotVolume": 256824,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 19139000
+      "RegularTradeVolume": 19154000
     },
     {
       "Date": "1150812",
@@ -15797,7 +15797,7 @@
       "AfterHoursOddLotVolume": 295,
       "OddLotVolume": 36206,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1026000
+      "RegularTradeVolume": 1029000
     },
     {
       "Date": "1150812",
@@ -15818,7 +15818,7 @@
       "AfterHoursOddLotVolume": 1933,
       "OddLotVolume": 18788,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1563000
+      "RegularTradeVolume": 1564000
     },
     {
       "Date": "1150812",
@@ -15839,7 +15839,7 @@
       "AfterHoursOddLotVolume": 61,
       "OddLotVolume": 12001,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 1454000
+      "RegularTradeVolume": 1459000
     },
     {
       "Date": "1150812",
@@ -15881,7 +15881,7 @@
       "AfterHoursOddLotVolume": 1103,
       "OddLotVolume": 20765,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 963000
+      "RegularTradeVolume": 964000
     },
     {
       "Date": "1150812",
@@ -15923,7 +15923,7 @@
       "AfterHoursOddLotVolume": 555,
       "OddLotVolume": 4656,
       "AfterHoursFixedVolume": 28000,
-      "RegularTradeVolume": 1300000
+      "RegularTradeVolume": 1328000
     },
     {
       "Date": "1150812",
@@ -15944,7 +15944,7 @@
       "AfterHoursOddLotVolume": 659,
       "OddLotVolume": 18621,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 2010000
+      "RegularTradeVolume": 2016000
     },
     {
       "Date": "1150812",
@@ -16028,7 +16028,7 @@
       "AfterHoursOddLotVolume": 1188,
       "OddLotVolume": 9639,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 617000
+      "RegularTradeVolume": 619000
     },
     {
       "Date": "1150812",
@@ -16070,7 +16070,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 0,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 22000
+      "RegularTradeVolume": 23000
     },
     {
       "Date": "1150812",
@@ -16091,7 +16091,7 @@
       "AfterHoursOddLotVolume": 2284,
       "OddLotVolume": 18268,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 850000
+      "RegularTradeVolume": 852000
     },
     {
       "Date": "1150812",
@@ -16196,7 +16196,7 @@
       "AfterHoursOddLotVolume": 14540,
       "OddLotVolume": 250666,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 18262000
+      "RegularTradeVolume": 18271000
     },
     {
       "Date": "1150812",
@@ -16259,7 +16259,7 @@
       "AfterHoursOddLotVolume": 2587,
       "OddLotVolume": 88864,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 9006000
+      "RegularTradeVolume": 9008000
     },
     {
       "Date": "1150812",
@@ -16301,7 +16301,7 @@
       "AfterHoursOddLotVolume": 411,
       "OddLotVolume": 7188,
       "AfterHoursFixedVolume": 203000,
-      "RegularTradeVolume": 1836000
+      "RegularTradeVolume": 2039000
     },
     {
       "Date": "1150812",
@@ -16364,7 +16364,7 @@
       "AfterHoursOddLotVolume": 4045,
       "OddLotVolume": 112335,
       "AfterHoursFixedVolume": 48000,
-      "RegularTradeVolume": 26092000
+      "RegularTradeVolume": 26140000
     },
     {
       "Date": "1150812",
@@ -16448,7 +16448,7 @@
       "AfterHoursOddLotVolume": 4,
       "OddLotVolume": 4094,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 637000
+      "RegularTradeVolume": 643000
     },
     {
       "Date": "1150812",
@@ -16490,7 +16490,7 @@
       "AfterHoursOddLotVolume": 1432,
       "OddLotVolume": 93048,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 2946000
+      "RegularTradeVolume": 2948000
     },
     {
       "Date": "1150812",
@@ -16511,7 +16511,7 @@
       "AfterHoursOddLotVolume": 910,
       "OddLotVolume": 7188,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1261000
+      "RegularTradeVolume": 1264000
     },
     {
       "Date": "1150812",
@@ -16532,7 +16532,7 @@
       "AfterHoursOddLotVolume": 532,
       "OddLotVolume": 1637,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 420000
+      "RegularTradeVolume": 424000
     },
     {
       "Date": "1150812",
@@ -16553,7 +16553,7 @@
       "AfterHoursOddLotVolume": 305,
       "OddLotVolume": 21782,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 5497000
+      "RegularTradeVolume": 5512000
     },
     {
       "Date": "1150812",
@@ -16574,7 +16574,7 @@
       "AfterHoursOddLotVolume": 200,
       "OddLotVolume": 13896,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 3840000
+      "RegularTradeVolume": 3850000
     },
     {
       "Date": "1150812",
@@ -16595,7 +16595,7 @@
       "AfterHoursOddLotVolume": 1099,
       "OddLotVolume": 15731,
       "AfterHoursFixedVolume": 12000,
-      "RegularTradeVolume": 3157000
+      "RegularTradeVolume": 3169000
     },
     {
       "Date": "1150812",
@@ -16658,7 +16658,7 @@
       "AfterHoursOddLotVolume": 193,
       "OddLotVolume": 20661,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1694000
+      "RegularTradeVolume": 1696000
     },
     {
       "Date": "1150812",
@@ -16679,7 +16679,7 @@
       "AfterHoursOddLotVolume": 279,
       "OddLotVolume": 8861,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1185000
+      "RegularTradeVolume": 1186000
     },
     {
       "Date": "1150812",
@@ -16700,7 +16700,7 @@
       "AfterHoursOddLotVolume": 3451,
       "OddLotVolume": 65356,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 5431000
+      "RegularTradeVolume": 5437000
     },
     {
       "Date": "1150812",
@@ -16721,7 +16721,7 @@
       "AfterHoursOddLotVolume": 25,
       "OddLotVolume": 12645,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1521000
+      "RegularTradeVolume": 1524000
     },
     {
       "Date": "1150812",
@@ -16784,7 +16784,7 @@
       "AfterHoursOddLotVolume": 2137,
       "OddLotVolume": 9589,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 429000
+      "RegularTradeVolume": 430000
     },
     {
       "Date": "1150812",
@@ -16805,7 +16805,7 @@
       "AfterHoursOddLotVolume": 1127,
       "OddLotVolume": 29497,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1894000
+      "RegularTradeVolume": 1895000
     },
     {
       "Date": "1150812",
@@ -16847,7 +16847,7 @@
       "AfterHoursOddLotVolume": 487,
       "OddLotVolume": 106301,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1081000
+      "RegularTradeVolume": 1083000
     },
     {
       "Date": "1150812",
@@ -16868,7 +16868,7 @@
       "AfterHoursOddLotVolume": 730,
       "OddLotVolume": 32376,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1089000
+      "RegularTradeVolume": 1091000
     },
     {
       "Date": "1150812",
@@ -16910,7 +16910,7 @@
       "AfterHoursOddLotVolume": 310,
       "OddLotVolume": 30587,
       "AfterHoursFixedVolume": 8000,
-      "RegularTradeVolume": 2243000
+      "RegularTradeVolume": 2251000
     },
     {
       "Date": "1150812",
@@ -16952,7 +16952,7 @@
       "AfterHoursOddLotVolume": 838,
       "OddLotVolume": 27246,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 2205000
+      "RegularTradeVolume": 2206000
     },
     {
       "Date": "1150812",
@@ -16973,7 +16973,7 @@
       "AfterHoursOddLotVolume": 369,
       "OddLotVolume": 35538,
       "AfterHoursFixedVolume": 22000,
-      "RegularTradeVolume": 4581000
+      "RegularTradeVolume": 4603000
     },
     {
       "Date": "1150812",
@@ -16994,7 +16994,7 @@
       "AfterHoursOddLotVolume": 4709,
       "OddLotVolume": 268733,
       "AfterHoursFixedVolume": 24000,
-      "RegularTradeVolume": 7890000
+      "RegularTradeVolume": 7914000
     },
     {
       "Date": "1150812",
@@ -17015,7 +17015,7 @@
       "AfterHoursOddLotVolume": 514,
       "OddLotVolume": 19008,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 699000
+      "RegularTradeVolume": 700000
     },
     {
       "Date": "1150812",
@@ -17036,7 +17036,7 @@
       "AfterHoursOddLotVolume": 526,
       "OddLotVolume": 21000,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1648000
+      "RegularTradeVolume": 1650000
     },
     {
       "Date": "1150812",
@@ -17120,7 +17120,7 @@
       "AfterHoursOddLotVolume": 600,
       "OddLotVolume": 29505,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 5875000
+      "RegularTradeVolume": 5890000
     },
     {
       "Date": "1150812",
@@ -17183,7 +17183,7 @@
       "AfterHoursOddLotVolume": 3849,
       "OddLotVolume": 292437,
       "AfterHoursFixedVolume": 45000,
-      "RegularTradeVolume": 13609000
+      "RegularTradeVolume": 13654000
     },
     {
       "Date": "1150812",
@@ -17204,7 +17204,7 @@
       "AfterHoursOddLotVolume": 1776,
       "OddLotVolume": 14286,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 1016000
+      "RegularTradeVolume": 1021000
     },
     {
       "Date": "1150812",
@@ -17225,7 +17225,7 @@
       "AfterHoursOddLotVolume": 1841,
       "OddLotVolume": 120147,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 7146000
+      "RegularTradeVolume": 7147000
     },
     {
       "Date": "1150812",
@@ -17246,7 +17246,7 @@
       "AfterHoursOddLotVolume": 950,
       "OddLotVolume": 86166,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 7124000
+      "RegularTradeVolume": 7127000
     },
     {
       "Date": "1150812",
@@ -17267,7 +17267,7 @@
       "AfterHoursOddLotVolume": 1011,
       "OddLotVolume": 71181,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 4541000
+      "RegularTradeVolume": 4547000
     },
     {
       "Date": "1150812",
@@ -17288,7 +17288,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 1750,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 182000
+      "RegularTradeVolume": 188000
     },
     {
       "Date": "1150812",
@@ -17330,7 +17330,7 @@
       "AfterHoursOddLotVolume": 425,
       "OddLotVolume": 41928,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 4005000
+      "RegularTradeVolume": 4011000
     },
     {
       "Date": "1150812",
@@ -17372,7 +17372,7 @@
       "AfterHoursOddLotVolume": 1307,
       "OddLotVolume": 302971,
       "AfterHoursFixedVolume": 35000,
-      "RegularTradeVolume": 21891000
+      "RegularTradeVolume": 21926000
     },
     {
       "Date": "1150812",
@@ -17414,7 +17414,7 @@
       "AfterHoursOddLotVolume": 2475,
       "OddLotVolume": 97768,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 4896000
+      "RegularTradeVolume": 4902000
     },
     {
       "Date": "1150812",
@@ -17456,7 +17456,7 @@
       "AfterHoursOddLotVolume": 326,
       "OddLotVolume": 24437,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 264000
+      "RegularTradeVolume": 266000
     },
     {
       "Date": "1150812",
@@ -17477,7 +17477,7 @@
       "AfterHoursOddLotVolume": 1035,
       "OddLotVolume": 13802,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 842000
+      "RegularTradeVolume": 844000
     },
     {
       "Date": "1150812",
@@ -17498,7 +17498,7 @@
       "AfterHoursOddLotVolume": 1081,
       "OddLotVolume": 36936,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1467000
+      "RegularTradeVolume": 1468000
     },
     {
       "Date": "1150812",
@@ -17519,7 +17519,7 @@
       "AfterHoursOddLotVolume": 1180,
       "OddLotVolume": 86148,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 4070000
+      "RegularTradeVolume": 4077000
     },
     {
       "Date": "1150812",
@@ -17645,7 +17645,7 @@
       "AfterHoursOddLotVolume": 1778,
       "OddLotVolume": 37795,
       "AfterHoursFixedVolume": 12000,
-      "RegularTradeVolume": 2317000
+      "RegularTradeVolume": 2329000
     },
     {
       "Date": "1150812",
@@ -17666,7 +17666,7 @@
       "AfterHoursOddLotVolume": 6399,
       "OddLotVolume": 249196,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 5748000
+      "RegularTradeVolume": 5754000
     },
     {
       "Date": "1150812",
@@ -17687,7 +17687,7 @@
       "AfterHoursOddLotVolume": 354,
       "OddLotVolume": 22667,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 853000
+      "RegularTradeVolume": 854000
     },
     {
       "Date": "1150812",
@@ -17708,7 +17708,7 @@
       "AfterHoursOddLotVolume": 828,
       "OddLotVolume": 40009,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1115000
+      "RegularTradeVolume": 1118000
     },
     {
       "Date": "1150812",
@@ -17729,7 +17729,7 @@
       "AfterHoursOddLotVolume": 30,
       "OddLotVolume": 30569,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 4119000
+      "RegularTradeVolume": 4124000
     },
     {
       "Date": "1150812",
@@ -17771,7 +17771,7 @@
       "AfterHoursOddLotVolume": 465,
       "OddLotVolume": 25734,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 708000
+      "RegularTradeVolume": 709000
     },
     {
       "Date": "1150812",
@@ -17855,7 +17855,7 @@
       "AfterHoursOddLotVolume": 3047,
       "OddLotVolume": 104513,
       "AfterHoursFixedVolume": 42000,
-      "RegularTradeVolume": 14972000
+      "RegularTradeVolume": 15014000
     },
     {
       "Date": "1150812",
@@ -17876,7 +17876,7 @@
       "AfterHoursOddLotVolume": 370,
       "OddLotVolume": 19047,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 149000
+      "RegularTradeVolume": 150000
     },
     {
       "Date": "1150812",
@@ -17897,7 +17897,7 @@
       "AfterHoursOddLotVolume": 444,
       "OddLotVolume": 15514,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1304000
+      "RegularTradeVolume": 1306000
     },
     {
       "Date": "1150812",
@@ -17939,7 +17939,7 @@
       "AfterHoursOddLotVolume": 892,
       "OddLotVolume": 37993,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1311000
+      "RegularTradeVolume": 1312000
     },
     {
       "Date": "1150812",
@@ -17960,7 +17960,7 @@
       "AfterHoursOddLotVolume": 1165,
       "OddLotVolume": 59584,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 1560000
+      "RegularTradeVolume": 1564000
     },
     {
       "Date": "1150812",
@@ -18107,7 +18107,7 @@
       "AfterHoursOddLotVolume": 228,
       "OddLotVolume": 8486,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 402000
+      "RegularTradeVolume": 403000
     },
     {
       "Date": "1150812",
@@ -18191,7 +18191,7 @@
       "AfterHoursOddLotVolume": 500,
       "OddLotVolume": 10904,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 852000
+      "RegularTradeVolume": 853000
     },
     {
       "Date": "1150812",
@@ -18485,7 +18485,7 @@
       "AfterHoursOddLotVolume": 255,
       "OddLotVolume": 8144,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1310000
+      "RegularTradeVolume": 1311000
     },
     {
       "Date": "1150812",
@@ -18506,7 +18506,7 @@
       "AfterHoursOddLotVolume": 553,
       "OddLotVolume": 80635,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1032000
+      "RegularTradeVolume": 1033000
     },
     {
       "Date": "1150812",
@@ -18527,7 +18527,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 6862,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 229000
+      "RegularTradeVolume": 230000
     },
     {
       "Date": "1150812",
@@ -18569,7 +18569,7 @@
       "AfterHoursOddLotVolume": 603,
       "OddLotVolume": 100256,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 5252000
+      "RegularTradeVolume": 5259000
     },
     {
       "Date": "1150812",
@@ -18653,7 +18653,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 4751,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 856000
+      "RegularTradeVolume": 858000
     },
     {
       "Date": "1150812",
@@ -18695,7 +18695,7 @@
       "AfterHoursOddLotVolume": 963,
       "OddLotVolume": 32016,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 2374000
+      "RegularTradeVolume": 2377000
     },
     {
       "Date": "1150812",
@@ -18821,7 +18821,7 @@
       "AfterHoursOddLotVolume": 671,
       "OddLotVolume": 18169,
       "AfterHoursFixedVolume": 5000,
-      "RegularTradeVolume": 1512000
+      "RegularTradeVolume": 1517000
     },
     {
       "Date": "1150812",
@@ -18884,7 +18884,7 @@
       "AfterHoursOddLotVolume": 11,
       "OddLotVolume": 13308,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 942000
+      "RegularTradeVolume": 943000
     },
     {
       "Date": "1150812",
@@ -18926,7 +18926,7 @@
       "AfterHoursOddLotVolume": 44147,
       "OddLotVolume": 2807022,
       "AfterHoursFixedVolume": 195000,
-      "RegularTradeVolume": 425613000
+      "RegularTradeVolume": 425808000
     },
     {
       "Date": "1150812",
@@ -18989,7 +18989,7 @@
       "AfterHoursOddLotVolume": 916,
       "OddLotVolume": 108878,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1286000
+      "RegularTradeVolume": 1287000
     },
     {
       "Date": "1150812",
@@ -19031,7 +19031,7 @@
       "AfterHoursOddLotVolume": 1058,
       "OddLotVolume": 54958,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1179000
+      "RegularTradeVolume": 1180000
     },
     {
       "Date": "1150812",
@@ -19136,7 +19136,7 @@
       "AfterHoursOddLotVolume": 12,
       "OddLotVolume": 2109,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 195000
+      "RegularTradeVolume": 196000
     },
     {
       "Date": "1150812",
@@ -19157,7 +19157,7 @@
       "AfterHoursOddLotVolume": 973,
       "OddLotVolume": 61358,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 1812000
+      "RegularTradeVolume": 1818000
     },
     {
       "Date": "1150812",
@@ -19199,7 +19199,7 @@
       "AfterHoursOddLotVolume": 186,
       "OddLotVolume": 52218,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1717000
+      "RegularTradeVolume": 1720000
     },
     {
       "Date": "1150812",
@@ -19241,7 +19241,7 @@
       "AfterHoursOddLotVolume": 1300,
       "OddLotVolume": 54286,
       "AfterHoursFixedVolume": 18000,
-      "RegularTradeVolume": 8878000
+      "RegularTradeVolume": 8896000
     },
     {
       "Date": "1150812",
@@ -19388,7 +19388,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 7433,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 200000
+      "RegularTradeVolume": 202000
     },
     {
       "Date": "1150812",
@@ -19493,7 +19493,7 @@
       "AfterHoursOddLotVolume": 190,
       "OddLotVolume": 7013,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 3755000
+      "RegularTradeVolume": 3758000
     },
     {
       "Date": "1150812",
@@ -19661,7 +19661,7 @@
       "AfterHoursOddLotVolume": 1041,
       "OddLotVolume": 76793,
       "AfterHoursFixedVolume": 29000,
-      "RegularTradeVolume": 4512000
+      "RegularTradeVolume": 4541000
     },
     {
       "Date": "1150812",
@@ -19787,7 +19787,7 @@
       "AfterHoursOddLotVolume": 605,
       "OddLotVolume": 20062,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 953000
+      "RegularTradeVolume": 954000
     },
     {
       "Date": "1150812",
@@ -19850,7 +19850,7 @@
       "AfterHoursOddLotVolume": 76,
       "OddLotVolume": 14742,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 497000
+      "RegularTradeVolume": 500000
     },
     {
       "Date": "1150812",
@@ -19892,7 +19892,7 @@
       "AfterHoursOddLotVolume": 447,
       "OddLotVolume": 10930,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 200000
+      "RegularTradeVolume": 202000
     },
     {
       "Date": "1150812",
@@ -20039,7 +20039,7 @@
       "AfterHoursOddLotVolume": 60,
       "OddLotVolume": 4985,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 1323000
+      "RegularTradeVolume": 1326000
     },
     {
       "Date": "1150812",
@@ -20501,7 +20501,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 4737,
       "AfterHoursFixedVolume": 7000,
-      "RegularTradeVolume": 484000
+      "RegularTradeVolume": 491000
     },
     {
       "Date": "1150812",
@@ -20543,7 +20543,7 @@
       "AfterHoursOddLotVolume": 500,
       "OddLotVolume": 52790,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1721000
+      "RegularTradeVolume": 1723000
     },
     {
       "Date": "1150812",
@@ -20774,7 +20774,7 @@
       "AfterHoursOddLotVolume": 1930,
       "OddLotVolume": 60558,
       "AfterHoursFixedVolume": 15000,
-      "RegularTradeVolume": 6229000
+      "RegularTradeVolume": 6244000
     },
     {
       "Date": "1150812",
@@ -20816,7 +20816,7 @@
       "AfterHoursOddLotVolume": 129,
       "OddLotVolume": 21959,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 787000
+      "RegularTradeVolume": 790000
     },
     {
       "Date": "1150812",
@@ -20837,7 +20837,7 @@
       "AfterHoursOddLotVolume": 1539,
       "OddLotVolume": 55530,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 1084000
+      "RegularTradeVolume": 1086000
     },
     {
       "Date": "1150812",
@@ -20879,7 +20879,7 @@
       "AfterHoursOddLotVolume": 1751,
       "OddLotVolume": 203330,
       "AfterHoursFixedVolume": 18000,
-      "RegularTradeVolume": 13214000
+      "RegularTradeVolume": 13232000
     },
     {
       "Date": "1150812",
@@ -20900,7 +20900,7 @@
       "AfterHoursOddLotVolume": 2071,
       "OddLotVolume": 197296,
       "AfterHoursFixedVolume": 33000,
-      "RegularTradeVolume": 30106000
+      "RegularTradeVolume": 30139000
     },
     {
       "Date": "1150812",
@@ -20942,7 +20942,7 @@
       "AfterHoursOddLotVolume": 3359,
       "OddLotVolume": 526970,
       "AfterHoursFixedVolume": 3000,
-      "RegularTradeVolume": 12437000
+      "RegularTradeVolume": 12440000
     },
     {
       "Date": "1150812",
@@ -20963,7 +20963,7 @@
       "AfterHoursOddLotVolume": 375,
       "OddLotVolume": 16744,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 1544000
+      "RegularTradeVolume": 1550000
     },
     {
       "Date": "1150812",
@@ -21005,7 +21005,7 @@
       "AfterHoursOddLotVolume": 224,
       "OddLotVolume": 28159,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 743000
+      "RegularTradeVolume": 745000
     },
     {
       "Date": "1150812",
@@ -21047,7 +21047,7 @@
       "AfterHoursOddLotVolume": 15,
       "OddLotVolume": 6727,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 846000
+      "RegularTradeVolume": 847000
     },
     {
       "Date": "1150812",
@@ -21110,7 +21110,7 @@
       "AfterHoursOddLotVolume": 890,
       "OddLotVolume": 36199,
       "AfterHoursFixedVolume": 14000,
-      "RegularTradeVolume": 6388000
+      "RegularTradeVolume": 6402000
     },
     {
       "Date": "1150812",
@@ -21131,7 +21131,7 @@
       "AfterHoursOddLotVolume": 24039,
       "OddLotVolume": 485675,
       "AfterHoursFixedVolume": 72000,
-      "RegularTradeVolume": 36655000
+      "RegularTradeVolume": 36727000
     },
     {
       "Date": "1150812",
@@ -21152,7 +21152,7 @@
       "AfterHoursOddLotVolume": 410,
       "OddLotVolume": 12049,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 581000
+      "RegularTradeVolume": 582000
     },
     {
       "Date": "1150812",
@@ -21173,7 +21173,7 @@
       "AfterHoursOddLotVolume": 386,
       "OddLotVolume": 16713,
       "AfterHoursFixedVolume": 12000,
-      "RegularTradeVolume": 2869000
+      "RegularTradeVolume": 2881000
     },
     {
       "Date": "1150812",
@@ -21194,7 +21194,7 @@
       "AfterHoursOddLotVolume": 4928,
       "OddLotVolume": 868843,
       "AfterHoursFixedVolume": 130000,
-      "RegularTradeVolume": 85138000
+      "RegularTradeVolume": 85268000
     },
     {
       "Date": "1150812",
@@ -21215,7 +21215,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 377,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 160000
+      "RegularTradeVolume": 161000
     },
     {
       "Date": "1150812",
@@ -21278,7 +21278,7 @@
       "AfterHoursOddLotVolume": 1337,
       "OddLotVolume": 80390,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1321000
+      "RegularTradeVolume": 1322000
     },
     {
       "Date": "1150812",
@@ -21299,7 +21299,7 @@
       "AfterHoursOddLotVolume": 500,
       "OddLotVolume": 7832,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1211000
+      "RegularTradeVolume": 1212000
     },
     {
       "Date": "1150812",
@@ -21341,7 +21341,7 @@
       "AfterHoursOddLotVolume": 60,
       "OddLotVolume": 8551,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 742000
+      "RegularTradeVolume": 743000
     },
     {
       "Date": "1150812",
@@ -21383,7 +21383,7 @@
       "AfterHoursOddLotVolume": 673,
       "OddLotVolume": 100012,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 4750000
+      "RegularTradeVolume": 4759000
     },
     {
       "Date": "1150812",
@@ -21404,7 +21404,7 @@
       "AfterHoursOddLotVolume": 808,
       "OddLotVolume": 79916,
       "AfterHoursFixedVolume": 14000,
-      "RegularTradeVolume": 4689000
+      "RegularTradeVolume": 4703000
     },
     {
       "Date": "1150812",
@@ -21530,7 +21530,7 @@
       "AfterHoursOddLotVolume": 2463,
       "OddLotVolume": 41645,
       "AfterHoursFixedVolume": 10000,
-      "RegularTradeVolume": 4852000
+      "RegularTradeVolume": 4862000
     },
     {
       "Date": "1150812",
@@ -21572,7 +21572,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 2273,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 406000
+      "RegularTradeVolume": 407000
     },
     {
       "Date": "1150812",
@@ -21635,7 +21635,7 @@
       "AfterHoursOddLotVolume": 883,
       "OddLotVolume": 26896,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 484000
+      "RegularTradeVolume": 486000
     },
     {
       "Date": "1150812",
@@ -21761,7 +21761,7 @@
       "AfterHoursOddLotVolume": 300,
       "OddLotVolume": 5756,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 525000
+      "RegularTradeVolume": 527000
     },
     {
       "Date": "1150812",
@@ -21908,7 +21908,7 @@
       "AfterHoursOddLotVolume": 120,
       "OddLotVolume": 768,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 44000
+      "RegularTradeVolume": 45000
     },
     {
       "Date": "1150812",
@@ -21929,7 +21929,7 @@
       "AfterHoursOddLotVolume": 1906,
       "OddLotVolume": 51988,
       "AfterHoursFixedVolume": 4000,
-      "RegularTradeVolume": 3613000
+      "RegularTradeVolume": 3617000
     },
     {
       "Date": "1150812",
@@ -22034,7 +22034,7 @@
       "AfterHoursOddLotVolume": 2642,
       "OddLotVolume": 40753,
       "AfterHoursFixedVolume": 13000,
-      "RegularTradeVolume": 14366000
+      "RegularTradeVolume": 14379000
     },
     {
       "Date": "1150812",
@@ -22055,7 +22055,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 493,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 48000
+      "RegularTradeVolume": 49000
     },
     {
       "Date": "1150812",
@@ -22223,7 +22223,7 @@
       "AfterHoursOddLotVolume": 0,
       "OddLotVolume": 653,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 76000
+      "RegularTradeVolume": 77000
     },
     {
       "Date": "1150812",
@@ -22244,7 +22244,7 @@
       "AfterHoursOddLotVolume": 1040,
       "OddLotVolume": 44240,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 11934000
+      "RegularTradeVolume": 11943000
     },
     {
       "Date": "1150812",
@@ -22349,7 +22349,7 @@
       "AfterHoursOddLotVolume": 515,
       "OddLotVolume": 24403,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 1490000
+      "RegularTradeVolume": 1491000
     },
     {
       "Date": "1150812",
@@ -22412,7 +22412,7 @@
       "AfterHoursOddLotVolume": 1639,
       "OddLotVolume": 54107,
       "AfterHoursFixedVolume": 11000,
-      "RegularTradeVolume": 9764000
+      "RegularTradeVolume": 9775000
     },
     {
       "Date": "1150812",
@@ -22496,7 +22496,7 @@
       "AfterHoursOddLotVolume": 629,
       "OddLotVolume": 74584,
       "AfterHoursFixedVolume": 9000,
-      "RegularTradeVolume": 9873000
+      "RegularTradeVolume": 9882000
     },
     {
       "Date": "1150812",
@@ -22685,7 +22685,7 @@
       "AfterHoursOddLotVolume": 4333,
       "OddLotVolume": 128810,
       "AfterHoursFixedVolume": 6000,
-      "RegularTradeVolume": 9679000
+      "RegularTradeVolume": 9685000
     },
     {
       "Date": "1150812",
@@ -22706,7 +22706,7 @@
       "AfterHoursOddLotVolume": 100,
       "OddLotVolume": 9502,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 3087000
+      "RegularTradeVolume": 3089000
     },
     {
       "Date": "1150812",
@@ -22790,7 +22790,7 @@
       "AfterHoursOddLotVolume": 2619,
       "OddLotVolume": 18772,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 942000
+      "RegularTradeVolume": 944000
     },
     {
       "Date": "1150812",
@@ -22811,7 +22811,7 @@
       "AfterHoursOddLotVolume": 773,
       "OddLotVolume": 12517,
       "AfterHoursFixedVolume": 1000,
-      "RegularTradeVolume": 746000
+      "RegularTradeVolume": 747000
     },
     {
       "Date": "1150812",
@@ -22916,7 +22916,7 @@
       "AfterHoursOddLotVolume": 2230,
       "OddLotVolume": 35758,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 5311000
+      "RegularTradeVolume": 5313000
     },
     {
       "Date": "1150812",
@@ -22979,7 +22979,7 @@
       "AfterHoursOddLotVolume": 8000,
       "OddLotVolume": 93436,
       "AfterHoursFixedVolume": 2000,
-      "RegularTradeVolume": 4082000
+      "RegularTradeVolume": 4084000
     }
   ]
 }
