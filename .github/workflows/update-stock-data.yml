@@ -108,16 +108,18 @@ jobs:
               + "/tpex_odd_stock"
           )
 
-          # 盤後定價：
+          # 盤後定價
           # 僅保留觀察資料，不參與券商成交量扣除
           TPEX_FIXED_API = (
               TPEX_OPENAPI
               + "/tpex_off_market"
           )
 
+          # 上櫃「全部證券」鉅額交易日成交資訊
+          # 官方 endpoint 的 qutoes 拼字就是如此
           TPEX_BLOCK_API = (
               TPEX_OPENAPI
-              + "/tpex_daily_trading_block"
+              + "/tpex_daily_qutoes_block"
           )
 
 
@@ -652,8 +654,10 @@ jobs:
               "Date",
               "TradeDate",
               "TradingDate",
+
               "資料日期",
               "交易日期",
+              "成交日期",
               "日期"
           ]
 
@@ -1252,9 +1256,7 @@ jobs:
 
 
           # ==================================================
-          #
           # TWSE
-          #
           # ==================================================
 
           print("")
@@ -1641,12 +1643,9 @@ jobs:
           # ==================================================
           # 9. TWSE Broker Display Volume
           #
-          # Total
-          # - Odd Lot
-          # - Block Trade
+          # Total - Odd - Block
           #
-          # IMPORTANT:
-          # After-hours fixed-price volume is NOT deducted.
+          # After-hours fixed NOT deducted
           # ==================================================
 
           for stock in twse_stocks:
@@ -1737,7 +1736,6 @@ jobs:
               ] = odd_total
 
 
-              # 保留，但不扣
               stock[
                   "AfterHoursFixedVolume"
               ] = fixed_volume
@@ -1770,9 +1768,7 @@ jobs:
 
 
           # ==================================================
-          #
           # TPEx
-          #
           # ==================================================
 
           print("")
@@ -1931,9 +1927,11 @@ jobs:
           )
 
 
+          # 鉅額交易為成交量公式必要資料
+          # API 失敗直接讓 Action fail
           tpex_block_payload = fetch_json(
               TPEX_BLOCK_API,
-              required=False
+              required=True
           )
 
 
@@ -1945,7 +1943,7 @@ jobs:
           )
 
 
-          # 僅觀察，不參與成交量扣除
+          # 盤後定價僅觀察
           tpex_fixed = extract_tpex_volume_map(
 
               tpex_fixed_payload,
@@ -1991,11 +1989,9 @@ jobs:
           #
           # Broker volume:
           #
-          # Total
-          # - Odd Lot
-          # - Block Trade
+          # Total - Odd - Block
           #
-          # After-hours fixed NOT deducted.
+          # After-hours fixed NOT deducted
           # ==================================================
 
           tpex_stocks = []
@@ -2290,7 +2286,6 @@ jobs:
                   "OddLotVolume":
                       odd_volume,
 
-                  # 保留，但不扣
                   "AfterHoursFixedVolume":
                       fixed_volume,
 
@@ -2720,6 +2715,13 @@ jobs:
           print(
               "Block:",
               twse_block_source
+          )
+
+
+          print("")
+          print(
+              "TPEx block source:",
+              TPEX_BLOCK_API
           )
 
           PY
