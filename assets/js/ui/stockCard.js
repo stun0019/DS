@@ -23,8 +23,13 @@ import {
 } from "../strategy/scoring.js";
 
 import {
-  calculateStrategyPrices
+  calculatePremarketPlan
 } from "../strategy/priceLevels.js";
+
+import {
+  getLiveState,
+  getLiveStatusLabel
+} from "../live/liveState.js";
 
 import {
   marketBadge,
@@ -79,18 +84,26 @@ function formatVolume(
 }
 
 
-function strategyPriceHtml(
-  prices,
-  side
+function premarketPlanHtml(
+  plan,
+  side,
+  liveState
 ) {
 
   if (
-    !prices
+    !plan
   ) {
 
     return "";
 
   }
+
+
+  const statusLabel =
+    getLiveStatusLabel(
+      liveState?.status,
+      side
+    );
 
 
   return `
@@ -100,21 +113,22 @@ function strategyPriceHtml(
       <div class="strategy-price">
 
         <div class="strategy-price-label">
-          觸發
+          觀察價
         </div>
 
         <div
           class="
             strategy-price-value
             ${
-              side === "long"
+              side ===
+              "long"
                 ? "long-text"
                 : "short-text"
             }
           "
         >
           ${formatPrice(
-            prices.entry
+            plan.observationPrice
           )}
         </div>
 
@@ -124,12 +138,12 @@ function strategyPriceHtml(
       <div class="strategy-price">
 
         <div class="strategy-price-label">
-          防守
+          昨日高
         </div>
 
         <div class="strategy-price-value">
           ${formatPrice(
-            prices.stop
+            plan.previousHigh
           )}
         </div>
 
@@ -139,12 +153,12 @@ function strategyPriceHtml(
       <div class="strategy-price">
 
         <div class="strategy-price-label">
-          TP1
+          昨日低
         </div>
 
         <div class="strategy-price-value">
           ${formatPrice(
-            prices.tp1
+            plan.previousLow
           )}
         </div>
 
@@ -154,12 +168,17 @@ function strategyPriceHtml(
       <div class="strategy-price">
 
         <div class="strategy-price-label">
-          TP2
+          盤中狀態
         </div>
 
-        <div class="strategy-price-value">
-          ${formatPrice(
-            prices.tp2
+        <div
+          class="strategy-price-value"
+          title="${escapeHtml(
+            statusLabel
+          )}"
+        >
+          ${escapeHtml(
+            statusLabel
           )}
         </div>
 
@@ -243,13 +262,37 @@ export function renderStockCards(
             : null;
 
 
-        const prices =
+        const plan =
           side
-            ? calculateStrategyPrices(
+            ? calculatePremarketPlan(
                 stock,
                 side
               )
             : null;
+
+
+        const liveState =
+          side
+            ? getLiveState(
+                stock.Code,
+                side
+              )
+            : null;
+
+
+        const quote =
+          liveState?.quote
+          ||
+          null;
+
+
+        const statusLabel =
+          side
+            ? getLiveStatusLabel(
+                liveState?.status,
+                side
+              )
+            : "";
 
 
         return `
@@ -408,9 +451,10 @@ export function renderStockCards(
               </div>
 
 
-              ${strategyPriceHtml(
-                prices,
-                side
+              ${premarketPlanHtml(
+                plan,
+                side,
+                liveState
               )}
 
             </div>
@@ -582,6 +626,7 @@ export function renderStockCards(
 
                 ${
                   side
+
                     ? `
 
                         <div class="detail-item">
@@ -610,13 +655,23 @@ export function renderStockCards(
                         <div class="detail-item">
 
                           <div class="detail-label">
-                            觸發參考
+                            盤前觀察價
                           </div>
 
-                          <div class="detail-value">
-                            ${prices
+                          <div
+                            class="
+                              detail-value
+                              ${
+                                side ===
+                                "long"
+                                  ? "long-text"
+                                  : "short-text"
+                              }
+                            "
+                          >
+                            ${plan
                               ? formatPrice(
-                                  prices.entry
+                                  plan.observationPrice
                                 )
                               : "-"
                             }
@@ -628,13 +683,28 @@ export function renderStockCards(
                         <div class="detail-item">
 
                           <div class="detail-label">
-                            防守參考
+                            盤中狀態
                           </div>
 
                           <div class="detail-value">
-                            ${prices
+                            ${escapeHtml(
+                              statusLabel
+                            )}
+                          </div>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                          <div class="detail-label">
+                            今日開盤
+                          </div>
+
+                          <div class="detail-value">
+                            ${quote
                               ? formatPrice(
-                                  prices.stop
+                                  quote.open
                                 )
                               : "-"
                             }
@@ -646,13 +716,13 @@ export function renderStockCards(
                         <div class="detail-item">
 
                           <div class="detail-label">
-                            TP1 / 1R
+                            今日最高
                           </div>
 
                           <div class="detail-value">
-                            ${prices
+                            ${quote
                               ? formatPrice(
-                                  prices.tp1
+                                  quote.high
                                 )
                               : "-"
                             }
@@ -664,13 +734,41 @@ export function renderStockCards(
                         <div class="detail-item">
 
                           <div class="detail-label">
-                            TP2 / 2R
+                            今日最低
                           </div>
 
                           <div class="detail-value">
-                            ${prices
+                            ${quote
                               ? formatPrice(
-                                  prices.tp2
+                                  quote.low
+                                )
+                              : "-"
+                            }
+                          </div>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                          <div class="detail-label">
+                            目前價格
+                          </div>
+
+                          <div
+                            class="
+                              detail-value
+                              ${
+                                side ===
+                                "long"
+                                  ? "long-text"
+                                  : "short-text"
+                              }
+                            "
+                          >
+                            ${quote
+                              ? formatPrice(
+                                  quote.last
                                 )
                               : "-"
                             }
@@ -679,6 +777,7 @@ export function renderStockCards(
                         </div>
 
                       `
+
                     : ""
                 }
 
