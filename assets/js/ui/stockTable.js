@@ -29,8 +29,13 @@ import {
 } from "../strategy/scoring.js";
 
 import {
-  calculateStrategyPrices
+  calculatePremarketPlan
 } from "../strategy/priceLevels.js";
+
+import {
+  getLiveState,
+  getLiveStatusLabel
+} from "../live/liveState.js";
 
 import {
   marketBadge
@@ -272,201 +277,6 @@ function buildSortOptions(
 }
 
 
-function renderTable(
-  container,
-  data,
-  {
-    side,
-    sortState,
-    onSort
-  }
-) {
-
-  container.innerHTML = `
-
-    <div class="table-scroll">
-
-      <table class="stock-table">
-
-        <thead>
-
-          <tr>
-
-            ${tableHeader(
-              "MarketName",
-              "text",
-              "市場",
-              sortState
-            )}
-
-            ${tableHeader(
-              "Code",
-              "text",
-              "代號",
-              sortState
-            )}
-
-            ${tableHeader(
-              "Name",
-              "text",
-              "名稱",
-              sortState
-            )}
-
-            ${tableHeader(
-              "Industry",
-              "text",
-              "產業",
-              sortState
-            )}
-
-            ${tableHeader(
-              "TradeVolume",
-              "number",
-              "成交量／張",
-              sortState
-            )}
-
-            ${tableHeader(
-              "ClosingPrice",
-              "number",
-              "收盤",
-              sortState
-            )}
-
-            ${tableHeader(
-              "ChangePercent",
-              "number",
-              "漲跌幅",
-              sortState
-            )}
-
-            ${tableHeader(
-              "Amplitude",
-              "number",
-              "振幅",
-              sortState
-            )}
-
-            ${tableHeader(
-              "ClosePosition",
-              "number",
-              "收盤位置",
-              sortState
-            )}
-
-            ${
-              side
-                ? tableHeader(
-                    "StrategyScore",
-                    "number",
-                    "候選分數",
-                    sortState
-                  )
-                : "<th>候選分數</th>"
-            }
-
-            <th>
-              觸發參考
-            </th>
-
-            <th>
-              防守參考
-            </th>
-
-            <th>
-              TP1
-            </th>
-
-            <th>
-              TP2
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-          ${renderRows(
-            data,
-            side
-          )}
-        </tbody>
-
-      </table>
-
-    </div>
-
-  `;
-
-
-  container
-  .querySelectorAll(
-    ".sortable"
-  )
-  .forEach(
-    header => {
-
-      header.addEventListener(
-        "click",
-        () => {
-
-          const key =
-            header.dataset.key;
-
-
-          const type =
-            header.dataset.type;
-
-
-          let direction;
-
-
-          if (
-            sortState.key ===
-            key
-          ) {
-
-            direction =
-
-              sortState.direction ===
-              "desc"
-
-                ? "asc"
-
-                : "desc";
-
-          }
-
-          else {
-
-            direction =
-
-              type ===
-              "number"
-
-                ? "desc"
-
-                : "asc";
-
-          }
-
-
-          onSort(
-            key,
-            direction,
-            type
-          );
-
-        }
-      );
-
-    }
-  );
-
-}
-
-
 function tableHeader(
   key,
   type,
@@ -567,13 +377,31 @@ function renderRows(
           : null;
 
 
-      const prices =
+      const plan =
         side
-          ? calculateStrategyPrices(
+          ? calculatePremarketPlan(
               stock,
               side
             )
           : null;
+
+
+      const liveState =
+        side
+          ? getLiveState(
+              stock.Code,
+              side
+            )
+          : null;
+
+
+      const liveStatus =
+        side
+          ? getLiveStatusLabel(
+              liveState?.status,
+              side
+            )
+          : "-";
 
 
       return `
@@ -660,18 +488,20 @@ function renderRows(
             class="
               price-trigger
               ${
-                side === "long"
+                side ===
+                "long"
                   ? "long-text"
-                  : side === "short"
+                  : side ===
+                    "short"
                     ? "short-text"
                     : ""
               }
             "
           >
             ${
-              prices
+              plan
                 ? formatPrice(
-                    prices.entry
+                    plan.observationPrice
                   )
                 : "-"
             }
@@ -679,9 +509,9 @@ function renderRows(
 
           <td>
             ${
-              prices
+              plan
                 ? formatPrice(
-                    prices.stop
+                    plan.previousHigh
                   )
                 : "-"
             }
@@ -689,9 +519,9 @@ function renderRows(
 
           <td>
             ${
-              prices
+              plan
                 ? formatPrice(
-                    prices.tp1
+                    plan.previousLow
                   )
                 : "-"
             }
@@ -699,9 +529,9 @@ function renderRows(
 
           <td>
             ${
-              prices
-                ? formatPrice(
-                    prices.tp2
+              side
+                ? escapeHtml(
+                    liveStatus
                   )
                 : "-"
             }
@@ -714,6 +544,203 @@ function renderRows(
     }
   )
   .join("");
+
+}
+
+
+function renderTable(
+  container,
+  data,
+  {
+    side,
+    sortState,
+    onSort
+  }
+) {
+
+  container.innerHTML = `
+
+    <div class="table-scroll">
+
+      <table class="stock-table">
+
+        <thead>
+
+          <tr>
+
+            ${tableHeader(
+              "MarketName",
+              "text",
+              "市場",
+              sortState
+            )}
+
+            ${tableHeader(
+              "Code",
+              "text",
+              "代號",
+              sortState
+            )}
+
+            ${tableHeader(
+              "Name",
+              "text",
+              "名稱",
+              sortState
+            )}
+
+            ${tableHeader(
+              "Industry",
+              "text",
+              "產業",
+              sortState
+            )}
+
+            ${tableHeader(
+              "TradeVolume",
+              "number",
+              "成交量／張",
+              sortState
+            )}
+
+            ${tableHeader(
+              "ClosingPrice",
+              "number",
+              "收盤",
+              sortState
+            )}
+
+            ${tableHeader(
+              "ChangePercent",
+              "number",
+              "漲跌幅",
+              sortState
+            )}
+
+            ${tableHeader(
+              "Amplitude",
+              "number",
+              "振幅",
+              sortState
+            )}
+
+            ${tableHeader(
+              "ClosePosition",
+              "number",
+              "收盤位置",
+              sortState
+            )}
+
+            ${
+              side
+
+                ? tableHeader(
+                    "StrategyScore",
+                    "number",
+                    "候選分數",
+                    sortState
+                  )
+
+                : "<th>候選分數</th>"
+            }
+
+            <th>
+              觀察價
+            </th>
+
+            <th>
+              昨日高
+            </th>
+
+            <th>
+              昨日低
+            </th>
+
+            <th>
+              盤中狀態
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+          ${renderRows(
+            data,
+            side
+          )}
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+
+  container
+  .querySelectorAll(
+    ".sortable"
+  )
+  .forEach(
+    header => {
+
+      header.addEventListener(
+        "click",
+        () => {
+
+          const key =
+            header.dataset.key;
+
+
+          const type =
+            header.dataset.type;
+
+
+          let direction;
+
+
+          if (
+            sortState.key ===
+            key
+          ) {
+
+            direction =
+
+              sortState.direction ===
+              "desc"
+
+                ? "asc"
+
+                : "desc";
+
+          }
+
+          else {
+
+            direction =
+
+              type ===
+              "number"
+
+                ? "desc"
+
+                : "asc";
+
+          }
+
+
+          onSort(
+            key,
+            direction,
+            type
+          );
+
+        }
+      );
+
+    }
+  );
 
 }
 
