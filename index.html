@@ -39,7 +39,12 @@
       --up: #ff5a67;
       --down: #35c98b;
 
+      --long: #ff6572;
+      --short: #3bd39a;
+
       --accent: #7c8cff;
+
+      --warning: #e7b65a;
 
       --radius-lg: 16px;
       --radius-md: 12px;
@@ -182,9 +187,11 @@
 
       width:
         min(
-          310px,
-          84vw
+          320px,
+          86vw
         );
+
+      overflow-y: auto;
 
       padding:
         max(
@@ -194,7 +201,7 @@
           )
         )
         16px
-        24px;
+        28px;
 
       background:
         #15181e;
@@ -226,10 +233,12 @@
 
 
     .drawer.show {
+
       transform:
         translateX(
           0
         );
+
     }
 
 
@@ -240,7 +249,7 @@
       align-items: center;
       justify-content: space-between;
 
-      margin-bottom: 24px;
+      margin-bottom: 20px;
 
       padding:
         0
@@ -249,43 +258,26 @@
     }
 
 
-    .drawer-brand {
-
-      min-width: 0;
-
-    }
-
-
     .drawer-eyebrow {
 
-      margin-bottom:
-        5px;
+      margin-bottom: 5px;
 
-      color:
-        var(--accent);
+      color: var(--accent);
 
-      font-size:
-        10px;
+      font-size: 10px;
 
-      font-weight:
-        750;
+      font-weight: 750;
 
-      letter-spacing:
-        0.08em;
+      letter-spacing: 0.08em;
 
     }
 
 
     .drawer-title {
 
-      color:
-        var(--text);
+      font-size: 18px;
 
-      font-size:
-        18px;
-
-      font-weight:
-        750;
+      font-weight: 750;
 
     }
 
@@ -299,8 +291,7 @@
         1px solid
         var(--border);
 
-      border-radius:
-        10px;
+      border-radius: 10px;
 
       background:
         var(--surface-2);
@@ -316,21 +307,18 @@
     .drawer-section-title {
 
       margin:
-        18px
+        20px
         8px
         8px;
 
       color:
         var(--text-muted);
 
-      font-size:
-        10px;
+      font-size: 10px;
 
-      font-weight:
-        700;
+      font-weight: 700;
 
-      letter-spacing:
-        0.08em;
+      letter-spacing: 0.08em;
 
     }
 
@@ -345,18 +333,16 @@
 
       gap: 12px;
 
-      margin-bottom:
-        5px;
+      margin-bottom: 5px;
 
       border:
         1px solid
         transparent;
 
-      border-radius:
-        11px;
+      border-radius: 11px;
 
       padding:
-        12px
+        11px
         13px;
 
       background:
@@ -365,11 +351,9 @@
       color:
         var(--text-secondary);
 
-      text-align:
-        left;
+      text-align: left;
 
-      cursor:
-        pointer;
+      cursor: pointer;
 
     }
 
@@ -409,6 +393,48 @@
     }
 
 
+    .nav-item.nav-long.active {
+
+      border-color:
+        rgba(
+          255,
+          101,
+          114,
+          0.35
+        );
+
+      background:
+        rgba(
+          255,
+          101,
+          114,
+          0.10
+        );
+
+    }
+
+
+    .nav-item.nav-short.active {
+
+      border-color:
+        rgba(
+          59,
+          211,
+          154,
+          0.35
+        );
+
+      background:
+        rgba(
+          59,
+          211,
+          154,
+          0.10
+        );
+
+    }
+
+
     .nav-icon {
 
       display: grid;
@@ -424,8 +450,7 @@
         1px solid
         var(--border);
 
-      border-radius:
-        9px;
+      border-radius: 9px;
 
       background:
         rgba(
@@ -435,53 +460,57 @@
           0.025
         );
 
-      font-size:
-        13px;
+      font-size: 12px;
 
-      font-weight:
-        800;
+      font-weight: 800;
 
     }
 
 
+    .nav-long .nav-icon {
+      color: var(--long);
+    }
+
+
+    .nav-short .nav-icon {
+      color: var(--short);
+    }
+
+
     .nav-copy {
-
       min-width: 0;
-
     }
 
 
     .nav-name {
 
+      display: block;
+
       color: inherit;
 
-      font-size:
-        13px;
+      font-size: 13px;
 
-      font-weight:
-        700;
+      font-weight: 700;
 
     }
 
 
     .nav-description {
 
+      display: block;
+
       overflow: hidden;
 
-      margin-top:
-        3px;
+      margin-top: 3px;
 
       color:
         var(--text-muted);
 
-      font-size:
-        10px;
+      font-size: 10px;
 
-      text-overflow:
-        ellipsis;
+      text-overflow: ellipsis;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
 
     }
 
@@ -494,13 +523,15 @@
 
       display: flex;
 
-      align-items: flex-start;
-      justify-content: space-between;
+      align-items:
+        flex-start;
+
+      justify-content:
+        space-between;
 
       gap: 18px;
 
-      margin-bottom:
-        22px;
+      margin-bottom: 22px;
 
     }
 
@@ -509,7 +540,8 @@
 
       display: flex;
 
-      align-items: flex-start;
+      align-items:
+        flex-start;
 
       min-width: 0;
 
@@ -527,8 +559,7 @@
       width: 42px;
       height: 42px;
 
-      margin-top:
-        1px;
+      margin-top: 1px;
 
       place-items: center;
 
@@ -536,8 +567,7 @@
         1px solid
         var(--border);
 
-      border-radius:
-        11px;
+      border-radius: 11px;
 
       padding: 0;
 
@@ -573,8 +603,7 @@
       width: 17px;
       height: 2px;
 
-      border-radius:
-        2px;
+      border-radius: 2px;
 
       background:
         currentColor;
@@ -600,28 +629,22 @@
 
 
     .title-area {
-
       min-width: 0;
-
     }
 
 
     .eyebrow {
 
-      margin-bottom:
-        6px;
+      margin-bottom: 6px;
 
       color:
         var(--accent);
 
-      font-size:
-        11px;
+      font-size: 11px;
 
-      font-weight:
-        750;
+      font-weight: 750;
 
-      letter-spacing:
-        0.08em;
+      letter-spacing: 0.08em;
 
     }
 
@@ -630,31 +653,25 @@
 
       margin: 0;
 
-      font-size:
-        27px;
+      font-size: 27px;
 
-      line-height:
-        1.25;
+      line-height: 1.25;
 
-      letter-spacing:
-        -0.02em;
+      letter-spacing: -0.02em;
 
     }
 
 
     .subtitle {
 
-      margin-top:
-        7px;
+      margin-top: 7px;
 
       color:
         var(--text-secondary);
 
-      font-size:
-        13px;
+      font-size: 13px;
 
-      line-height:
-        1.55;
+      line-height: 1.55;
 
     }
 
@@ -667,8 +684,7 @@
         1px solid
         var(--border);
 
-      border-radius:
-        10px;
+      border-radius: 10px;
 
       padding:
         10px
@@ -722,34 +738,100 @@
 
     .view-name {
 
-      font-size:
-        16px;
+      font-size: 17px;
 
-      font-weight:
-        750;
+      font-weight: 750;
 
     }
 
 
     .view-description {
 
-      margin-top:
-        4px;
+      margin-top: 4px;
 
       color:
         var(--text-muted);
 
-      font-size:
-        11px;
+      font-size: 11px;
 
     }
 
 
-    .candidate-chip {
+    .view-chip {
 
       display: none;
 
       flex-shrink: 0;
+
+      border-radius: 999px;
+
+      padding:
+        6px
+        10px;
+
+      font-size: 10px;
+
+      font-weight: 750;
+
+    }
+
+
+    .view-chip.show {
+      display: inline-flex;
+    }
+
+
+    .view-chip.long {
+
+      border:
+        1px solid
+        rgba(
+          255,
+          101,
+          114,
+          0.32
+        );
+
+      background:
+        rgba(
+          255,
+          101,
+          114,
+          0.10
+        );
+
+      color:
+        #ff929c;
+
+    }
+
+
+    .view-chip.short {
+
+      border:
+        1px solid
+        rgba(
+          59,
+          211,
+          154,
+          0.32
+        );
+
+      background:
+        rgba(
+          59,
+          211,
+          154,
+          0.10
+        );
+
+      color:
+        #78e2ba;
+
+    }
+
+
+    .view-chip.hot {
 
       border:
         1px solid
@@ -757,15 +839,8 @@
           124,
           140,
           255,
-          0.25
+          0.28
         );
-
-      border-radius:
-        999px;
-
-      padding:
-        6px
-        9px;
 
       background:
         rgba(
@@ -778,18 +853,6 @@
       color:
         #b8c0ff;
 
-      font-size:
-        10px;
-
-      font-weight:
-        700;
-
-    }
-
-
-    .candidate-chip.show {
-      display:
-        inline-block;
     }
 
 
@@ -803,7 +866,7 @@
 
       grid-template-columns:
         repeat(
-          3,
+          4,
           minmax(
             0,
             1fr
@@ -812,24 +875,18 @@
 
       gap: 12px;
 
-      margin-bottom:
-        18px;
+      margin-bottom: 18px;
 
     }
 
 
     .summary-card {
 
+      min-width: 0;
+
       padding:
         14px
         16px;
-
-      background:
-        linear-gradient(
-          145deg,
-          var(--surface-2),
-          var(--surface)
-        );
 
       border:
         1px solid
@@ -838,19 +895,24 @@
       border-radius:
         var(--radius-md);
 
+      background:
+        linear-gradient(
+          145deg,
+          var(--surface-2),
+          var(--surface)
+        );
+
     }
 
 
     .summary-label {
 
-      margin-bottom:
-        6px;
+      margin-bottom: 6px;
 
       color:
         var(--text-secondary);
 
-      font-size:
-        11px;
+      font-size: 11px;
 
     }
 
@@ -859,17 +921,163 @@
 
       overflow: hidden;
 
-      font-size:
-        17px;
+      font-size: 16px;
 
-      font-weight:
-        750;
+      font-weight: 750;
 
-      text-overflow:
-        ellipsis;
+      text-overflow: ellipsis;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
+
+    }
+
+
+    /* ========================================
+       Strategy rule
+    ======================================== */
+
+    .strategy-rules {
+
+      display: none;
+
+      margin-bottom: 16px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        var(--radius-md);
+
+      overflow: hidden;
+
+      background:
+        var(--surface);
+
+    }
+
+
+    .strategy-rules.show {
+      display: block;
+    }
+
+
+    .rules-header {
+
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 12px;
+
+      padding:
+        12px
+        14px;
+
+      background:
+        var(--surface-2);
+
+    }
+
+
+    .rules-title {
+
+      font-size: 12px;
+
+      font-weight: 750;
+
+    }
+
+
+    .rules-note {
+
+      color:
+        var(--text-muted);
+
+      font-size: 10px;
+
+    }
+
+
+    .rules-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(
+            0,
+            1fr
+          )
+        );
+
+      gap: 1px;
+
+      background:
+        var(--border);
+
+    }
+
+
+    .rule-box {
+
+      padding:
+        13px
+        14px;
+
+      background:
+        var(--surface);
+
+      color:
+        var(--text-secondary);
+
+      font-size: 11px;
+
+      line-height: 1.8;
+
+    }
+
+
+    .rule-label {
+
+      margin-bottom: 4px;
+
+      color:
+        var(--text);
+
+      font-weight: 750;
+
+    }
+
+
+    .rule-long .rule-label {
+      color: var(--long);
+    }
+
+
+    .rule-short .rule-label {
+      color: var(--short);
+    }
+
+
+    .strategy-warning {
+
+      padding:
+        10px
+        14px;
+
+      border-top:
+        1px solid
+        var(--border);
+
+      color:
+        var(--warning);
+
+      font-size: 10px;
+
+      line-height: 1.55;
 
     }
 
@@ -889,8 +1097,7 @@
 
       gap: 12px;
 
-      margin-bottom:
-        14px;
+      margin-bottom: 14px;
 
     }
 
@@ -900,15 +1107,13 @@
       color:
         var(--text-secondary);
 
-      font-size:
-        12px;
+      font-size: 12px;
 
     }
 
 
     .status.error {
-      color:
-        var(--up);
+      color: var(--up);
     }
 
 
@@ -917,8 +1122,7 @@
       color:
         var(--text-muted);
 
-      font-size:
-        11px;
+      font-size: 11px;
 
     }
 
@@ -936,8 +1140,7 @@
         1px solid
         var(--border);
 
-      border-radius:
-        10px;
+      border-radius: 10px;
 
       padding:
         10px
@@ -957,7 +1160,7 @@
 
 
     /* ========================================
-       Market badge
+       Badges
     ======================================== */
 
     .market-badge {
@@ -966,34 +1169,27 @@
         inline-flex;
 
       align-items: center;
-
       justify-content: center;
 
-      min-width:
-        32px;
+      min-width: 32px;
 
       border:
         1px solid
         var(--border);
 
-      border-radius:
-        6px;
+      border-radius: 6px;
 
       padding:
         3px
         5px;
 
-      font-size:
-        9px;
+      font-size: 9px;
 
-      font-weight:
-        750;
+      font-weight: 750;
 
-      line-height:
-        1;
+      line-height: 1;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
 
     }
 
@@ -1046,6 +1242,77 @@
     }
 
 
+    .strategy-badge {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      border-radius: 999px;
+
+      padding:
+        4px
+        7px;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      white-space: nowrap;
+
+    }
+
+
+    .strategy-badge.long {
+
+      border:
+        1px solid
+        rgba(
+          255,
+          101,
+          114,
+          0.30
+        );
+
+      background:
+        rgba(
+          255,
+          101,
+          114,
+          0.10
+        );
+
+      color:
+        #ff8f9a;
+
+    }
+
+
+    .strategy-badge.short {
+
+      border:
+        1px solid
+        rgba(
+          59,
+          211,
+          154,
+          0.30
+        );
+
+      background:
+        rgba(
+          59,
+          211,
+          154,
+          0.10
+        );
+
+      color:
+        #72deb5;
+
+    }
+
+
     /* ========================================
        Desktop table
     ======================================== */
@@ -1079,8 +1346,7 @@
 
       width: 100%;
 
-      min-width:
-        1340px;
+      min-width: 1540px;
 
       border-collapse:
         collapse;
@@ -1089,8 +1355,7 @@
 
 
     thead {
-      background:
-        #1b1f27;
+      background: #1b1f27;
     }
 
 
@@ -1104,7 +1369,7 @@
 
       padding:
         13px
-        12px;
+        11px;
 
       border-bottom:
         1px solid
@@ -1116,20 +1381,15 @@
       background:
         #1b1f27;
 
-      font-size:
-        11px;
+      font-size: 10.5px;
 
-      font-weight:
-        650;
+      font-weight: 650;
 
-      text-align:
-        right;
+      text-align: right;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
 
-      user-select:
-        none;
+      user-select: none;
 
     }
 
@@ -1138,7 +1398,7 @@
 
       padding:
         13px
-        12px;
+        11px;
 
       border-bottom:
         1px solid
@@ -1152,21 +1412,17 @@
       color:
         #d9dde3;
 
-      font-size:
-        12px;
+      font-size: 11.5px;
 
-      text-align:
-        right;
+      text-align: right;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
 
     }
 
 
     tbody tr:hover {
-      background:
-        #1c2027;
+      background: #1c2027;
     }
 
 
@@ -1218,14 +1474,11 @@
 
     .sort-icon {
 
-      display:
-        inline-block;
+      display: inline-block;
 
-      min-width:
-        12px;
+      min-width: 12px;
 
-      margin-left:
-        3px;
+      margin-left: 3px;
 
       color:
         var(--accent);
@@ -1234,8 +1487,7 @@
 
 
     .code {
-      color:
-        var(--text-secondary);
+      color: var(--text-secondary);
     }
 
 
@@ -1244,33 +1496,55 @@
       color:
         var(--text);
 
-      font-weight:
-        700;
+      font-weight: 700;
 
     }
 
 
     .industry {
-      color:
-        #aeb5c0;
+      color: #aeb5c0;
     }
 
 
-    .up {
-      color:
-        var(--up);
+    .up,
+    .long-text {
+      color: var(--long);
     }
 
 
-    .down {
-      color:
-        var(--down);
+    .down,
+    .short-text {
+      color: var(--short);
     }
 
 
     .neutral {
-      color:
-        var(--text-secondary);
+      color: var(--text-secondary);
+    }
+
+
+    .score {
+
+      font-weight: 800;
+
+      font-variant-numeric:
+        tabular-nums;
+
+    }
+
+
+    .score.long {
+      color: var(--long);
+    }
+
+
+    .score.short {
+      color: var(--short);
+    }
+
+
+    .price-trigger {
+      font-weight: 750;
     }
 
 
@@ -1287,15 +1561,13 @@
 
       position: relative;
 
-      margin-bottom:
-        8px;
+      margin-bottom: 9px;
 
       border:
         1px solid
         var(--border);
 
-      border-radius:
-        14px;
+      border-radius: 14px;
 
       overflow: hidden;
 
@@ -1311,9 +1583,34 @@
     }
 
 
+    .mobile-stock-card.strategy-long {
+
+      border-color:
+        rgba(
+          255,
+          101,
+          114,
+          0.23
+        );
+
+    }
+
+
+    .mobile-stock-card.strategy-short {
+
+      border-color:
+        rgba(
+          59,
+          211,
+          154,
+          0.23
+        );
+
+    }
+
+
     .mobile-stock-card:active {
-      background:
-        #1d2129;
+      background: #1d2129;
     }
 
 
@@ -1342,35 +1639,30 @@
 
       gap: 6px;
 
-      line-height:
-        1.35;
+      line-height: 1.35;
 
     }
 
 
     .mobile-rank {
 
-      display:
-        none;
+      display: none;
 
       flex-shrink: 0;
 
-      width:
-        21px;
+      width: 21px;
 
       color:
         var(--accent);
 
-      font-size:
-        10px;
+      font-size: 10px;
 
-      font-weight:
-        800;
+      font-weight: 800;
 
     }
 
 
-    .candidate-mode
+    .rank-mode
     .mobile-rank {
 
       display:
@@ -1386,11 +1678,9 @@
       color:
         var(--text);
 
-      font-size:
-        16px;
+      font-size: 16px;
 
-      font-weight:
-        750;
+      font-weight: 750;
 
     }
 
@@ -1402,11 +1692,25 @@
       color:
         var(--text-muted);
 
-      font-size:
-        10px;
+      font-size: 10px;
 
-      font-weight:
-        650;
+      font-weight: 650;
+
+    }
+
+
+    .mobile-score {
+
+      flex-shrink: 0;
+
+      margin-left: auto;
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+      font-variant-numeric:
+        tabular-nums;
 
     }
 
@@ -1415,14 +1719,11 @@
 
       flex-shrink: 0;
 
-      margin-left:
-        auto;
+      margin-left: auto;
 
-      font-size:
-        13px;
+      font-size: 13px;
 
-      font-weight:
-        750;
+      font-weight: 750;
 
       font-variant-numeric:
         tabular-nums;
@@ -1434,19 +1735,16 @@
 
       gap: 6px;
 
-      margin-top:
-        8px;
+      margin-top: 8px;
 
       overflow: hidden;
 
       color:
         var(--text-secondary);
 
-      font-size:
-        10.5px;
+      font-size: 10.5px;
 
-      line-height:
-        1.4;
+      line-height: 1.4;
 
     }
 
@@ -1459,8 +1757,7 @@
 
       overflow: hidden;
 
-      max-width:
-        105px;
+      max-width: 110px;
 
       color:
         #aeb5c0;
@@ -1478,8 +1775,7 @@
 
       flex-shrink: 0;
 
-      color:
-        #414854;
+      color: #414854;
 
     }
 
@@ -1488,8 +1784,7 @@
 
       flex-shrink: 0;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
 
       font-variant-numeric:
         tabular-nums;
@@ -1501,38 +1796,103 @@
 
       position: relative;
 
-      margin-top:
-        9px;
+      margin-top: 9px;
 
-      padding-right:
-        30px;
+      padding-right: 30px;
 
       color:
         var(--text-secondary);
 
-      font-size:
-        10px;
+      font-size: 10px;
 
-      line-height:
-        1.4;
+      line-height: 1.4;
 
       font-variant-numeric:
         tabular-nums;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
 
     }
 
 
-    .mobile-ohlc-separator {
+    .strategy-price-row {
 
-      margin:
-        0
-        2px;
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          4,
+          minmax(
+            0,
+            1fr
+          )
+        );
+
+      gap: 5px;
+
+      margin-top: 10px;
+
+    }
+
+
+    .strategy-price {
+
+      min-width: 0;
+
+      padding:
+        7px
+        6px;
+
+      border:
+        1px solid
+        rgba(
+          255,
+          255,
+          255,
+          0.06
+        );
+
+      border-radius: 8px;
+
+      background:
+        rgba(
+          255,
+          255,
+          255,
+          0.025
+        );
+
+      text-align: center;
+
+    }
+
+
+    .strategy-price-label {
+
+      margin-bottom: 3px;
 
       color:
-        #4a515d;
+        var(--text-muted);
+
+      font-size: 8px;
+
+    }
+
+
+    .strategy-price-value {
+
+      overflow: hidden;
+
+      color:
+        var(--text);
+
+      font-size: 10px;
+
+      font-weight: 750;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
 
     }
 
@@ -1541,17 +1901,12 @@
 
       position: absolute;
 
-      right:
-        16px;
+      right: 16px;
 
-      bottom:
-        17px;
+      bottom: 18px;
 
-      width:
-        9px;
-
-      height:
-        9px;
+      width: 9px;
+      height: 9px;
 
       border-right:
         2px solid
@@ -1575,11 +1930,9 @@
     .mobile-stock-card.expanded
     .mobile-arrow {
 
-      top:
-        64px;
+      top: 63px;
 
-      bottom:
-        auto;
+      bottom: auto;
 
       transform:
         rotate(
@@ -1613,8 +1966,7 @@
     .mobile-stock-card.expanded
     .mobile-card-details {
 
-      max-height:
-        340px;
+      max-height: 700px;
 
       padding:
         12px
@@ -1665,8 +2017,7 @@
           0.8
         );
 
-      border-radius:
-        9px;
+      border-radius: 9px;
 
       background:
         rgba(
@@ -1681,14 +2032,12 @@
 
     .detail-label {
 
-      margin-bottom:
-        4px;
+      margin-bottom: 4px;
 
       color:
         var(--text-muted);
 
-      font-size:
-        9px;
+      font-size: 9px;
 
     }
 
@@ -1700,17 +2049,14 @@
       color:
         #e1e5ea;
 
-      font-size:
-        11px;
+      font-size: 11px;
 
-      font-weight:
-        650;
+      font-weight: 650;
 
       text-overflow:
         ellipsis;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
 
       font-variant-numeric:
         tabular-nums;
@@ -1718,7 +2064,8 @@
     }
 
 
-    .loading {
+    .loading,
+    .empty {
 
       padding:
         50px
@@ -1727,29 +2074,13 @@
       color:
         var(--text-secondary);
 
-      text-align:
-        center;
-
-    }
-
-
-    .empty {
-
-      padding:
-        48px
-        20px;
-
-      color:
-        var(--text-muted);
-
-      text-align:
-        center;
+      text-align: center;
 
     }
 
 
     /* ========================================
-       Mobile
+       Mobile breakpoint
     ======================================== */
 
     @media (
@@ -1818,18 +2149,15 @@
 
       .eyebrow {
 
-        margin-bottom:
-          4px;
+        margin-bottom: 4px;
 
-        font-size:
-          9px;
+        font-size: 9px;
 
       }
 
 
       h1 {
-        font-size:
-          19px;
+        font-size: 19px;
       }
 
 
@@ -1844,8 +2172,7 @@
           8px
           10px;
 
-        font-size:
-          11px;
+        font-size: 11px;
 
       }
 
@@ -1862,14 +2189,12 @@
 
 
       .view-name {
-        font-size:
-          14px;
+        font-size: 14px;
       }
 
 
       .view-description {
-        font-size:
-          9.5px;
+        font-size: 9.5px;
       }
 
 
@@ -1881,8 +2206,7 @@
 
         gap: 8px;
 
-        margin-bottom:
-          13px;
+        margin-bottom: 13px;
 
       }
 
@@ -1896,28 +2220,43 @@
       }
 
 
-      .summary-card:last-child {
-
-        grid-column:
-          1 / -1;
-
-      }
-
-
       .summary-label {
 
-        margin-bottom:
-          4px;
+        margin-bottom: 4px;
 
-        font-size:
-          9px;
+        font-size: 9px;
 
       }
 
 
       .summary-value {
-        font-size:
-          14px;
+        font-size: 13px;
+      }
+
+
+      .rules-grid {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .rules-header {
+
+        align-items:
+          flex-start;
+
+        flex-direction:
+          column;
+
+        gap: 3px;
+
+      }
+
+
+      .rule-box {
+        font-size: 10px;
       }
 
 
@@ -1933,11 +2272,9 @@
 
       .status {
 
-        margin-bottom:
-          8px;
+        margin-bottom: 8px;
 
-        font-size:
-          10px;
+        font-size: 10px;
 
       }
 
@@ -1970,52 +2307,48 @@
 
       .app {
 
-        padding-left:
-          11px;
+        padding-left: 11px;
 
-        padding-right:
-          11px;
+        padding-right: 11px;
 
       }
 
 
       .mobile-card-summary {
 
-        padding-left:
-          11px;
+        padding-left: 11px;
 
-        padding-right:
-          11px;
+        padding-right: 11px;
 
       }
 
 
       .mobile-name {
-        font-size:
-          15px;
+        font-size: 15px;
       }
 
 
       .mobile-industry-inline {
-        max-width:
-          75px;
+        max-width: 75px;
       }
 
 
       .mobile-line-secondary {
 
-        gap:
-          4px;
+        gap: 4px;
 
-        font-size:
-          9.5px;
+        font-size: 9.5px;
 
       }
 
 
       .mobile-ohlc-row {
-        font-size:
-          9.3px;
+        font-size: 9.2px;
+      }
+
+
+      .strategy-price-value {
+        font-size: 9px;
       }
 
     }
@@ -2045,7 +2378,7 @@
 
     <div class="drawer-header">
 
-      <div class="drawer-brand">
+      <div>
 
         <div class="drawer-eyebrow">
           TWSE / TPEX
@@ -2070,8 +2403,56 @@
 
 
     <div class="drawer-section-title">
-      市場
+      隔日策略
     </div>
+
+
+    <button
+      class="nav-item nav-long"
+      data-view="long"
+    >
+
+      <span class="nav-icon">
+        多
+      </span>
+
+      <span class="nav-copy">
+
+        <span class="nav-name">
+          做多候選池
+        </span>
+
+        <span class="nav-description">
+          強勢股＋突破價位
+        </span>
+
+      </span>
+
+    </button>
+
+
+    <button
+      class="nav-item nav-short"
+      data-view="short"
+    >
+
+      <span class="nav-icon">
+        空
+      </span>
+
+      <span class="nav-copy">
+
+        <span class="nav-name">
+          做空候選池
+        </span>
+
+        <span class="nav-description">
+          弱勢股＋跌破價位
+        </span>
+
+      </span>
+
+    </button>
 
 
     <button
@@ -2086,16 +2467,21 @@
       <span class="nav-copy">
 
         <span class="nav-name">
-          候選池
+          成交量 TOP 10
         </span>
 
         <span class="nav-description">
-          成交量最高 TOP 10
+          全市場券商可比成交量
         </span>
 
       </span>
 
     </button>
+
+
+    <div class="drawer-section-title">
+      市場資料
+    </div>
 
 
     <button
@@ -2210,7 +2596,7 @@
           </h1>
 
           <div class="subtitle">
-            上市＋上櫃前一交易日行情
+            前一交易日官方行情＋隔日多空候選分析
           </div>
 
         </div>
@@ -2228,7 +2614,7 @@
     </header>
 
 
-    <!-- Current view -->
+    <!-- View heading -->
 
     <section class="view-heading">
 
@@ -2238,24 +2624,24 @@
           id="viewName"
           class="view-name"
         >
-          候選池
+          做多候選池
         </div>
 
         <div
           id="viewDescription"
           class="view-description"
         >
-          成交量最高 TOP 10
+          強勢、流動性與收盤位置綜合評分
         </div>
 
       </div>
 
 
       <div
-        id="candidateChip"
-        class="candidate-chip show"
+        id="viewChip"
+        class="view-chip long show"
       >
-        TOP 10
+        LONG
       </div>
 
     </section>
@@ -2301,7 +2687,7 @@
       <div class="summary-card">
 
         <div class="summary-label">
-          資料更新
+          資料產生
         </div>
 
         <div
@@ -2310,6 +2696,86 @@
         >
           -
         </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          頁面讀取
+        </div>
+
+        <div
+          id="pageReadValue"
+          class="summary-value"
+        >
+          -
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Strategy rules -->
+
+    <section
+      id="strategyRules"
+      class="strategy-rules show"
+    >
+
+      <div class="rules-header">
+
+        <div class="rules-title">
+          V2 候選池篩選規則
+        </div>
+
+        <div class="rules-note">
+          目前使用單一交易日資料
+        </div>
+
+      </div>
+
+
+      <div class="rules-grid">
+
+        <div class="rule-box rule-long">
+
+          <div class="rule-label">
+            做多
+          </div>
+
+          流動性排名前 120 檔<br>
+          漲跌幅 ＞ 0%<br>
+          收盤價 ＞ 開盤價<br>
+          收盤位置 ≥ 65%<br>
+          當日振幅 ≥ 2%
+
+        </div>
+
+
+        <div class="rule-box rule-short">
+
+          <div class="rule-label">
+            做空
+          </div>
+
+          流動性排名前 120 檔<br>
+          漲跌幅 ＜ 0%<br>
+          收盤價 ＜ 開盤價<br>
+          收盤位置 ≤ 35%<br>
+          當日振幅 ≥ 2%
+
+        </div>
+
+      </div>
+
+
+      <div class="strategy-warning">
+
+        分數＝流動性 25＋方向強度 20＋實體強度 15＋收盤位置 25＋振幅 15。
+        進場、停損與 TP 僅為隔日技術參考價位，不代表實際掛單建議。
 
       </div>
 
@@ -2344,28 +2810,16 @@
             排序方式
           </option>
 
+          <option value="StrategyScore:desc">
+            候選分數｜高 → 低
+          </option>
+
           <option value="TradeVolume:desc">
             成交量｜大 → 小
           </option>
 
           <option value="TradeVolume:asc">
             成交量｜小 → 大
-          </option>
-
-          <option value="TradeValue:desc">
-            成交金額｜大 → 小
-          </option>
-
-          <option value="TradeValue:asc">
-            成交金額｜小 → 大
-          </option>
-
-          <option value="Transaction:desc">
-            成交筆數｜大 → 小
-          </option>
-
-          <option value="Transaction:asc">
-            成交筆數｜小 → 大
           </option>
 
           <option value="ChangePercent:desc">
@@ -2384,12 +2838,20 @@
             振幅｜小 → 大
           </option>
 
-          <option value="Industry:asc">
-            產業別
+          <option value="ClosePosition:desc">
+            收盤位置｜高 → 低
           </option>
 
-          <option value="MarketName:asc">
-            市場
+          <option value="ClosePosition:asc">
+            收盤位置｜低 → 高
+          </option>
+
+          <option value="TradeValue:desc">
+            成交金額｜大 → 小
+          </option>
+
+          <option value="Industry:asc">
+            產業別
           </option>
 
         </select>
@@ -2443,7 +2905,7 @@
                 data-key="Industry"
                 data-type="text"
               >
-                產業別
+                產業
                 <span class="sort-icon"></span>
               </th>
 
@@ -2452,52 +2914,7 @@
                 data-key="TradeVolume"
                 data-type="number"
               >
-                成交量（排除零股／張）
-                <span class="sort-icon"></span>
-              </th>
-
-              <th
-                class="sortable"
-                data-key="Transaction"
-                data-type="number"
-              >
-                成交筆數
-                <span class="sort-icon"></span>
-              </th>
-
-              <th
-                class="sortable"
-                data-key="TradeValue"
-                data-type="number"
-              >
-                成交金額
-                <span class="sort-icon"></span>
-              </th>
-
-              <th
-                class="sortable"
-                data-key="OpeningPrice"
-                data-type="number"
-              >
-                開盤
-                <span class="sort-icon"></span>
-              </th>
-
-              <th
-                class="sortable"
-                data-key="HighestPrice"
-                data-type="number"
-              >
-                最高
-                <span class="sort-icon"></span>
-              </th>
-
-              <th
-                class="sortable"
-                data-key="LowestPrice"
-                data-type="number"
-              >
-                最低
+                成交量／張
                 <span class="sort-icon"></span>
               </th>
 
@@ -2526,6 +2943,40 @@
               >
                 振幅
                 <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="ClosePosition"
+                data-type="number"
+              >
+                收盤位置
+                <span class="sort-icon"></span>
+              </th>
+
+              <th
+                class="sortable"
+                data-key="StrategyScore"
+                data-type="number"
+              >
+                候選分數
+                <span class="sort-icon"></span>
+              </th>
+
+              <th>
+                觸發參考
+              </th>
+
+              <th>
+                防守參考
+              </th>
+
+              <th>
+                TP1
+              </th>
+
+              <th>
+                TP2
               </th>
 
             </tr>
@@ -2566,15 +3017,88 @@
       "./stocks.json";
 
 
+    /* ========================================
+       V2 Strategy config
+    ======================================== */
+
+    const STRATEGY = {
+
+      candidateLimit: 10,
+
+      liquidityPoolSize: 120,
+
+      minimumAmplitude: 2,
+
+      longClosePosition: 0.65,
+
+      shortClosePosition: 0.35,
+
+      stopRangeRatio: 0.35,
+
+      weights: {
+
+        liquidity: 25,
+
+        change: 20,
+
+        body: 15,
+
+        closePosition: 25,
+
+        amplitude: 15
+
+      }
+
+    };
+
+
     const VIEW_CONFIG = {
+
+      long: {
+
+        name:
+          "做多候選池",
+
+        description:
+          "強勢、流動性與收盤位置綜合評分",
+
+        chip:
+          "LONG",
+
+        chipClass:
+          "long"
+
+      },
+
+      short: {
+
+        name:
+          "做空候選池",
+
+        description:
+          "弱勢、流動性與收盤位置綜合評分",
+
+        chip:
+          "SHORT",
+
+        chipClass:
+          "short"
+
+      },
 
       candidate: {
 
         name:
-          "候選池",
+          "成交量 TOP 10",
 
         description:
-          "上市＋上櫃成交量最高 TOP 10"
+          "上市＋上櫃券商可比成交量排名",
+
+        chip:
+          "TOP 10",
+
+        chipClass:
+          "hot"
 
       },
 
@@ -2584,7 +3108,13 @@
           "全部市場",
 
         description:
-          "上市＋上櫃全部個股"
+          "上市＋上櫃全部個股",
+
+        chip:
+          "",
+
+        chipClass:
+          ""
 
       },
 
@@ -2594,7 +3124,13 @@
           "上市股票",
 
         description:
-          "TWSE 上市個股"
+          "TWSE 上市個股",
+
+        chip:
+          "",
+
+        chipClass:
+          ""
 
       },
 
@@ -2604,7 +3140,13 @@
           "上櫃股票",
 
         description:
-          "TPEx 上櫃個股"
+          "TPEx 上櫃個股",
+
+        chip:
+          "",
+
+        chipClass:
+          ""
 
       }
 
@@ -2623,13 +3165,20 @@
 
       tradeDate: "",
 
+      tradeDateISO: "",
+
       updatedAt: "",
 
       volumeMode: "",
 
+      syncStatus: "",
+
       marketCounts: {}
 
     };
+
+
+    let pageReadAt = "";
 
 
     let sortState = {
@@ -2689,6 +3238,12 @@
       );
 
 
+    const pageReadValue =
+      document.getElementById(
+        "pageReadValue"
+      );
+
+
     const mobileSortSelect =
       document.getElementById(
         "mobileSortSelect"
@@ -2707,47 +3262,38 @@
       );
 
 
-    const candidateChip =
+    const viewChip =
       document.getElementById(
-        "candidateChip"
+        "viewChip"
+      );
+
+
+    const strategyRules =
+      document.getElementById(
+        "strategyRules"
       );
 
 
     /* ========================================
-       Initial page
+       Generic helpers
     ======================================== */
 
-    function getInitialPage() {
+    function clamp(
+      value,
+      min,
+      max
+    ) {
 
-      const hash =
-        location.hash
-        .replace(
-          "#",
-          ""
+      return Math.min(
+        max,
+        Math.max(
+          min,
+          value
         )
-        .trim()
-        .toLowerCase();
-
-
-      if (
-        VIEW_CONFIG[
-          hash
-        ]
-      ) {
-
-        return hash;
-
-      }
-
-
-      return "candidate";
+      );
 
     }
 
-
-    /* ========================================
-       Number
-    ======================================== */
 
     function toNumber(
       value
@@ -2796,10 +3342,6 @@
     }
 
 
-    /* ========================================
-       HTML
-    ======================================== */
-
     function escapeHtml(
       value
     ) {
@@ -2837,6 +3379,38 @@
 
 
     /* ========================================
+       Initial page
+    ======================================== */
+
+    function getInitialPage() {
+
+      const hash =
+        location.hash
+        .replace(
+          "#",
+          ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+      if (
+        VIEW_CONFIG[
+          hash
+        ]
+      ) {
+
+        return hash;
+
+      }
+
+
+      return "long";
+
+    }
+
+
+    /* ========================================
        Market
     ======================================== */
 
@@ -2853,17 +3427,12 @@
       }
 
 
-      if (
+      return (
         stock.Market ===
         "TPEX"
-      ) {
-
-        return "上櫃";
-
-      }
-
-
-      return "上市";
+      )
+        ? "上櫃"
+        : "上市";
 
     }
 
@@ -2918,83 +3487,58 @@
       stock
     ) {
 
-      if (
-        stock.AdjustedTradeVolume
-        !== undefined
-        &&
-        stock.AdjustedTradeVolume
-        !== null
-        &&
-        stock.AdjustedTradeVolume
-        !== ""
+      const fields = [
+
+        "BrokerComparableVolume",
+
+        "AdjustedTradeVolume",
+
+        "RegularTradeVolume",
+
+        "NonOddLotTradeVolume",
+
+        "TradeVolume"
+
+      ];
+
+
+      for (
+        const field
+        of fields
       ) {
 
-        return Math.max(
+        if (
+          stock[
+            field
+          ] !== undefined
+          &&
+          stock[
+            field
+          ] !== null
+          &&
+          stock[
+            field
+          ] !== ""
+        ) {
 
-          0,
+          return Math.max(
 
-          toNumber(
-            stock.AdjustedTradeVolume
-          )
-        );
+            0,
+
+            toNumber(
+              stock[
+                field
+              ]
+            )
+
+          );
+
+        }
 
       }
 
 
-      if (
-        stock.RegularTradeVolume
-        !== undefined
-        &&
-        stock.RegularTradeVolume
-        !== null
-        &&
-        stock.RegularTradeVolume
-        !== ""
-      ) {
-
-        return Math.max(
-
-          0,
-
-          toNumber(
-            stock.RegularTradeVolume
-          )
-        );
-
-      }
-
-
-      if (
-        stock.NonOddLotTradeVolume
-        !== undefined
-        &&
-        stock.NonOddLotTradeVolume
-        !== null
-        &&
-        stock.NonOddLotTradeVolume
-        !== ""
-      ) {
-
-        return Math.max(
-
-          0,
-
-          toNumber(
-            stock.NonOddLotTradeVolume
-          )
-        );
-
-      }
-
-
-      return Math.max(
-
-        0,
-
-        toNumber(
-          stock.TradeVolume
-        )
-      );
+      return 0;
 
     }
 
@@ -3019,6 +3563,7 @@
     ) {
 
       return (
+
         Math.round(
           getVolumeLots(
             stock
@@ -3027,8 +3572,11 @@
         .toLocaleString(
           "zh-TW"
         )
+
         +
+
         "張"
+
       );
 
     }
@@ -3093,13 +3641,12 @@
 
         {
 
-          minimumFractionDigits:
-            0,
+          minimumFractionDigits: 0,
 
-          maximumFractionDigits:
-            2
+          maximumFractionDigits: 2
 
         }
+
       );
 
     }
@@ -3127,17 +3674,17 @@
 
 
         return (
-          (
+
+          result.toFixed(
             result >= 100
-              ? result.toFixed(
-                  1
-                )
-              : result.toFixed(
-                  2
-                )
+              ? 1
+              : 2
           )
+
           +
+
           "億"
+
         );
 
       }
@@ -3155,17 +3702,17 @@
 
 
         return (
-          (
+
+          result.toFixed(
             result >= 100
-              ? result.toFixed(
-                  0
-                )
-              : result.toFixed(
-                  1
-                )
+              ? 0
+              : 1
           )
+
           +
+
           "萬"
+
         );
 
       }
@@ -3193,6 +3740,23 @@
 
 
       if (
+        raw.length === 8
+      ) {
+
+        return (
+
+          `${raw.slice(0, 4)}/`
+          +
+          `${raw.slice(4, 6)}/`
+          +
+          `${raw.slice(6, 8)}`
+
+        );
+
+      }
+
+
+      if (
         raw.length !== 7
       ) {
 
@@ -3202,13 +3766,16 @@
 
 
       const year =
+
         Number(
           raw.slice(
             0,
             3
           )
         )
+
         +
+
         1911;
 
 
@@ -3225,8 +3792,42 @@
     }
 
 
+    function formatLocalDateTime(
+      date
+    ) {
+
+      const pad =
+        number =>
+          String(
+            number
+          )
+          .padStart(
+            2,
+            "0"
+          );
+
+
+      return (
+
+        `${date.getFullYear()}-`
+        +
+        `${pad(date.getMonth() + 1)}-`
+        +
+        `${pad(date.getDate())} `
+        +
+        `${pad(date.getHours())}:`
+        +
+        `${pad(date.getMinutes())}:`
+        +
+        `${pad(date.getSeconds())}`
+
+      );
+
+    }
+
+
     /* ========================================
-       Change
+       OHLC calculations
     ======================================== */
 
     function calculatePreviousClose(
@@ -3284,6 +3885,176 @@
         100
 
       );
+
+    }
+
+
+    function calculateAmplitude(
+      stock
+    ) {
+
+      const high =
+        toNumber(
+          stock.HighestPrice
+        );
+
+
+      const low =
+        toNumber(
+          stock.LowestPrice
+        );
+
+
+      const open =
+        toNumber(
+          stock.OpeningPrice
+        );
+
+
+      if (
+        high <= 0
+        ||
+        low <= 0
+        ||
+        open <= 0
+      ) {
+
+        return 0;
+
+      }
+
+
+      return (
+
+        (
+          high
+          -
+          low
+        )
+
+        /
+
+        open
+
+        *
+
+        100
+
+      );
+
+    }
+
+
+    function calculateClosePosition(
+      stock
+    ) {
+
+      const high =
+        toNumber(
+          stock.HighestPrice
+        );
+
+
+      const low =
+        toNumber(
+          stock.LowestPrice
+        );
+
+
+      const close =
+        toNumber(
+          stock.ClosingPrice
+        );
+
+
+      const range =
+        high
+        -
+        low;
+
+
+      if (
+        range <= 0
+      ) {
+
+        return 0.5;
+
+      }
+
+
+      return clamp(
+
+        (
+          close
+          -
+          low
+        )
+
+        /
+
+        range,
+
+        0,
+
+        1
+
+      );
+
+    }
+
+
+    function calculateBodyRatio(
+      stock
+    ) {
+
+      const open =
+        toNumber(
+          stock.OpeningPrice
+        );
+
+
+      const close =
+        toNumber(
+          stock.ClosingPrice
+        );
+
+
+      const high =
+        toNumber(
+          stock.HighestPrice
+        );
+
+
+      const low =
+        toNumber(
+          stock.LowestPrice
+        );
+
+
+      const range =
+        high
+        -
+        low;
+
+
+      if (
+        range <= 0
+      ) {
+
+        return 0;
+
+      }
+
+
+      return (
+
+        close
+        -
+        open
+
+      )
+      /
+      range;
 
     }
 
@@ -3379,11 +4150,9 @@
           "zh-TW",
 
           {
-
-            maximumFractionDigits:
-              2
-
+            maximumFractionDigits: 2
           }
+
         )
 
       );
@@ -3392,12 +4161,604 @@
 
 
     /* ========================================
-       Amplitude
+       Taiwan stock reference tick
     ======================================== */
 
-    function calculateAmplitude(
+    function getPriceTick(
+      price
+    ) {
+
+      if (
+        price < 10
+      ) {
+
+        return 0.01;
+
+      }
+
+
+      if (
+        price < 50
+      ) {
+
+        return 0.05;
+
+      }
+
+
+      if (
+        price < 100
+      ) {
+
+        return 0.1;
+
+      }
+
+
+      if (
+        price < 500
+      ) {
+
+        return 0.5;
+
+      }
+
+
+      if (
+        price < 1000
+      ) {
+
+        return 1;
+
+      }
+
+
+      return 5;
+
+    }
+
+
+    function roundToTick(
+      price,
+      direction = "nearest"
+    ) {
+
+      if (
+        price <= 0
+      ) {
+
+        return 0;
+
+      }
+
+
+      const tick =
+        getPriceTick(
+          price
+        );
+
+
+      const units =
+        price
+        /
+        tick;
+
+
+      let rounded;
+
+
+      if (
+        direction ===
+        "up"
+      ) {
+
+        rounded =
+          Math.ceil(
+            units
+            -
+            1e-9
+          );
+
+      }
+
+      else if (
+        direction ===
+        "down"
+      ) {
+
+        rounded =
+          Math.floor(
+            units
+            +
+            1e-9
+          );
+
+      }
+
+      else {
+
+        rounded =
+          Math.round(
+            units
+          );
+
+      }
+
+
+      return Number(
+        (
+          rounded
+          *
+          tick
+        )
+        .toFixed(
+          2
+        )
+      );
+
+    }
+
+
+    /* ========================================
+       Liquidity ranking
+    ======================================== */
+
+    function assignLiquidityRanks() {
+
+      const ranked =
+        [...stocks]
+        .sort(
+          (
+            a,
+            b
+          ) =>
+
+            getTradeVolumeShares(
+              b
+            )
+
+            -
+
+            getTradeVolumeShares(
+              a
+            )
+
+        );
+
+
+      ranked.forEach(
+        (
+          stock,
+          index
+        ) => {
+
+          stock.__liquidityRank =
+            index
+            +
+            1;
+
+        }
+      );
+
+    }
+
+
+    function liquidityScore(
       stock
     ) {
+
+      const rank =
+        stock.__liquidityRank
+        ||
+        999999;
+
+
+      if (
+        rank >
+        STRATEGY.liquidityPoolSize
+      ) {
+
+        return 0;
+
+      }
+
+
+      const maxIndex =
+        Math.max(
+          1,
+          STRATEGY.liquidityPoolSize
+          -
+          1
+        );
+
+
+      return (
+
+        STRATEGY.weights.liquidity
+
+        *
+
+        (
+          1
+          -
+          (
+            rank
+            -
+            1
+          )
+          /
+          maxIndex
+        )
+
+      );
+
+    }
+
+
+    /* ========================================
+       Strategy score
+    ======================================== */
+
+    function calculateLongScore(
+      stock
+    ) {
+
+      const change =
+        calculateChangePercent(
+          stock
+        );
+
+
+      const body =
+        calculateBodyRatio(
+          stock
+        );
+
+
+      const closePosition =
+        calculateClosePosition(
+          stock
+        );
+
+
+      const amplitude =
+        calculateAmplitude(
+          stock
+        );
+
+
+      const scoreLiquidity =
+        liquidityScore(
+          stock
+        );
+
+
+      const scoreChange =
+
+        clamp(
+          change
+          /
+          5,
+          0,
+          1
+        )
+
+        *
+
+        STRATEGY.weights.change;
+
+
+      const scoreBody =
+
+        clamp(
+          body,
+          0,
+          1
+        )
+
+        *
+
+        STRATEGY.weights.body;
+
+
+      const scoreClose =
+
+        closePosition
+
+        *
+
+        STRATEGY.weights.closePosition;
+
+
+      const scoreAmplitude =
+
+        clamp(
+          amplitude
+          /
+          6,
+          0,
+          1
+        )
+
+        *
+
+        STRATEGY.weights.amplitude;
+
+
+      return Math.round(
+
+        clamp(
+
+          scoreLiquidity
+          +
+          scoreChange
+          +
+          scoreBody
+          +
+          scoreClose
+          +
+          scoreAmplitude,
+
+          0,
+
+          100
+
+        )
+
+      );
+
+    }
+
+
+    function calculateShortScore(
+      stock
+    ) {
+
+      const change =
+        calculateChangePercent(
+          stock
+        );
+
+
+      const body =
+        calculateBodyRatio(
+          stock
+        );
+
+
+      const closePosition =
+        calculateClosePosition(
+          stock
+        );
+
+
+      const amplitude =
+        calculateAmplitude(
+          stock
+        );
+
+
+      const scoreLiquidity =
+        liquidityScore(
+          stock
+        );
+
+
+      const scoreChange =
+
+        clamp(
+          (
+            -change
+          )
+          /
+          5,
+          0,
+          1
+        )
+
+        *
+
+        STRATEGY.weights.change;
+
+
+      const scoreBody =
+
+        clamp(
+          -body,
+          0,
+          1
+        )
+
+        *
+
+        STRATEGY.weights.body;
+
+
+      const scoreClose =
+
+        (
+          1
+          -
+          closePosition
+        )
+
+        *
+
+        STRATEGY.weights.closePosition;
+
+
+      const scoreAmplitude =
+
+        clamp(
+          amplitude
+          /
+          6,
+          0,
+          1
+        )
+
+        *
+
+        STRATEGY.weights.amplitude;
+
+
+      return Math.round(
+
+        clamp(
+
+          scoreLiquidity
+          +
+          scoreChange
+          +
+          scoreBody
+          +
+          scoreClose
+          +
+          scoreAmplitude,
+
+          0,
+
+          100
+
+        )
+
+      );
+
+    }
+
+
+    function isLongCandidate(
+      stock
+    ) {
+
+      const rank =
+        stock.__liquidityRank
+        ||
+        999999;
+
+
+      const open =
+        toNumber(
+          stock.OpeningPrice
+        );
+
+
+      const close =
+        toNumber(
+          stock.ClosingPrice
+        );
+
+
+      return (
+
+        rank
+        <=
+        STRATEGY.liquidityPoolSize
+
+        &&
+
+        calculateChangePercent(
+          stock
+        ) > 0
+
+        &&
+
+        close > open
+
+        &&
+
+        calculateClosePosition(
+          stock
+        )
+        >=
+        STRATEGY.longClosePosition
+
+        &&
+
+        calculateAmplitude(
+          stock
+        )
+        >=
+        STRATEGY.minimumAmplitude
+
+      );
+
+    }
+
+
+    function isShortCandidate(
+      stock
+    ) {
+
+      const rank =
+        stock.__liquidityRank
+        ||
+        999999;
+
+
+      const open =
+        toNumber(
+          stock.OpeningPrice
+        );
+
+
+      const close =
+        toNumber(
+          stock.ClosingPrice
+        );
+
+
+      return (
+
+        rank
+        <=
+        STRATEGY.liquidityPoolSize
+
+        &&
+
+        calculateChangePercent(
+          stock
+        ) < 0
+
+        &&
+
+        close < open
+
+        &&
+
+        calculateClosePosition(
+          stock
+        )
+        <=
+        STRATEGY.shortClosePosition
+
+        &&
+
+        calculateAmplitude(
+          stock
+        )
+        >=
+        STRATEGY.minimumAmplitude
+
+      );
+
+    }
+
+
+    /* ========================================
+       Entry / Stop / TP
+    ======================================== */
+
+    function calculateStrategyPrices(
+      stock,
+      side
+    ) {
+
+      const open =
+        toNumber(
+          stock.OpeningPrice
+        );
+
 
       const high =
         toNumber(
@@ -3411,10 +4772,16 @@
         );
 
 
-      const open =
+      const close =
         toNumber(
-          stock.OpeningPrice
+          stock.ClosingPrice
         );
+
+
+      const range =
+        high
+        -
+        low;
 
 
       if (
@@ -3422,40 +4789,378 @@
         ||
         low <= 0
         ||
-        open <= 0
+        close <= 0
+        ||
+        range <= 0
       ) {
 
-        return 0;
+        return null;
 
       }
 
 
-      return (
+      if (
+        side ===
+        "long"
+      ) {
 
-        (
-          high
+        const tick =
+          getPriceTick(
+            high
+          );
+
+
+        const entry =
+          roundToTick(
+            high
+            +
+            tick,
+            "up"
+          );
+
+
+        const rawStop =
+
+          Math.max(
+
+            low,
+
+            Math.min(
+
+              open,
+
+              close
+              -
+              range
+              *
+              STRATEGY.stopRangeRatio
+
+            )
+
+          );
+
+
+        const stop =
+          roundToTick(
+            rawStop,
+            "down"
+          );
+
+
+        const risk =
+          entry
           -
+          stop;
+
+
+        if (
+          risk <= 0
+        ) {
+
+          return null;
+
+        }
+
+
+        return {
+
+          entry,
+
+          stop,
+
+          tp1:
+            roundToTick(
+              entry
+              +
+              risk,
+              "nearest"
+            ),
+
+          tp2:
+            roundToTick(
+              entry
+              +
+              risk
+              *
+              2,
+              "nearest"
+            )
+
+        };
+
+      }
+
+
+      const tick =
+        getPriceTick(
           low
-        )
+        );
 
-        /
 
-        open
+      const entry =
+        roundToTick(
+          low
+          -
+          tick,
+          "down"
+        );
 
-        *
 
-        100
+      const rawStop =
 
-      );
+        Math.min(
+
+          high,
+
+          Math.max(
+
+            open,
+
+            close
+            +
+            range
+            *
+            STRATEGY.stopRangeRatio
+
+          )
+
+        );
+
+
+      const stop =
+        roundToTick(
+          rawStop,
+          "up"
+        );
+
+
+      const risk =
+        stop
+        -
+        entry;
+
+
+      if (
+        risk <= 0
+      ) {
+
+        return null;
+
+      }
+
+
+      return {
+
+        entry,
+
+        stop,
+
+        tp1:
+          roundToTick(
+            entry
+            -
+            risk,
+            "nearest"
+          ),
+
+        tp2:
+          roundToTick(
+            entry
+            -
+            risk
+            *
+            2,
+            "nearest"
+          )
+
+      };
 
     }
 
 
     /* ========================================
-       Page
+       Decorate strategy
+    ======================================== */
+
+    function getStrategySide() {
+
+      if (
+        currentPage ===
+        "long"
+      ) {
+
+        return "long";
+
+      }
+
+
+      if (
+        currentPage ===
+        "short"
+      ) {
+
+        return "short";
+
+      }
+
+
+      return null;
+
+    }
+
+
+    function getStrategyScore(
+      stock
+    ) {
+
+      if (
+        currentPage ===
+        "long"
+      ) {
+
+        return calculateLongScore(
+          stock
+        );
+
+      }
+
+
+      if (
+        currentPage ===
+        "short"
+      ) {
+
+        return calculateShortScore(
+          stock
+        );
+
+      }
+
+
+      return 0;
+
+    }
+
+
+    /* ========================================
+       Page data
     ======================================== */
 
     function getPageStocks() {
+
+      if (
+        currentPage ===
+        "long"
+      ) {
+
+        return [...stocks]
+
+        .filter(
+          isLongCandidate
+        )
+
+        .sort(
+          (
+            a,
+            b
+          ) =>
+
+            calculateLongScore(
+              b
+            )
+
+            -
+
+            calculateLongScore(
+              a
+            )
+
+        )
+
+        .slice(
+          0,
+          STRATEGY.candidateLimit
+        );
+
+      }
+
+
+      if (
+        currentPage ===
+        "short"
+      ) {
+
+        return [...stocks]
+
+        .filter(
+          isShortCandidate
+        )
+
+        .sort(
+          (
+            a,
+            b
+          ) =>
+
+            calculateShortScore(
+              b
+            )
+
+            -
+
+            calculateShortScore(
+              a
+            )
+
+        )
+
+        .slice(
+          0,
+          STRATEGY.candidateLimit
+        );
+
+      }
+
+
+      if (
+        currentPage ===
+        "candidate"
+      ) {
+
+        return [...stocks]
+
+        .filter(
+          stock =>
+            getTradeVolumeShares(
+              stock
+            ) > 0
+        )
+
+        .sort(
+          (
+            a,
+            b
+          ) =>
+
+            getTradeVolumeShares(
+              b
+            )
+
+            -
+
+            getTradeVolumeShares(
+              a
+            )
+
+        )
+
+        .slice(
+          0,
+          10
+        );
+
+      }
+
 
       if (
         currentPage ===
@@ -3485,49 +5190,16 @@
       }
 
 
-      if (
-        currentPage ===
-        "candidate"
-      ) {
-
-        return [...stocks]
-
-        .filter(
-          stock =>
-            getTradeVolumeShares(
-              stock
-            ) > 0
-        )
-
-        .sort(
-          (
-            a,
-            b
-          ) =>
-
-            getTradeVolumeShares(
-              b
-            )
-            -
-            getTradeVolumeShares(
-              a
-            )
-        )
-
-        .slice(
-          0,
-          10
-        );
-
-      }
-
-
       return [
         ...stocks
       ];
 
     }
 
+
+    /* ========================================
+       Header
+    ======================================== */
 
     function updateViewHeader() {
 
@@ -3545,12 +5217,39 @@
         config.description;
 
 
-      candidateChip.classList.toggle(
+      viewChip.className =
+        "view-chip";
+
+
+      if (
+        config.chip
+      ) {
+
+        viewChip.textContent =
+          config.chip;
+
+
+        viewChip.classList.add(
+          "show"
+        );
+
+
+        viewChip.classList.add(
+          config.chipClass
+        );
+
+      }
+
+
+      strategyRules.classList.toggle(
 
         "show",
 
         currentPage ===
-        "candidate"
+        "long"
+        ||
+        currentPage ===
+        "short"
 
       );
 
@@ -3580,7 +5279,7 @@
 
     function setPage(
       page,
-      updateHash=true
+      updateHash = true
     ) {
 
       if (
@@ -3590,7 +5289,7 @@
       ) {
 
         page =
-          "candidate";
+          "long";
 
       }
 
@@ -3657,20 +5356,45 @@
     function updateSummary() {
 
       tradeDateValue.textContent =
+
+        metadata.tradeDateISO
+
+        ?
+
+        metadata.tradeDateISO.replace(
+          /-/g,
+          "/"
+        )
+
+        :
+
         formatTradeDate(
           metadata.tradeDate
         );
 
 
       countValue.textContent =
+
         `${currentView.length.toLocaleString(
           "zh-TW"
         )} 檔`;
 
 
       updatedAtValue.textContent =
+
         metadata.updatedAt
+
         ||
+
+        "-";
+
+
+      pageReadValue.textContent =
+
+        pageReadAt
+
+        ||
+
         "-";
 
 
@@ -3690,20 +5414,97 @@
         ).length;
 
 
+      const syncText =
+
+        metadata.syncStatus
+
+        ?
+
+        `｜${metadata.syncStatus}`
+
+        :
+
+        "";
+
+
       if (
+        currentPage ===
+        "long"
+      ) {
+
+        statusEl.textContent =
+
+          `做多候選 ${currentView.length} 檔`
+
+          +
+
+          `｜流動性前 ${STRATEGY.liquidityPoolSize}`
+
+          +
+
+          `｜上市 ${twseCount}`
+
+          +
+
+          `｜上櫃 ${tpexCount}`
+
+          +
+
+          syncText;
+
+      }
+
+      else if (
+        currentPage ===
+        "short"
+      ) {
+
+        statusEl.textContent =
+
+          `做空候選 ${currentView.length} 檔`
+
+          +
+
+          `｜流動性前 ${STRATEGY.liquidityPoolSize}`
+
+          +
+
+          `｜上市 ${twseCount}`
+
+          +
+
+          `｜上櫃 ${tpexCount}`
+
+          +
+
+          syncText;
+
+      }
+
+      else if (
         currentPage ===
         "candidate"
       ) {
 
         statusEl.textContent =
 
-          `候選池 TOP ${currentView.length}`
+          `成交量 TOP ${currentView.length}`
+
           +
+
           `｜上市 ${twseCount}`
+
           +
+
           `｜上櫃 ${tpexCount}`
+
           +
-          `｜成交量排除零股`;
+
+          `｜券商可比成交量`
+
+          +
+
+          syncText;
 
       }
 
@@ -3714,12 +5515,18 @@
           `目前顯示 ${currentView.length.toLocaleString(
             "zh-TW"
           )} 檔`
+
           +
+
           `｜上市 ${twseCount}`
+
           +
+
           `｜上櫃 ${tpexCount}`
+
           +
-          `｜成交量排除零股`;
+
+          syncText;
 
       }
 
@@ -3727,7 +5534,7 @@
 
 
     /* ========================================
-       Desktop
+       Desktop table
     ======================================== */
 
     function renderDesktopTable(
@@ -3741,6 +5548,10 @@
       const fragment =
         document
         .createDocumentFragment();
+
+
+      const side =
+        getStrategySide();
 
 
       data.forEach(
@@ -3762,6 +5573,40 @@
             calculateAmplitude(
               stock
             );
+
+
+          const closePosition =
+            calculateClosePosition(
+              stock
+            );
+
+
+          const score =
+            side
+            ?
+            getStrategyScore(
+              stock
+            )
+            :
+            null;
+
+
+          const prices =
+            side
+            ?
+            calculateStrategyPrices(
+              stock,
+              side
+            )
+            :
+            null;
+
+
+          const scoreClass =
+            side ===
+            "long"
+              ? "long"
+              : "short";
 
 
           tr.innerHTML = `
@@ -3799,47 +5644,15 @@
             </td>
 
             <td>
-              ${formatNumber(
-                stock.Transaction
-              )}
-            </td>
-
-            <td>
-              ${formatNumber(
-                stock.TradeValue
-              )}
-            </td>
-
-            <td>
-              ${formatPrice(
-                stock.OpeningPrice
-              )}
-            </td>
-
-            <td>
-              ${formatPrice(
-                stock.HighestPrice
-              )}
-            </td>
-
-            <td>
-              ${formatPrice(
-                stock.LowestPrice
-              )}
-            </td>
-
-            <td>
               ${formatPrice(
                 stock.ClosingPrice
               )}
             </td>
 
             <td
-              class="
-                ${getChangeClass(
-                  changePercent
-                )}
-              "
+              class="${getChangeClass(
+                changePercent
+              )}"
             >
               ${formatChangePercent(
                 stock
@@ -3850,6 +5663,77 @@
               ${amplitude.toFixed(
                 2
               )}%
+            </td>
+
+            <td>
+              ${(
+                closePosition
+                *
+                100
+              ).toFixed(
+                0
+              )}%
+            </td>
+
+            <td
+              class="
+                score
+                ${side
+                  ? scoreClass
+                  : ""
+                }
+              "
+            >
+              ${side
+                ? score
+                : "-"
+              }
+            </td>
+
+            <td
+              class="
+                price-trigger
+                ${side === "long"
+                  ? "long-text"
+                  : side === "short"
+                    ? "short-text"
+                    : ""
+                }
+              "
+            >
+              ${prices
+                ? formatPrice(
+                    prices.entry
+                  )
+                : "-"
+              }
+            </td>
+
+            <td>
+              ${prices
+                ? formatPrice(
+                    prices.stop
+                  )
+                : "-"
+              }
+            </td>
+
+            <td>
+              ${prices
+                ? formatPrice(
+                    prices.tp1
+                  )
+                : "-"
+              }
+            </td>
+
+            <td>
+              ${prices
+                ? formatPrice(
+                    prices.tp2
+                  )
+                : "-"
+              }
             </td>
 
           `;
@@ -3874,6 +5758,53 @@
        Mobile
     ======================================== */
 
+    function strategyBadge(
+      side
+    ) {
+
+      if (
+        side ===
+        "long"
+      ) {
+
+        return `
+          <span
+            class="
+              strategy-badge
+              long
+            "
+          >
+            做多
+          </span>
+        `;
+
+      }
+
+
+      if (
+        side ===
+        "short"
+      ) {
+
+        return `
+          <span
+            class="
+              strategy-badge
+              short
+            "
+          >
+            做空
+          </span>
+        `;
+
+      }
+
+
+      return "";
+
+    }
+
+
     function renderMobileCards(
       data
     ) {
@@ -3882,12 +5813,31 @@
         "";
 
 
-      mobileStockList.classList.toggle(
+      const side =
+        getStrategySide();
 
-        "candidate-mode",
+
+      const isRankMode =
 
         currentPage ===
-        "candidate"
+        "long"
+
+        ||
+
+        currentPage ===
+        "short"
+
+        ||
+
+        currentPage ===
+        "candidate";
+
+
+      mobileStockList.classList.toggle(
+
+        "rank-mode",
+
+        isRankMode
 
       );
 
@@ -3896,12 +5846,19 @@
         data.length === 0
       ) {
 
-        mobileStockList.innerHTML =
-          `
-            <div class="empty">
-              沒有資料
-            </div>
-          `;
+        mobileStockList.innerHTML = `
+
+          <div class="empty">
+
+            ${
+              side
+                ? "目前沒有符合篩選規則的候選股"
+                : "沒有資料"
+            }
+
+          </div>
+
+        `;
 
 
         return;
@@ -3930,6 +5887,17 @@
             "mobile-stock-card";
 
 
+          if (
+            side
+          ) {
+
+            card.classList.add(
+              `strategy-${side}`
+            );
+
+          }
+
+
           card.tabIndex =
             0;
 
@@ -3940,14 +5908,14 @@
             );
 
 
-          const changeClass =
-            getChangeClass(
-              changePercent
+          const amplitude =
+            calculateAmplitude(
+              stock
             );
 
 
-          const amplitude =
-            calculateAmplitude(
+          const closePosition =
+            calculateClosePosition(
               stock
             );
 
@@ -3956,6 +5924,27 @@
             getChangeClass(
               stock.Change
             );
+
+
+          const score =
+            side
+            ?
+            getStrategyScore(
+              stock
+            )
+            :
+            null;
+
+
+          const prices =
+            side
+            ?
+            calculateStrategyPrices(
+              stock,
+              side
+            )
+            :
+            null;
 
 
           card.innerHTML = `
@@ -3975,37 +5964,62 @@
                 </span>
 
                 <span class="mobile-name">
-
                   ${escapeHtml(
                     stock.Name || ""
                   )}
-
                 </span>
 
                 <span class="mobile-code">
-
                   ${escapeHtml(
                     stock.Code || ""
                   )}
-
                 </span>
 
                 ${marketBadge(
                   stock
                 )}
 
-                <span
-                  class="
-                    mobile-change-percent
-                    ${changeClass}
-                  "
-                >
+                ${strategyBadge(
+                  side
+                )}
 
-                  ${formatChangePercent(
-                    stock
-                  )}
+                ${
+                  side
 
-                </span>
+                  ?
+
+                  `
+                    <span
+                      class="
+                        mobile-score
+                        ${side === "long"
+                          ? "long-text"
+                          : "short-text"
+                        }
+                      "
+                    >
+                      ${score}分
+                    </span>
+                  `
+
+                  :
+
+                  `
+                    <span
+                      class="
+                        mobile-change-percent
+                        ${getChangeClass(
+                          changePercent
+                        )}
+                      "
+                    >
+                      ${formatChangePercent(
+                        stock
+                      )}
+                    </span>
+                  `
+
+                }
 
               </div>
 
@@ -4018,17 +6032,13 @@
               >
 
                 <span
-                  class="
-                    mobile-industry-inline
-                  "
+                  class="mobile-industry-inline"
                 >
-
                   ${escapeHtml(
                     stock.Industry
                     ||
                     "未分類"
                   )}
-
                 </span>
 
                 <span class="mobile-divider">
@@ -4050,10 +6060,17 @@
 
                 <span class="mobile-stat-inline">
 
-                  成交金額
-                  ${formatCompactMoney(
-                    stock.TradeValue
-                  )}
+                  ${
+                    side
+                    ?
+                    `漲跌 ${formatChangePercent(
+                      stock
+                    )}`
+                    :
+                    `成交金額 ${formatCompactMoney(
+                      stock.TradeValue
+                    )}`
+                  }
 
                 </span>
 
@@ -4069,40 +6086,113 @@
                   )}
                 </span>
 
-                <span class="mobile-ohlc-separator">
-                  ｜
-                </span>
-
                 <span>
-                  高
+                  ｜高
                   ${formatPrice(
                     stock.HighestPrice
                   )}
                 </span>
 
-                <span class="mobile-ohlc-separator">
-                  ｜
-                </span>
-
                 <span>
-                  低
+                  ｜低
                   ${formatPrice(
                     stock.LowestPrice
                   )}
                 </span>
 
-                <span class="mobile-ohlc-separator">
-                  ｜
-                </span>
-
                 <span>
-                  收
+                  ｜收
                   ${formatPrice(
                     stock.ClosingPrice
                   )}
                 </span>
 
               </div>
+
+
+              ${
+                prices
+
+                ?
+
+                `
+                  <div class="strategy-price-row">
+
+                    <div class="strategy-price">
+
+                      <div class="strategy-price-label">
+                        觸發
+                      </div>
+
+                      <div
+                        class="
+                          strategy-price-value
+                          ${side === "long"
+                            ? "long-text"
+                            : "short-text"
+                          }
+                        "
+                      >
+                        ${formatPrice(
+                          prices.entry
+                        )}
+                      </div>
+
+                    </div>
+
+
+                    <div class="strategy-price">
+
+                      <div class="strategy-price-label">
+                        防守
+                      </div>
+
+                      <div class="strategy-price-value">
+                        ${formatPrice(
+                          prices.stop
+                        )}
+                      </div>
+
+                    </div>
+
+
+                    <div class="strategy-price">
+
+                      <div class="strategy-price-label">
+                        TP1
+                      </div>
+
+                      <div class="strategy-price-value">
+                        ${formatPrice(
+                          prices.tp1
+                        )}
+                      </div>
+
+                    </div>
+
+
+                    <div class="strategy-price">
+
+                      <div class="strategy-price-label">
+                        TP2
+                      </div>
+
+                      <div class="strategy-price-value">
+                        ${formatPrice(
+                          prices.tp2
+                        )}
+                      </div>
+
+                    </div>
+
+                  </div>
+                `
+
+                :
+
+                ""
+
+              }
 
             </div>
 
@@ -4118,14 +6208,19 @@
                 <div class="detail-item">
 
                   <div class="detail-label">
-                    市場
+                    漲跌幅
                   </div>
 
-                  <div class="detail-value">
-                    ${escapeHtml(
-                      getMarketName(
-                        stock
-                      )
+                  <div
+                    class="
+                      detail-value
+                      ${getChangeClass(
+                        changePercent
+                      )}
+                    "
+                  >
+                    ${formatChangePercent(
+                      stock
                     )}
                   </div>
 
@@ -4135,15 +6230,68 @@
                 <div class="detail-item">
 
                   <div class="detail-label">
-                    成交筆數
+                    振幅
                   </div>
 
                   <div class="detail-value">
+                    ${amplitude.toFixed(
+                      2
+                    )}%
+                  </div>
 
-                    ${formatNumber(
-                      stock.Transaction
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    收盤位置
+                  </div>
+
+                  <div class="detail-value">
+                    ${(
+                      closePosition
+                      *
+                      100
+                    ).toFixed(
+                      0
+                    )}%
+                  </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    流動性排名
+                  </div>
+
+                  <div class="detail-value">
+                    #${(
+                      stock.__liquidityRank
+                      ||
+                      0
+                    ).toLocaleString(
+                      "zh-TW"
                     )}
+                  </div>
 
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    昨收
+                  </div>
+
+                  <div class="detail-value">
+                    ${formatPrice(
+                      calculatePreviousClose(
+                        stock
+                      )
+                    )}
                   </div>
 
                 </div>
@@ -4161,11 +6309,9 @@
                       ${priceChangeClass}
                     "
                   >
-
                     ${formatPriceChange(
                       stock
                     )}
-
                   </div>
 
                 </div>
@@ -4174,34 +6320,13 @@
                 <div class="detail-item">
 
                   <div class="detail-label">
-                    振幅
+                    成交筆數
                   </div>
 
                   <div class="detail-value">
-
-                    ${amplitude.toFixed(
-                      2
-                    )}%
-
-                  </div>
-
-                </div>
-
-
-                <div class="detail-item">
-
-                  <div class="detail-label">
-                    昨收
-                  </div>
-
-                  <div class="detail-value">
-
-                    ${formatPrice(
-                      calculatePreviousClose(
-                        stock
-                      )
+                    ${formatNumber(
+                      stock.Transaction
                     )}
-
                   </div>
 
                 </div>
@@ -4210,78 +6335,137 @@
                 <div class="detail-item">
 
                   <div class="detail-label">
-                    排除零股成交量
+                    成交金額
                   </div>
 
                   <div class="detail-value">
+                    ${formatCompactMoney(
+                      stock.TradeValue
+                    )}
+                  </div>
 
+                </div>
+
+
+                <div class="detail-item">
+
+                  <div class="detail-label">
+                    券商可比成交量
+                  </div>
+
+                  <div class="detail-value">
                     ${formatVolumeLots(
                       stock
                     )}
-
                   </div>
 
                 </div>
 
 
-                <div class="detail-item">
+                ${
+                  side
 
-                  <div class="detail-label">
-                    零股成交量
-                  </div>
+                  ?
 
-                  <div class="detail-value">
+                  `
+                    <div class="detail-item">
 
-                    ${Math.round(
-                      toNumber(
-                        stock.OddLotVolume
-                      )
-                      /
-                      1000
-                    )
-                    .toLocaleString(
-                      "zh-TW"
-                    )}張
+                      <div class="detail-label">
+                        候選分數
+                      </div>
 
-                  </div>
+                      <div
+                        class="
+                          detail-value
+                          ${side === "long"
+                            ? "long-text"
+                            : "short-text"
+                          }
+                        "
+                      >
+                        ${score} / 100
+                      </div>
 
-                </div>
-
-
-                <div class="detail-item">
-
-                  <div class="detail-label">
-                    完整成交金額
-                  </div>
-
-                  <div class="detail-value">
-
-                    ${formatNumber(
-                      stock.TradeValue
-                    )}
-
-                  </div>
-
-                </div>
+                    </div>
 
 
-                <div class="detail-item">
+                    <div class="detail-item">
 
-                  <div class="detail-label">
-                    產業
-                  </div>
+                      <div class="detail-label">
+                        觸發參考
+                      </div>
 
-                  <div class="detail-value">
+                      <div class="detail-value">
+                        ${prices
+                          ? formatPrice(
+                              prices.entry
+                            )
+                          : "-"
+                        }
+                      </div>
 
-                    ${escapeHtml(
-                      stock.Industry
-                      ||
-                      "未分類"
-                    )}
+                    </div>
 
-                  </div>
 
-                </div>
+                    <div class="detail-item">
+
+                      <div class="detail-label">
+                        防守參考
+                      </div>
+
+                      <div class="detail-value">
+                        ${prices
+                          ? formatPrice(
+                              prices.stop
+                            )
+                          : "-"
+                        }
+                      </div>
+
+                    </div>
+
+
+                    <div class="detail-item">
+
+                      <div class="detail-label">
+                        TP1 / 1R
+                      </div>
+
+                      <div class="detail-value">
+                        ${prices
+                          ? formatPrice(
+                              prices.tp1
+                            )
+                          : "-"
+                        }
+                      </div>
+
+                    </div>
+
+
+                    <div class="detail-item">
+
+                      <div class="detail-label">
+                        TP2 / 2R
+                      </div>
+
+                      <div class="detail-value">
+                        ${prices
+                          ? formatPrice(
+                              prices.tp2
+                            )
+                          : "-"
+                        }
+                      </div>
+
+                    </div>
+                  `
+
+                  :
+
+                  ""
+
+                }
 
               </div>
 
@@ -4409,6 +6593,30 @@
 
       if (
         key ===
+        "ClosePosition"
+      ) {
+
+        return calculateClosePosition(
+          stock
+        );
+
+      }
+
+
+      if (
+        key ===
+        "StrategyScore"
+      ) {
+
+        return getStrategyScore(
+          stock
+        );
+
+      }
+
+
+      if (
+        key ===
         "MarketName"
       ) {
 
@@ -4434,11 +6642,15 @@
 
 
       return String(
+
         stock[
           key
         ]
+
         ||
+
         ""
+
       );
 
     }
@@ -4483,7 +6695,7 @@
               );
 
 
-            let result = 0;
+            let result;
 
 
             if (
@@ -4515,8 +6727,10 @@
 
 
             return (
+
               direction ===
               "asc"
+
             )
               ? result
               : -result;
@@ -4554,8 +6768,10 @@
       ) {
 
         direction =
+
           sortState.direction ===
           "desc"
+
             ? "asc"
             : "desc";
 
@@ -4564,8 +6780,10 @@
       else {
 
         direction =
+
           type ===
           "number"
+
             ? "desc"
             : "asc";
 
@@ -4616,8 +6834,10 @@
 
 
             icon.textContent =
+
               sortState.direction ===
               "desc"
+
                 ? "↓"
                 : "↑";
 
@@ -4686,19 +6906,26 @@
         "讀取 stocks.json 中...";
 
 
-      mobileStockList.innerHTML =
-        `
-          <div class="loading">
-            載入資料中...
-          </div>
-        `;
+      mobileStockList.innerHTML = `
+
+        <div class="loading">
+          載入資料中...
+        </div>
+
+      `;
 
 
       try {
 
         const response =
           await fetch(
-            `${DATA_URL}?t=${Date.now()}`
+
+            `${DATA_URL}?t=${Date.now()}`,
+
+            {
+              cache: "no-store"
+            }
+
           );
 
 
@@ -4718,10 +6945,13 @@
 
 
         const data =
+
           Array.isArray(
             json
           )
+
             ? json
+
             : json.data;
 
 
@@ -4756,10 +6986,44 @@
                 );
 
 
+              const high =
+                toNumber(
+                  stock.HighestPrice
+                );
+
+
+              const low =
+                toNumber(
+                  stock.LowestPrice
+                );
+
+
+              const open =
+                toNumber(
+                  stock.OpeningPrice
+                );
+
+
               return (
+
                 code !== ""
+
                 &&
+
                 close > 0
+
+                &&
+
+                high > 0
+
+                &&
+
+                low > 0
+
+                &&
+
+                open > 0
+
               );
 
             }
@@ -4769,37 +7033,84 @@
         metadata = {
 
           tradeDate:
+
             Array.isArray(
               json
             )
+
               ? ""
+
               : json.tradeDate,
 
-          updatedAt:
+
+          tradeDateISO:
+
             Array.isArray(
               json
             )
+
               ? ""
+
+              : json.tradeDateISO,
+
+
+          updatedAt:
+
+            Array.isArray(
+              json
+            )
+
+              ? ""
+
               : json.updatedAt,
 
+
           volumeMode:
+
             Array.isArray(
               json
             )
+
               ? ""
+
               : json.volumeMode,
 
-          marketCounts:
+
+          syncStatus:
+
             Array.isArray(
               json
             )
+
+              ? ""
+
+              : json.syncStatus,
+
+
+          marketCounts:
+
+            Array.isArray(
+              json
+            )
+
               ? {}
+
               : (
                   json.marketCounts
                   ||
                   {}
                 )
+
         };
+
+
+        pageReadAt =
+          formatLocalDateTime(
+            new Date()
+          );
+
+
+        assignLiquidityRanks();
 
 
         setPage(
@@ -4827,12 +7138,13 @@
           "";
 
 
-        mobileStockList.innerHTML =
-          `
-            <div class="loading">
-              資料讀取失敗
-            </div>
-          `;
+        mobileStockList.innerHTML = `
+
+          <div class="loading">
+            資料讀取失敗
+          </div>
+
+        `;
 
 
         tradeDateValue.textContent =
@@ -4847,14 +7159,21 @@
           "-";
 
 
+        pageReadValue.textContent =
+          "-";
+
+
         statusEl.classList.add(
           "error"
         );
 
 
         statusEl.textContent =
+
           "stocks.json 讀取失敗："
+
           +
+
           error.message;
 
       }
@@ -4886,7 +7205,8 @@
     );
 
 
-    drawerOverlay.addEventListener(
+    drawerOverlay
+    .addEventListener(
       "click",
       closeDrawer
     );
@@ -4993,9 +7313,11 @@
 
 
         const type =
+
           textKeys.includes(
             key
           )
+
             ? "text"
             : "number";
 
@@ -5020,7 +7342,8 @@
     );
 
 
-    window.addEventListener(
+    window
+    .addEventListener(
       "hashchange",
       () => {
 
@@ -5044,7 +7367,8 @@
     );
 
 
-    document.addEventListener(
+    document
+    .addEventListener(
       "keydown",
       event => {
 
