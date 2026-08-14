@@ -31,7 +31,8 @@ const TRIGGERED_STATUSES =
     [
       LIVE_STATUS.TRIGGERED,
       LIVE_STATUS.CONFIRMING,
-      LIVE_STATUS.ENTRY_READY
+      LIVE_STATUS.ENTRY_READY,
+      LIVE_STATUS.RISK_BLOCKED
     ]
   );
 
@@ -334,7 +335,12 @@ function activeSignalResult(
     return {
       ...baseResult,
       status:
-        LIVE_STATUS.ENTRY_READY,
+        refreshedRiskPlan?.maxLots ===
+        0
+
+          ? LIVE_STATUS.RISK_BLOCKED
+
+          : LIVE_STATUS.ENTRY_READY,
       entry:
         previousState.entry,
       stop:
@@ -409,7 +415,12 @@ function activeSignalResult(
   return {
     ...baseResult,
     status:
-      LIVE_STATUS.ENTRY_READY,
+      riskPlan.maxLots ===
+      0
+
+        ? LIVE_STATUS.RISK_BLOCKED
+
+        : LIVE_STATUS.ENTRY_READY,
     entry:
       riskPlan.entry,
     stop:

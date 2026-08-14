@@ -467,6 +467,15 @@ export function renderRulesPanel(
 
           </div>
 
+          若結構成立但已設定單筆風險上限，且
+          <code>maxLots = 0</code>，狀態改為
+          <strong>風險超標</strong>，不得進入 Entry Ready。
+          這不是 terminal state；後續行情會重新計算
+          Entry、Stop 與 Risk Plan，直到
+          <code>maxLots ≥ 1</code> 才能轉為 Entry Ready。
+
+          <br><br>
+
           任一狀態若進入
           <strong>今日劇本失效</strong>，
           即成為該交易日的 terminal state。
@@ -648,6 +657,11 @@ export function renderRulesPanel(
             TP2 = 扣除成本後 2R
 
           </div>
+
+          有設定單筆風險上限時，
+          <code>maxLots = 0</code> 代表一張也超過風險預算，
+          UI 顯示<strong>風險超標</strong>且禁止 Entry Ready。
+          未設定上限時，maxLots 保持空值，不阻擋正常訊號。
 
         </div>
 

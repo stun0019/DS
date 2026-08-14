@@ -1108,7 +1108,8 @@
 
 
 .live-status-triggered,
-.live-status-confirming {
+.live-status-confirming,
+.live-status-risk_blocked {
   color:
     var(--warning);
 }

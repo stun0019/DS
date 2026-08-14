@@ -11,7 +11,7 @@
 3. `scripts/enrich_day_trade_eligibility.py` 增補官方現股當沖資格，並用 TWSE TWTBAU1、TPEx `tpex_intraday_trading_pre` 覆蓋當日暫停先賣後買標記。
 4. 前端載入 `stocks.json`，只讓合格標的進入多空候選池。
 5. 即時 Provider 送入 Quote；突破後只使用突破時間之後新形成的 Swing Low／High 建立結構停損，突破前 Swing 一律禁止使用。
-6. 風險計畫納入 28 折月退手續費與賣出端 0.15% 當沖證交稅，產生淨風險、保本價與成本後 1R／2R。
+6. 風險計畫納入 28 折月退手續費與賣出端 0.15% 當沖證交稅，產生淨風險、保本價與成本後 1R／2R；有設定風險上限且 `maxLots = 0` 時會進入可恢復的 `RISK_BLOCKED`，禁止 Entry Ready。
 
 ## 本機執行
 
@@ -63,7 +63,7 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 
 - 官方「可先賣」資格不等同券商當下保證有券；實際券源仍需由券商 API 確認。
 - TPEx SSL fallback 僅限憑證驗證失敗，並辨識 `CERTIFICATE_VERIFY_FAILED` 與 `Missing Subject Key Identifier`；啟用時會輸出安全警告。
-- 單筆風險上限預設不設定，使用者可在頁面輸入；`maxLots` 採月退前 `cashRiskPerLot` 保守計算。
+- 單筆風險上限預設不設定，使用者可在頁面輸入；`maxLots` 採月退前 `cashRiskPerLot` 保守計算。若結果為 0，UI 顯示「風險超標」，後續 Quote 仍會重算，直到 `maxLots >= 1` 才能進入 Entry Ready；未設定上限時不套用此阻擋。
 - 交易成本依使用者提供的月退比例連續估算，未套用逐筆最低手續費與券商個別取整方式，實際金額以對帳單為準。
 - 現股當沖 0.15% 優惠稅率目前施行至 2027-12-31，屆期前需重新確認法規並更新設定。
 - 候選分數是規則排序，不代表預期報酬。正式使用前仍需完成含手續費、交易稅與滑價的歷史回測。

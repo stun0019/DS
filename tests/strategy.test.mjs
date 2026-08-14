@@ -29,6 +29,7 @@ import {
 } from "../assets/js/live/liveDataProvider.js";
 
 import {
+  getLiveStatusLabel,
   LIVE_STATUS,
   resetLiveStates
 } from "../assets/js/live/liveState.js";
@@ -666,6 +667,196 @@ test(
     assert.equal(
       nextState.lastQuoteTimestamp,
       "2026-08-17T01:15:06.000Z"
+    );
+  }
+);
+
+
+function createRiskEvaluatedLiveState(
+  stock,
+  maxRiskAmount
+) {
+
+  resetLiveStates();
+
+  applyLiveQuoteToState(
+    stock,
+    "long",
+    {
+      code: stock.Code,
+      last: 111,
+      timestamp: "2026-08-18T09:15:00+08:00"
+    },
+    {
+      maxRiskAmount
+    }
+  );
+
+  return applyLiveQuoteToState(
+    stock,
+    "long",
+    {
+      code: stock.Code,
+      last: 111.5,
+      timestamp: "2026-08-18T09:15:05+08:00",
+      candles: [
+        {
+          timestamp: "2026-08-18T09:15:01+08:00",
+          open: 110,
+          high: 112,
+          low: 106,
+          close: 108,
+          isComplete: true
+        },
+        {
+          timestamp: "2026-08-18T09:15:02+08:00",
+          open: 108,
+          high: 110,
+          low: 104,
+          close: 106,
+          isComplete: true
+        },
+        {
+          timestamp: "2026-08-18T09:15:03+08:00",
+          open: 106,
+          high: 112,
+          low: 107,
+          close: 111.5,
+          isComplete: true
+        }
+      ]
+    },
+    {
+      maxRiskAmount
+    }
+  );
+
+}
+
+
+test(
+  "maxLots zero blocks entry-ready when a risk limit is configured",
+  () => {
+    const stock =
+      createStock();
+
+    const blockedState =
+      createRiskEvaluatedLiveState(
+        stock,
+        5000
+      );
+
+    assert.equal(
+      Math.round(
+        blockedState.riskPlan.cashRiskPerLot
+        /
+        100
+      )
+      *
+      100,
+      8000
+    );
+
+    assert.equal(
+      blockedState.riskPlan.maxLots,
+      0
+    );
+
+    assert.equal(
+      blockedState.status,
+      LIVE_STATUS.RISK_BLOCKED
+    );
+
+    assert.notEqual(
+      blockedState.status,
+      LIVE_STATUS.ENTRY_READY
+    );
+
+    assert.equal(
+      getLiveStatusLabel(
+        blockedState.status,
+        "long"
+      ),
+      "風險超標"
+    );
+  }
+);
+
+
+test(
+  "risk-blocked returns to entry-ready after per-lot risk falls",
+  () => {
+    const stock =
+      createStock();
+
+    const blockedState =
+      createRiskEvaluatedLiveState(
+        stock,
+        5000
+      );
+
+    const readyState =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 108,
+          timestamp: "2026-08-18T09:15:06+08:00"
+        },
+        {
+          maxRiskAmount: 5000
+        }
+      );
+
+    assert.equal(
+      blockedState.status,
+      LIVE_STATUS.RISK_BLOCKED
+    );
+
+    assert.ok(
+      readyState.riskPlan.cashRiskPerLot <
+      5000
+    );
+
+    assert.equal(
+      readyState.riskPlan.maxLots,
+      1
+    );
+
+    assert.equal(
+      readyState.entry,
+      108
+    );
+
+    assert.equal(
+      readyState.status,
+      LIVE_STATUS.ENTRY_READY
+    );
+  }
+);
+
+
+test(
+  "an unset risk limit preserves normal entry-ready behavior",
+  () => {
+    const stock =
+      createStock();
+
+    const readyState =
+      createRiskEvaluatedLiveState(
+        stock,
+        null
+      );
+
+    assert.equal(
+      readyState.riskPlan.maxLots,
+      null
+    );
+
+    assert.equal(
+      readyState.status,
+      LIVE_STATUS.ENTRY_READY
     );
   }
 );

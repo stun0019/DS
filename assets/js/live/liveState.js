@@ -18,6 +18,9 @@ export const LIVE_STATUS = {
   ENTRY_READY:
     "ENTRY_READY",
 
+  RISK_BLOCKED:
+    "RISK_BLOCKED",
+
   INVALIDATED:
     "INVALIDATED"
 
@@ -249,6 +252,11 @@ export function getLiveStatusLabel(
     case LIVE_STATUS.ENTRY_READY:
 
       return "進場條件成立";
+
+
+    case LIVE_STATUS.RISK_BLOCKED:
+
+      return "風險超標";
 
 
     case LIVE_STATUS.INVALIDATED:
