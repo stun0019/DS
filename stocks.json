@@ -4585,8 +4585,8 @@
       "RegularSessionVolume": 129000,
       "AdjustedTradeVolume": 129000,
       "RegularTradeVolume": 129000,
-      "DayTradeEligible": false,
-      "SellFirstDayTradeAllowed": false,
+      "DayTradeEligible": true,
+      "SellFirstDayTradeAllowed": true,
       "SellFirstSuspended": false
     },
     {
@@ -4981,8 +4981,8 @@
       "RegularSessionVolume": 1442000,
       "AdjustedTradeVolume": 1442000,
       "RegularTradeVolume": 1442000,
-      "DayTradeEligible": false,
-      "SellFirstDayTradeAllowed": false,
+      "DayTradeEligible": true,
+      "SellFirstDayTradeAllowed": true,
       "SellFirstSuspended": false
     },
     {
@@ -12022,8 +12022,8 @@
       "RegularSessionVolume": 25942000,
       "AdjustedTradeVolume": 25942000,
       "RegularTradeVolume": 25942000,
-      "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
+      "DayTradeEligible": false,
+      "SellFirstDayTradeAllowed": false,
       "SellFirstSuspended": false
     },
     {
@@ -12055,8 +12055,8 @@
       "RegularSessionVolume": 8505000,
       "AdjustedTradeVolume": 8505000,
       "RegularTradeVolume": 8505000,
-      "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
+      "DayTradeEligible": false,
+      "SellFirstDayTradeAllowed": false,
       "SellFirstSuspended": false
     },
     {
@@ -15859,8 +15859,8 @@
       "AdjustedTradeVolume": 383000,
       "RegularTradeVolume": 383000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true
+      "SellFirstDayTradeAllowed": true,
+      "SellFirstSuspended": false
     },
     {
       "Date": "1150813",
@@ -25089,8 +25089,8 @@
       "RegularSessionVolume": 213000,
       "AdjustedTradeVolume": 213000,
       "RegularTradeVolume": 213000,
-      "DayTradeEligible": false,
-      "SellFirstDayTradeAllowed": false,
+      "DayTradeEligible": true,
+      "SellFirstDayTradeAllowed": true,
       "SellFirstSuspended": false
     },
     {
@@ -28695,8 +28695,8 @@
       "AdjustedTradeVolume": 54000,
       "RegularTradeVolume": 54000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true
+      "SellFirstDayTradeAllowed": true,
+      "SellFirstSuspended": false
     },
     {
       "Date": "1150813",
@@ -63405,7 +63405,7 @@
     }
   ],
   "dayTradeEligibility": {
-    "updatedAt": "2026-08-14 13:53:41",
+    "updatedAt": "2026-08-14 18:39:02",
     "sources": {
       "eligibility": {
         "TWSE": "https://openapi.twse.com.tw/v1/exchangeReport/TWTB4U",
@@ -63418,17 +63418,17 @@
     },
     "marketDates": {
       "TWSE": "1150814",
-      "TPEX": "1150813"
+      "TPEX": "1150814"
     },
     "sellFirstSuspensions": {
       "asOfDate": "1150814",
       "sourceDates": {
         "TWSE": "1150814",
-        "TPEX": "1150812"
+        "TPEX": "1150813"
       },
       "counts": {
         "TWSE": 23,
-        "TPEX": 18
+        "TPEX": 16
       },
       "sourceEligibleCounts": {
         "TWSE": 56,
@@ -63436,9 +63436,9 @@
       }
     },
     "counts": {
-      "eligible": 1669,
-      "buyFirstOnly": 41,
-      "ineligible": 272,
+      "eligible": 1672,
+      "buyFirstOnly": 39,
+      "ineligible": 271,
       "unknown": 0
     }
   }
