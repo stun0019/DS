@@ -86,12 +86,8 @@ function selectCandidates(
       isCandidate
     )
     .map(
-      (
+      stock => ({
         stock,
-        sourceIndex
-      ) => ({
-        stock,
-        sourceIndex,
         score:
           calculateScore(
             stock
@@ -110,9 +106,49 @@ function selectCandidates(
 
         ||
 
-        first.sourceIndex
+        Number(
+          first.stock.__liquidityRank
+          ??
+          Number.MAX_SAFE_INTEGER
+        )
         -
-        second.sourceIndex
+        Number(
+          second.stock.__liquidityRank
+          ??
+          Number.MAX_SAFE_INTEGER
+        )
+
+        ||
+
+        (
+          String(
+            first.stock.Code
+            ??
+            ""
+          ) <
+            String(
+              second.stock.Code
+              ??
+              ""
+            )
+
+            ? -1
+
+            : String(
+                first.stock.Code
+                ??
+                ""
+              ) >
+                String(
+                  second.stock.Code
+                  ??
+                  ""
+                )
+
+              ? 1
+
+              : 0
+        )
     )
     .slice(
       0,

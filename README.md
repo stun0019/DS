@@ -71,7 +71,8 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 {
   metadata: {
     sourceType: "REAL_HISTORICAL_DATA",
-    adapter: "JSON_IMPORT"
+    adapter: "JSON_IMPORT",
+    volumeMode: "BROKER_COMPARABLE_V4"
   },
   dailySnapshots: [
     { date: "2026-08-13", stocks: [/* 當日盤後股票資料 */] }
@@ -101,6 +102,10 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 ```
 
 `HistoricalDatasetBuilder` 會先把匯入資料組成上述 contract，並逐日使用 `previousTradingDate` 的 Snapshot 呼叫正式 Candidate Selector。成功輸出會附帶 `candidateAudits`、`validationLogs` 與 `metadata.historicalStats`；Audit 包含代號、名稱、方向、Strategy Score、Liquidity Rank、Observation、昨日 High／Low。若資料附有正式 Trading Calendar，Builder 也會核對真正的上一交易日。
+
+REAL Snapshot 的每檔股票必須包含 `Code`、完整 OHLC、`Change`、布林型態的 `DayTradeEligible`／`SellFirstDayTradeAllowed`，以及至少一個受支援成交量欄位：`BrokerComparableVolume`、`AdjustedTradeVolume`、`RegularTradeVolume`、`NonOddLotTradeVolume`、`TradeVolume`。缺欄、空陣列、非有限數字、負成交量或不合理 OHLC 一律拒絕，不會用 0 補值。成交量 fallback 維持上述順序；匯入未宣告 `volumeMode` 時會明確標為 `VOLUME_MODE_UNDECLARED`，不推測或重算。
+
+Liquidity Rank 固定依 `Volume DESC → Code ASC`；Candidate 固定依 `Strategy Score DESC → Liquidity Rank ASC → Code ASC`。因此 JSON／CSV 股票列順序不會改變 Long／Short Top10 或 Candidate Audit。驗證成功的 metadata 會標記 `validationStatus: "VALIDATED"`、`snapshotSchemaValidated: true` 與 `candidateSelectionDeterministic: true`，Replay UI 同時顯示來源、驗證狀態、成交量模式與資料筆數摘要。
 
 Builder 會拒絕缺少 Snapshot／5m、同日或未來 Snapshot、未來 Candle、代號不一致、日期倒退、重複或亂序 K、低於 5 分鐘及未完成 K。只有所有 Session 驗證通過後才會交給既有 `runBacktest`；Replay 每一步仍只送入當前 K 棒。出場目標可選 TP1 或 TP2；若同一根 K 同時碰到 Stop 與目標，採保守原則先判定 Stop。滑價可選 0、1、2 Tick，買賣成交價一律透過台股 Tick Engine 往不利方向調整。Structural Stop 不變，但 Position Sizing 會以 Filled Entry、Expected Filled Stop 與交易成本重新計算；若滑價後可交易張數為 0，只記錄 `ENTRY_REJECTED_RISK`，不建立交易。P&L、R 與所有績效都使用 Filled Price 與 Actual Shares。
 

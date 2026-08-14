@@ -11,6 +11,10 @@ import {
 } from "../strategy/priceLevels.js";
 
 import {
+  SUPPORTED_TRADE_VOLUME_FIELDS
+} from "../data/stockData.js";
+
+import {
   getPreviousTradingDate,
   normalizeTradingDate
 } from "../utils/tradingCalendar.js";
@@ -22,6 +26,25 @@ export const HISTORICAL_VALIDATION_EVENT = {
   SESSION_REJECTED:
     "HISTORICAL_SESSION_REJECTED"
 };
+
+
+export const HISTORICAL_VOLUME_MODE_UNDECLARED =
+  "VOLUME_MODE_UNDECLARED";
+
+
+const REQUIRED_SNAPSHOT_NUMERIC_FIELDS = [
+  "OpeningPrice",
+  "HighestPrice",
+  "LowestPrice",
+  "ClosingPrice",
+  "Change"
+];
+
+
+const REQUIRED_SNAPSHOT_BOOLEAN_FIELDS = [
+  "DayTradeEligible",
+  "SellFirstDayTradeAllowed"
+];
 
 
 export class HistoricalDatasetValidationError
@@ -110,6 +133,226 @@ function normalizeCode(
     ""
   )
   .trim();
+
+}
+
+
+function hasDeclaredValue(
+  object,
+  field
+) {
+
+  return Object.prototype.hasOwnProperty.call(
+    object,
+    field
+  )
+  &&
+  object[field] !== undefined
+  &&
+  object[field] !== null
+  &&
+  !(
+    typeof object[field] ===
+      "string"
+    &&
+    object[field].trim() ===
+      ""
+  );
+
+}
+
+
+function validateSnapshotStock(
+  stock,
+  code,
+  date
+) {
+
+  for (
+    const field
+    of REQUIRED_SNAPSHOT_NUMERIC_FIELDS
+  ) {
+
+    if (
+      !hasDeclaredValue(
+        stock,
+        field
+      )
+    ) {
+
+      reject(
+        "MISSING_SNAPSHOT_FIELD",
+        `Snapshot stock ${code} is missing ${field}`,
+        date
+      );
+
+    }
+
+
+    if (
+      !Number.isFinite(
+        Number(
+          stock[field]
+        )
+      )
+    ) {
+
+      reject(
+        field ===
+          "Change"
+
+          ? "INVALID_SNAPSHOT_CHANGE"
+
+          : "INVALID_SNAPSHOT_OHLC",
+        `Snapshot stock ${code} has invalid ${field}`,
+        date
+      );
+
+    }
+
+  }
+
+
+  for (
+    const field
+    of REQUIRED_SNAPSHOT_BOOLEAN_FIELDS
+  ) {
+
+    if (
+      !hasDeclaredValue(
+        stock,
+        field
+      )
+    ) {
+
+      reject(
+        "MISSING_SNAPSHOT_FIELD",
+        `Snapshot stock ${code} is missing ${field}`,
+        date
+      );
+
+    }
+
+
+    if (
+      typeof stock[field] !==
+        "boolean"
+    ) {
+
+      reject(
+        "INVALID_SNAPSHOT_ELIGIBILITY",
+        `Snapshot stock ${code} requires boolean ${field}`,
+        date
+      );
+
+    }
+
+  }
+
+
+  const declaredVolumeFields =
+    SUPPORTED_TRADE_VOLUME_FIELDS.filter(
+      field =>
+        hasDeclaredValue(
+          stock,
+          field
+        )
+    );
+
+
+  if (
+    declaredVolumeFields.length ===
+      0
+  ) {
+
+    reject(
+      "MISSING_SNAPSHOT_VOLUME",
+      `Snapshot stock ${code} has no supported volume field`,
+      date
+    );
+
+  }
+
+
+  for (
+    const field
+    of declaredVolumeFields
+  ) {
+
+    const volume =
+      Number(
+        stock[field]
+      );
+
+
+    if (
+      !Number.isFinite(
+        volume
+      )
+      ||
+      volume <
+        0
+    ) {
+
+      reject(
+        "INVALID_SNAPSHOT_VOLUME",
+        `Snapshot stock ${code} has invalid ${field}`,
+        date
+      );
+
+    }
+
+  }
+
+
+  const open =
+    Number(
+      stock.OpeningPrice
+    );
+
+  const high =
+    Number(
+      stock.HighestPrice
+    );
+
+  const low =
+    Number(
+      stock.LowestPrice
+    );
+
+  const close =
+    Number(
+      stock.ClosingPrice
+    );
+
+
+  if (
+    open <= 0
+    ||
+    high <= 0
+    ||
+    low <= 0
+    ||
+    close <= 0
+    ||
+    high < open
+    ||
+    high < close
+    ||
+    high < low
+    ||
+    low > open
+    ||
+    low > close
+  ) {
+
+    reject(
+      "INVALID_SNAPSHOT_OHLC",
+      `Snapshot stock ${code} has inconsistent OHLC values`,
+      date
+    );
+
+  }
 
 }
 
@@ -256,6 +499,9 @@ function normalizeSnapshots(
     !Array.isArray(
       dailySnapshots
     )
+    ||
+    dailySnapshots.length ===
+      0
   ) {
 
     reject(
@@ -288,6 +534,20 @@ function normalizeSnapshots(
           ? snapshot.stocks
 
           : [];
+
+
+      if (
+        stocks.length ===
+          0
+      ) {
+
+        reject(
+          "EMPTY_SNAPSHOT_STOCKS",
+          "Daily Snapshot stocks must not be empty",
+          date
+        );
+
+      }
 
       const seenCodes =
         new Set();
@@ -333,6 +593,13 @@ function normalizeSnapshots(
 
             seenCodes.add(
               code
+            );
+
+
+            validateSnapshotStock(
+              stock,
+              code,
+              date
             );
 
 
@@ -1001,6 +1268,9 @@ function normalizeSessions(
     !Array.isArray(
       sessions
     )
+    ||
+    sessions.length ===
+      0
   ) {
 
     reject(
@@ -1329,13 +1599,29 @@ export function buildHistoricalReplayDataset(
       fiveMinuteBarCount
     );
 
+  const declaredVolumeMode =
+    String(
+      metadata.volumeMode
+      ??
+      ""
+    )
+    .trim();
+
 
   return {
     metadata: {
       ...metadata,
       historicalStats,
       validationStatus:
-        "VALIDATED"
+        "VALIDATED",
+      snapshotSchemaValidated:
+        true,
+      candidateSelectionDeterministic:
+        true,
+      volumeMode:
+        declaredVolumeMode
+        ||
+        HISTORICAL_VOLUME_MODE_UNDECLARED
     },
     dailySnapshots,
     sessions:

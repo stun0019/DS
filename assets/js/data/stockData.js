@@ -11,7 +11,7 @@ import {
 } from "../utils/format.js";
 
 
-const VOLUME_FIELDS = [
+export const SUPPORTED_TRADE_VOLUME_FIELDS = [
 
   "BrokerComparableVolume",
 
@@ -32,7 +32,7 @@ export function getTradeVolumeShares(
 
   for (
     const field
-    of VOLUME_FIELDS
+    of SUPPORTED_TRADE_VOLUME_FIELDS
   ) {
 
     if (
@@ -143,6 +143,38 @@ export function assignLiquidityRanks(
 
         getTradeVolumeShares(
           a
+        )
+
+        ||
+
+        (
+          String(
+            a.Code
+            ??
+            ""
+          ) <
+            String(
+              b.Code
+              ??
+              ""
+            )
+
+            ? -1
+
+            : String(
+                a.Code
+                ??
+                ""
+              ) >
+                String(
+                  b.Code
+                  ??
+                  ""
+                )
+
+              ? 1
+
+              : 0
         )
     );
 

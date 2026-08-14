@@ -2,6 +2,10 @@ import {
   buildHistoricalReplayDataset
 } from "./historicalDatasetBuilder.js";
 
+import {
+  SUPPORTED_TRADE_VOLUME_FIELDS
+} from "../data/stockData.js";
+
 
 export const HISTORICAL_SOURCE_TYPE = {
   SAMPLE_MOCK:
@@ -382,6 +386,30 @@ function csvNumber(
 }
 
 
+function csvOptionalNumber(
+  row,
+  ...names
+) {
+
+  const value =
+    csvValue(
+      row,
+      ...names
+    );
+
+
+  return value ===
+    ""
+
+    ? undefined
+
+    : Number(
+        value
+      );
+
+}
+
+
 function csvBoolean(
   row,
   ...names
@@ -401,12 +429,60 @@ function csvBoolean(
 }
 
 
+function csvOptionalBoolean(
+  row,
+  ...names
+) {
+
+  const value =
+    csvValue(
+      row,
+      ...names
+    )
+    .toLowerCase();
+
+
+  if (
+    [
+      "true",
+      "1",
+      "yes"
+    ].includes(
+      value
+    )
+  ) {
+
+    return true;
+
+  }
+
+
+  if (
+    [
+      "false",
+      "0",
+      "no"
+    ].includes(
+      value
+    )
+  ) {
+
+    return false;
+
+  }
+
+
+  return undefined;
+
+}
+
+
 function stockFromCsvRow(
   row,
   code
 ) {
 
-  return {
+  const stock = {
     Code:
       code,
     Name:
@@ -420,46 +496,68 @@ function stockFromCsvRow(
         "market"
       ),
     OpeningPrice:
-      csvNumber(
+      csvOptionalNumber(
         row,
         "openingPrice"
       ),
     HighestPrice:
-      csvNumber(
+      csvOptionalNumber(
         row,
         "highestPrice"
       ),
     LowestPrice:
-      csvNumber(
+      csvOptionalNumber(
         row,
         "lowestPrice"
       ),
     ClosingPrice:
-      csvNumber(
+      csvOptionalNumber(
         row,
         "closingPrice"
       ),
     Change:
-      csvNumber(
+      csvOptionalNumber(
         row,
         "change"
       ),
-    TradeVolume:
-      csvNumber(
-        row,
-        "tradeVolume"
-      ),
     DayTradeEligible:
-      csvBoolean(
+      csvOptionalBoolean(
         row,
         "dayTradeEligible"
       ),
     SellFirstDayTradeAllowed:
-      csvBoolean(
+      csvOptionalBoolean(
         row,
         "sellFirstDayTradeAllowed"
       )
   };
+
+
+  SUPPORTED_TRADE_VOLUME_FIELDS.forEach(
+    field => {
+
+      const value =
+        csvOptionalNumber(
+          row,
+          field
+        );
+
+
+      if (
+        value !==
+          undefined
+      ) {
+
+        stock[field] =
+          value;
+
+      }
+
+    }
+  );
+
+
+  return stock;
 
 }
 
@@ -536,6 +634,20 @@ export function parseHistorical5mCsv(
       )
     );
 
+  const declaredVolumeModes =
+    new Set(
+      rows.map(
+        row =>
+          csvValue(
+            row,
+            "volumeMode"
+          )
+      )
+      .filter(
+        Boolean
+      )
+    );
+
 
   if (
     declaredSourceTypes.size > 1
@@ -543,6 +655,17 @@ export function parseHistorical5mCsv(
 
     throw new Error(
       "Historical 5m CSV 的來源標記不一致"
+    );
+
+  }
+
+
+  if (
+    declaredVolumeModes.size > 1
+  ) {
+
+    throw new Error(
+      "Historical 5m CSV 的 volumeMode 不一致"
     );
 
   }
@@ -801,14 +924,72 @@ export function parseHistorical5mCsv(
     ||
     HISTORICAL_SOURCE_TYPE.SAMPLE_MOCK;
 
+  const volumeMode =
+    [...declaredVolumeModes][0]
+    ??
+    "";
+
+  const normalizedSessions =
+    [...sessions.values()]
+    .sort(
+      (
+        first,
+        second
+      ) =>
+        first.date.localeCompare(
+          second.date
+        )
+    );
+
+
+  normalizedSessions.forEach(
+    session => {
+
+      Object.values(
+        session.barsByCode
+      )
+      .forEach(
+        bars =>
+          bars.sort(
+            (
+              first,
+              second
+            ) =>
+              first.timestamp.localeCompare(
+                second.timestamp
+              )
+          )
+      );
+
+    }
+  );
+
 
   return normalizeReplayDataset(
     {
       metadata: {
-        sourceType
+        sourceType,
+        ...(
+          volumeMode
+
+            ? {
+                volumeMode
+              }
+
+            : {}
+        )
       },
       dailySnapshots:
         [...snapshots.entries()]
+        .sort(
+          (
+            [firstDate],
+            [secondDate]
+          ) =>
+            firstDate.localeCompare(
+              secondDate
+            )
+        )
         .map(
           ([
             date,
@@ -820,7 +1001,7 @@ export function parseHistorical5mCsv(
           })
         ),
       sessions:
-        [...sessions.values()]
+        normalizedSessions
     },
     {
       adapter:

@@ -1608,10 +1608,8 @@ test(
   "historical providers cannot confuse mock and real source labels",
   () => {
 
-    const baseDataset = {
-      dailySnapshots: [],
-      sessions: []
-    };
+    const baseDataset =
+      replayDataset();
 
 
     const jsonProvider =

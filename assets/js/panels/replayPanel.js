@@ -151,6 +151,11 @@ function renderDatasetSummary(
   const stats =
     dataset?.metadata?.historicalStats;
 
+  const metadata =
+    dataset?.metadata
+    ??
+    {};
+
 
   if (
     !stats
@@ -182,6 +187,30 @@ function renderDatasetSummary(
       </div>
 
       <div class="replay-metrics-grid">
+        ${metric(
+          "Source Type",
+          escapeHtml(
+            getHistoricalSourceLabel(
+              metadata.sourceType
+            )
+          )
+        )}
+        ${metric(
+          "Validation Status",
+          escapeHtml(
+            metadata.validationStatus
+            ??
+            "-"
+          )
+        )}
+        ${metric(
+          "Volume Mode",
+          escapeHtml(
+            metadata.volumeMode
+            ??
+            "VOLUME_MODE_UNDECLARED"
+          )
+        )}
         ${metric("資料期間", escapeHtml(dataRange))}
         ${metric("Daily Snapshot", stats.dailySnapshotCount)}
         ${metric("Session", stats.sessionCount)}

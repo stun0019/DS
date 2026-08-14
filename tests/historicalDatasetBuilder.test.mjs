@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   HISTORICAL_VALIDATION_EVENT,
+  HISTORICAL_VOLUME_MODE_UNDECLARED,
   HistoricalDatasetBuilder,
   HistoricalDatasetValidationError,
   buildHistoricalReplayDataset
@@ -21,6 +22,15 @@ import {
 import {
   getCandidatesBySide
 } from "../assets/js/strategy/candidateSelector.js";
+
+import {
+  getStrategyScore
+} from "../assets/js/strategy/scoring.js";
+
+import {
+  SUPPORTED_TRADE_VOLUME_FIELDS,
+  getTradeVolumeShares
+} from "../assets/js/data/stockData.js";
 
 import {
   TRADING_CALENDAR_SOURCE
@@ -1032,6 +1042,920 @@ test(
     assert.deepEqual(
       csvDataset.metadata.historicalStats,
       jsonDataset.metadata.historicalStats
+    );
+
+  }
+);
+
+
+function orderedCsvDataset(
+  stocks,
+  reverseRows =
+    false,
+  volumeMode =
+    "BROKER_COMPARABLE_V4"
+) {
+
+  const headers = [
+    "sourceType",
+    "volumeMode",
+    "recordType",
+    "snapshotDate",
+    "sessionDate",
+    "previousTradingDate",
+    "code",
+    "name",
+    "market",
+    "openingPrice",
+    "highestPrice",
+    "lowestPrice",
+    "closingPrice",
+    "change",
+    ...SUPPORTED_TRADE_VOLUME_FIELDS,
+    "dayTradeEligible",
+    "sellFirstDayTradeAllowed",
+    "timestamp",
+    "timeframeMinutes",
+    "isComplete",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+  ];
+
+  const sourceType =
+    HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA;
+
+  const snapshotRows =
+    stocks.map(
+      stock => ({
+        sourceType,
+        volumeMode,
+        recordType:
+          "SNAPSHOT",
+        snapshotDate:
+          "2026-08-17",
+        code:
+          stock.Code,
+        name:
+          stock.Name,
+        market:
+          stock.Market,
+        openingPrice:
+          stock.OpeningPrice,
+        highestPrice:
+          stock.HighestPrice,
+        lowestPrice:
+          stock.LowestPrice,
+        closingPrice:
+          stock.ClosingPrice,
+        change:
+          stock.Change,
+        BrokerComparableVolume:
+          stock.BrokerComparableVolume,
+        AdjustedTradeVolume:
+          stock.AdjustedTradeVolume,
+        RegularTradeVolume:
+          stock.RegularTradeVolume,
+        NonOddLotTradeVolume:
+          stock.NonOddLotTradeVolume,
+        TradeVolume:
+          stock.TradeVolume,
+        dayTradeEligible:
+          stock.DayTradeEligible,
+        sellFirstDayTradeAllowed:
+          stock.SellFirstDayTradeAllowed
+      })
+    );
+
+  const barRows =
+    stocks.map(
+      stock => ({
+        sourceType,
+        volumeMode,
+        recordType:
+          "BAR",
+        sessionDate:
+          "2026-08-18",
+        previousTradingDate:
+          "2026-08-17",
+        code:
+          stock.Code,
+        timestamp:
+          "2026-08-18T09:00:00+08:00",
+        timeframeMinutes: 5,
+        isComplete: true,
+        open: 100,
+        high: 101,
+        low: 99,
+        close: 100,
+        volume: 1000
+      })
+    );
+
+  const rows = [
+    ...snapshotRows,
+    ...barRows
+  ];
+
+
+  if (
+    reverseRows
+  ) {
+
+    rows.reverse();
+
+  }
+
+
+  return [
+    headers.join(
+      ","
+    ),
+    ...rows.map(
+      row =>
+        headers.map(
+          header =>
+            row[header]
+            ??
+            ""
+        )
+        .join(
+          ","
+        )
+    )
+  ]
+  .join(
+    "\n"
+  );
+
+}
+
+
+test(
+  "REAL snapshots reject each missing required numeric field",
+  () => {
+
+    [
+      "HighestPrice",
+      "LowestPrice",
+      "Change"
+    ].forEach(
+      field => {
+
+        const input =
+          rawHistoricalInput();
+
+        delete input.dailySnapshots[0]
+        .stocks[0][field];
+
+
+        assertValidationError(
+          () =>
+            buildHistoricalReplayDataset(
+              input
+            ),
+          "MISSING_SNAPSHOT_FIELD"
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "REAL snapshots reject inconsistent OHLC",
+  () => {
+
+    const input =
+      rawHistoricalInput();
+
+    input.dailySnapshots[0]
+    .stocks[0]
+    .HighestPrice =
+      90;
+
+
+    assertValidationError(
+      () =>
+        buildHistoricalReplayDataset(
+          input
+        ),
+      "INVALID_SNAPSHOT_OHLC"
+    );
+
+  }
+);
+
+
+test(
+  "REAL snapshots reject non-finite Change and invalid volume",
+  () => {
+
+    const invalidChange =
+      rawHistoricalInput();
+
+    invalidChange.dailySnapshots[0]
+    .stocks[0]
+    .Change =
+      Number.POSITIVE_INFINITY;
+
+
+    assertValidationError(
+      () =>
+        buildHistoricalReplayDataset(
+          invalidChange
+        ),
+      "INVALID_SNAPSHOT_CHANGE"
+    );
+
+
+    [
+      -1,
+      Number.NaN
+    ].forEach(
+      volume => {
+
+        const invalidVolume =
+          rawHistoricalInput();
+
+        invalidVolume.dailySnapshots[0]
+        .stocks[0]
+        .TradeVolume =
+          volume;
+
+
+        assertValidationError(
+          () =>
+            buildHistoricalReplayDataset(
+              invalidVolume
+            ),
+          "INVALID_SNAPSHOT_VOLUME"
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "REAL snapshots reject missing or non-boolean eligibility",
+  () => {
+
+    [
+      "DayTradeEligible",
+      "SellFirstDayTradeAllowed"
+    ].forEach(
+      field => {
+
+        const missingInput =
+          rawHistoricalInput();
+
+        delete missingInput.dailySnapshots[0]
+        .stocks[0][field];
+
+
+        assertValidationError(
+          () =>
+            buildHistoricalReplayDataset(
+              missingInput
+            ),
+          "MISSING_SNAPSHOT_FIELD"
+        );
+
+
+        const invalidInput =
+          rawHistoricalInput();
+
+        invalidInput.dailySnapshots[0]
+        .stocks[0][field] =
+          "true";
+
+
+        assertValidationError(
+          () =>
+            buildHistoricalReplayDataset(
+              invalidInput
+            ),
+          "INVALID_SNAPSHOT_ELIGIBILITY"
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "REAL snapshots reject missing all supported volume fields",
+  () => {
+
+    const input =
+      rawHistoricalInput();
+
+    SUPPORTED_TRADE_VOLUME_FIELDS.forEach(
+      field => {
+
+        delete input.dailySnapshots[0]
+        .stocks[0][field];
+
+      }
+    );
+
+
+    assertValidationError(
+      () =>
+        buildHistoricalReplayDataset(
+          input
+        ),
+      "MISSING_SNAPSHOT_VOLUME"
+    );
+
+  }
+);
+
+
+test(
+  "empty daily snapshots fail closed",
+  () => {
+
+    const input =
+      rawHistoricalInput();
+
+    input.dailySnapshots =
+      [];
+
+
+    assertValidationError(
+      () =>
+        buildHistoricalReplayDataset(
+          input
+        ),
+      "MISSING_DAILY_SNAPSHOTS"
+    );
+
+  }
+);
+
+
+test(
+  "empty sessions fail closed",
+  () => {
+
+    const input =
+      rawHistoricalInput();
+
+    input.sessions =
+      [];
+
+
+    assertValidationError(
+      () =>
+        buildHistoricalReplayDataset(
+          input
+        ),
+      "MISSING_SESSIONS"
+    );
+
+  }
+);
+
+
+test(
+  "empty snapshot stock lists fail closed",
+  () => {
+
+    const input =
+      rawHistoricalInput();
+
+    input.dailySnapshots[0].stocks =
+      [];
+
+
+    assertValidationError(
+      () =>
+        buildHistoricalReplayDataset(
+          input
+        ),
+      "EMPTY_SNAPSHOT_STOCKS"
+    );
+
+  }
+);
+
+
+test(
+  "JSON stock order does not change candidate codes ranks or scores",
+  () => {
+
+    const original =
+      rawHistoricalInput();
+
+    const shuffled =
+      clone(
+        original
+      );
+
+    shuffled.dailySnapshots.forEach(
+      snapshot =>
+        snapshot.stocks.reverse()
+    );
+
+    shuffled.sessions.forEach(
+      session => {
+
+        session.barsByCode =
+          Object.fromEntries(
+            Object.entries(
+              session.barsByCode
+            )
+            .reverse()
+          );
+
+      }
+    );
+
+
+    const first =
+      buildHistoricalReplayDataset(
+        original
+      );
+
+    const second =
+      buildHistoricalReplayDataset(
+        shuffled
+      );
+
+
+    assert.deepEqual(
+      second.candidateAudits,
+      first.candidateAudits
+    );
+
+  }
+);
+
+
+test(
+  "CSV row order does not change candidate codes ranks or scores",
+  () => {
+
+    const stocks = [
+      ...createLongStocks(
+        "CSV"
+      ),
+      ...createShortStocks(
+        "CSV"
+      )
+    ];
+
+    const first =
+      parseHistorical5mCsv(
+        orderedCsvDataset(
+          stocks
+        )
+      );
+
+    const second =
+      parseHistorical5mCsv(
+        orderedCsvDataset(
+          stocks,
+          true
+        )
+      );
+
+
+    assert.deepEqual(
+      second.candidateAudits,
+      first.candidateAudits
+    );
+
+  }
+);
+
+
+test(
+  "equal strategy scores use liquidity rank as deterministic tie-break",
+  () => {
+
+    const stocks =
+      createLongStocks(
+        "TIE",
+        30
+      )
+      .map(
+        (
+          stock,
+          index
+        ) => ({
+          ...stock,
+          Change: 2,
+          TradeVolume:
+            2_000_000
+            -
+            index * 1000
+        })
+      )
+      .reverse();
+
+    const candidates =
+      getCandidatesBySide(
+        stocks
+      ).long;
+
+    let foundScoreTie =
+      false;
+
+
+    for (
+      let index = 1;
+      index < candidates.length;
+      index += 1
+    ) {
+
+      const previous =
+        candidates[index - 1];
+
+      const current =
+        candidates[index];
+
+      const previousScore =
+        getStrategyScore(
+          previous,
+          "long"
+        );
+
+      const currentScore =
+        getStrategyScore(
+          current,
+          "long"
+        );
+
+
+      assert.ok(
+        previousScore >=
+          currentScore
+      );
+
+
+      if (
+        previousScore ===
+          currentScore
+      ) {
+
+        foundScoreTie =
+          true;
+
+        assert.ok(
+          previous.__liquidityRank <
+            current.__liquidityRank
+        );
+
+      }
+
+    }
+
+
+    assert.equal(
+      foundScoreTie,
+      true
+    );
+
+  }
+);
+
+
+test(
+  "equal volume liquidity ranks use Code ASC tie-break",
+  () => {
+
+    const stocks =
+      createLongStocks(
+        "EQV",
+        12
+      )
+      .map(
+        stock => ({
+          ...stock,
+          Change: 2,
+          TradeVolume:
+            1_000_000
+        })
+      )
+      .reverse();
+
+    const expectedCodes =
+      stocks.map(
+        stock =>
+          stock.Code
+      )
+      .sort()
+      .slice(
+        0,
+        10
+      );
+
+    const candidates =
+      getCandidatesBySide(
+        stocks
+      ).long;
+
+
+    assert.deepEqual(
+      candidates.map(
+        stock =>
+          stock.Code
+      ),
+      expectedCodes
+    );
+
+    assert.deepEqual(
+      candidates.map(
+        stock =>
+          stock.__liquidityRank
+      ),
+      Array.from(
+        {
+          length: 10
+        },
+        (
+          _,
+          index
+        ) =>
+          index + 1
+      )
+    );
+
+  }
+);
+
+
+test(
+  "BrokerComparableVolume takes precedence when present",
+  () => {
+
+    assert.equal(
+      getTradeVolumeShares(
+        {
+          BrokerComparableVolume: 100,
+          AdjustedTradeVolume: 200,
+          RegularTradeVolume: 300,
+          NonOddLotTradeVolume: 400,
+          TradeVolume: 500
+        }
+      ),
+      100
+    );
+
+  }
+);
+
+
+test(
+  "historical volume fallback order remains unchanged",
+  () => {
+
+    const volumeValues = [
+      101,
+      202,
+      303,
+      404,
+      505
+    ];
+
+
+    SUPPORTED_TRADE_VOLUME_FIELDS.forEach(
+      (
+        _,
+        startIndex
+      ) => {
+
+        const stock =
+          Object.fromEntries(
+            SUPPORTED_TRADE_VOLUME_FIELDS.slice(
+              startIndex
+            )
+            .map(
+              (
+                field,
+                offset
+              ) => [
+                field,
+                volumeValues[
+                  startIndex
+                  +
+                  offset
+                ]
+              ]
+            )
+          );
+
+
+        assert.equal(
+          getTradeVolumeShares(
+            stock
+          ),
+          volumeValues[startIndex]
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "CSV preserves every historical volume field and declared volumeMode",
+  () => {
+
+    const stock = {
+      ...createLongStocks(
+        "VOL",
+        1
+      )[0],
+      BrokerComparableVolume: 111,
+      AdjustedTradeVolume: 222,
+      RegularTradeVolume: 333,
+      NonOddLotTradeVolume: 444,
+      TradeVolume: 555
+    };
+
+    const dataset =
+      parseHistorical5mCsv(
+        orderedCsvDataset(
+          [
+            stock
+          ]
+        )
+      );
+
+    const importedStock =
+      dataset.dailySnapshots[0]
+      .stocks[0];
+
+
+    SUPPORTED_TRADE_VOLUME_FIELDS.forEach(
+      field => {
+
+        assert.equal(
+          importedStock[field],
+          stock[field]
+        );
+
+      }
+    );
+
+    assert.equal(
+      getTradeVolumeShares(
+        importedStock
+      ),
+      111
+    );
+
+    assert.equal(
+      dataset.metadata.volumeMode,
+      "BROKER_COMPARABLE_V4"
+    );
+
+  }
+);
+
+
+test(
+  "JSON preserves every historical volume field without recomputation",
+  () => {
+
+    const input =
+      rawHistoricalInput();
+
+    const sourceStock =
+      input.dailySnapshots[0]
+      .stocks[0];
+
+    Object.assign(
+      sourceStock,
+      {
+        BrokerComparableVolume: 611,
+        AdjustedTradeVolume: 622,
+        RegularTradeVolume: 633,
+        NonOddLotTradeVolume: 644,
+        TradeVolume: 655
+      }
+    );
+
+    const dataset =
+      new JsonHistorical5mProvider()
+      .toReplayDataset(
+        input
+      );
+
+    const importedStock =
+      dataset.dailySnapshots[0]
+      .stocks[0];
+
+
+    SUPPORTED_TRADE_VOLUME_FIELDS.forEach(
+      field => {
+
+        assert.equal(
+          importedStock[field],
+          sourceStock[field]
+        );
+
+      }
+    );
+
+    assert.equal(
+      getTradeVolumeShares(
+        importedStock
+      ),
+      611
+    );
+
+  }
+);
+
+
+test(
+  "CSV missing Snapshot fields stay missing instead of becoming zero",
+  () => {
+
+    const stock =
+      createLongStocks(
+        "MISS",
+        1
+      )[0];
+
+    delete stock.HighestPrice;
+
+
+    assertValidationError(
+      () =>
+        parseHistorical5mCsv(
+          orderedCsvDataset(
+            [
+              stock
+            ]
+          )
+        ),
+      "MISSING_SNAPSHOT_FIELD"
+    );
+
+  }
+);
+
+
+test(
+  "validated metadata declares schema determinism and safe volume fallback",
+  () => {
+
+    const undeclared =
+      buildHistoricalReplayDataset(
+        rawHistoricalInput()
+      );
+
+    const declaredInput =
+      rawHistoricalInput();
+
+    declaredInput.metadata.volumeMode =
+      "ADJUSTED_TRADE_VOLUME";
+
+    const declared =
+      buildHistoricalReplayDataset(
+        declaredInput
+      );
+
+
+    assert.equal(
+      undeclared.metadata.validationStatus,
+      "VALIDATED"
+    );
+
+    assert.equal(
+      undeclared.metadata.snapshotSchemaValidated,
+      true
+    );
+
+    assert.equal(
+      undeclared.metadata.candidateSelectionDeterministic,
+      true
+    );
+
+    assert.equal(
+      undeclared.metadata.volumeMode,
+      HISTORICAL_VOLUME_MODE_UNDECLARED
+    );
+
+    assert.equal(
+      declared.metadata.volumeMode,
+      "ADJUSTED_TRADE_VOLUME"
     );
 
   }
