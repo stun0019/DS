@@ -278,11 +278,32 @@ export async function loadStockData() {
           updatedAt:
             json.updatedAt || "",
 
+          candidateDataUpdatedAt:
+            json.candidateDataUpdatedAt || "",
+
+          priceDataUpdatedAt:
+            json.priceDataUpdatedAt || "",
+
+          candidateDataSyncedAt:
+            json.candidateDataSyncedAt || "",
+
           volumeMode:
             json.volumeMode || "",
 
           syncStatus:
             json.syncStatus || "",
+
+          marketTradeDates:
+            json.marketTradeDates || {},
+
+          validForTradingDate:
+            json.validForTradingDate || "",
+
+          candidateForTradingDate:
+            json.candidateForTradingDate || "",
+
+          nextTradingDate:
+            json.nextTradingDate || "",
 
           marketCounts:
             json.marketCounts || {},

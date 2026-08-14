@@ -110,6 +110,14 @@ function summarizeTrades(
       )
     );
 
+  const totalSlippageCost =
+    sum(
+      trades.map(
+        trade =>
+          trade.slippageCost
+      )
+    );
+
   const grossProfit =
     sum(
       wins.map(
@@ -168,6 +176,7 @@ function summarizeTrades(
 
         : 0,
     totalR,
+    totalSlippageCost,
     averageR:
       trades.length > 0
 

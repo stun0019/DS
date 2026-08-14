@@ -14,6 +14,8 @@
 6. Direction Confirmation 通過後才執行 Risk Check；有設定風險上限且 `maxLots = 0` 時進入可恢復的 `RISK_BLOCKED`，風險降低後仍須重新確認方向，禁止把「靠近 Stop」當成進場訊號。
 7. Replay／Backtest 共用正式 Signal、Structure、Risk 與交易成本邏輯，逐根計算 Entry、Exit、P&L、R、每日／區間與標的績效。
 
+Live 啟動前會以 `stocks.json` 的 `tradeDateISO`、`syncStatus` 與 `validForTradingDate` 驗證候選資料。盤前同步流程會查詢 TWSE 官方開休市日曆，只有官方確認的交易日才會寫入 `validForTradingDate`，不得用日曆日減一或僅憑更新時間推算；缺少可驗證資訊時會進入 `DATA_STALE`，禁止形成正式交易訊號。
+
 ## 本機執行
 
 此專案使用瀏覽器原生 ES Modules，請透過 HTTP server 開啟：
@@ -63,7 +65,7 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 
 ## Replay／Backtest 資料
 
-從側邊選單進入「Replay 回測」後可載入 JSON，或在瀏覽器 Console 呼叫 `stockDaybydayReplay.run(dataset, options)`。資料結構：
+從側邊選單進入「Replay 回測」後可載入 JSON／CSV，或在瀏覽器 Console 呼叫 `stockDaybydayReplay.run(dataset, options)`。Replay Dataset 統一由 `Historical5mProvider` 轉換，引擎本身不綁定資料來源。資料結構：
 
 ```js
 {
@@ -94,7 +96,9 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 }
 ```
 
-Replay 會驗證 K 棒時間嚴格遞增且間隔不少於 5 分鐘，每一步只送入當前 K 棒；`previousTradingDate` 對應的快照必須早於回測日。出場目標可選 TP1 或 TP2；若同一根 K 同時碰到 Stop 與目標，採保守原則先判定 Stop。
+Replay 會驗證 K 棒時間嚴格遞增且間隔不少於 5 分鐘，每一步只送入當前 K 棒；`previousTradingDate` 對應的快照必須早於回測日。出場目標可選 TP1 或 TP2；若同一根 K 同時碰到 Stop 與目標，採保守原則先判定 Stop。滑價可選 0、1、2 Tick，買賣成交價一律透過台股 Tick Engine 往不利方向調整，P&L、R 與績效都使用 Filled Price。
+
+JSON 可在 `metadata.sourceType` 明確填入 `REAL_HISTORICAL_DATA`；未標記資料一律顯示 `SAMPLE / MOCK`。CSV 每列代表一根 5 分 K，需提供 `sessionDate`、`previousTradingDate`、股票盤後 OHLC／成交量／當沖資格、`timestamp`、`timeframeMinutes`、`isComplete` 與盤中 OHLCV。只有 CSV 的 `sourceType` 明確且一致為 `REAL_HISTORICAL_DATA` 時，UI 才會顯示 `REAL HISTORICAL DATA`。
 
 ## 重要限制
 

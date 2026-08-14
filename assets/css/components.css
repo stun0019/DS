@@ -894,6 +894,32 @@
 }
 
 
+.system-pill.data-fresh {
+  border:
+    1px solid
+    rgba(59, 211, 154, 0.25);
+
+  background:
+    rgba(59, 211, 154, 0.08);
+
+  color:
+    #80dfbc;
+}
+
+
+.system-pill.data-stale {
+  border:
+    1px solid
+    rgba(255, 98, 98, 0.38);
+
+  background:
+    rgba(255, 98, 98, 0.12);
+
+  color:
+    #ff9d9d;
+}
+
+
 .execution-metric {
   display: flex;
 
@@ -1122,6 +1148,12 @@
 
 
 .live-status-invalidated {
+  color:
+    var(--long);
+}
+
+
+.live-status-data_stale {
   color:
     var(--long);
 }

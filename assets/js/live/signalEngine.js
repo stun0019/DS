@@ -388,6 +388,43 @@ function invalidatedResult(
 }
 
 
+function dataStaleResult(
+  plan,
+  freshness
+) {
+
+  return {
+    status:
+      LIVE_STATUS.DATA_STALE,
+    observationPrice:
+      plan?.observationPrice
+      ??
+      null,
+    distanceTicks:
+      null,
+    candles: [],
+    triggeredAt: null,
+    triggerPrice: null,
+    pullbackAt: null,
+    swing: null,
+    directionConfirmedAt: null,
+    directionConfirmation: null,
+    entryReadyAt: null,
+    riskBlockedAt: null,
+    blockReason:
+      freshness?.reason
+      ??
+      "候選資料過期",
+    entry: null,
+    stop: null,
+    riskPlan: null,
+    candidateDataFreshness:
+      freshness
+  };
+
+}
+
+
 function activeSignalResult(
   stock,
   side,
@@ -764,7 +801,9 @@ export function evaluateLiveSignal(
   {
     previousState = null,
     maxRiskAmount =
-      LIVE_CONFIG.maxRiskAmount
+      LIVE_CONFIG.maxRiskAmount,
+    candidateDataFreshness =
+      null
   } = {}
 ) {
 
@@ -781,6 +820,21 @@ export function evaluateLiveSignal(
       ||
       0
     );
+
+
+  if (
+    candidateDataFreshness
+    &&
+    candidateDataFreshness.isFresh !==
+      true
+  ) {
+
+    return dataStaleResult(
+      plan,
+      candidateDataFreshness
+    );
+
+  }
 
 
   if (
@@ -994,6 +1048,10 @@ export function applyLiveQuoteToState(
     {
       ...result,
       quote,
+      candidateDataFreshness:
+        options.candidateDataFreshness
+        ??
+        null,
       sessionDate,
       lastQuoteTimestamp:
         incomingQuoteTime.timestamp

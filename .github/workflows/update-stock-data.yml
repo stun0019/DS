@@ -57,6 +57,7 @@ jobs:
 
           TWSE_MARKET_API = TWSE_OPENAPI + "/exchangeReport/STOCK_DAY_ALL"
           TWSE_COMPANY_API = TWSE_OPENAPI + "/opendata/t187ap03_L"
+          TWSE_HOLIDAY_API = TWSE_OPENAPI + "/holidaySchedule/holidaySchedule"
 
           # TPEx 主成交量來源：券商 K 線比較基礎
           TPEX_MARKET_API = TPEX_OPENAPI + "/tpex_mainboard_quotes"
@@ -312,6 +313,55 @@ jobs:
 
               return []
 
+          def is_twse_trading_date(session_iso, holiday_payload):
+              session_date = datetime.strptime(session_iso, "%Y-%m-%d").date()
+
+              if session_date.weekday() >= 5:
+                  print("TWSE calendar: weekend, market closed")
+                  return False
+
+              session_roc = normalize_trade_date(session_iso)
+              calendar_dates = [
+                  normalize_trade_date(row.get("Date"))
+                  for row in unwrap_records(holiday_payload)
+                  if isinstance(row, dict)
+              ]
+
+              if not any(
+                  date.startswith(session_roc[:3])
+                  for date in calendar_dates
+              ):
+                  print("TWSE calendar: current year is unavailable")
+                  return False
+
+              calendar_rows = [
+                  row
+                  for row in unwrap_records(holiday_payload)
+                  if isinstance(row, dict)
+                  and normalize_trade_date(row.get("Date")) == session_roc
+              ]
+
+              if not calendar_rows:
+                  print("TWSE calendar: regular trading weekday")
+                  return True
+
+              calendar_text = " ".join(
+                  clean_text(row.get("Name"))
+                  + " "
+                  + clean_text(row.get("Description"))
+                  for row in calendar_rows
+              )
+
+              if any(
+                  marker in calendar_text
+                  for marker in ("開始交易", "最後交易")
+              ):
+                  print("TWSE calendar: confirmed special trading day")
+                  return True
+
+              print("TWSE calendar: market closed -", calendar_text)
+              return False
+
           def extract_row_date(row):
               if not isinstance(row, dict):
                   return ""
@@ -356,6 +406,9 @@ jobs:
                   return {
                       "tradeDate": payload.get("tradeDate", ""),
                       "updatedAt": payload.get("updatedAt", ""),
+                      "validForTradingDate": payload.get(
+                          "validForTradingDate", ""
+                      ),
                       "volumeMode": payload.get("volumeMode", ""),
                   }
               except Exception as error:
@@ -509,6 +562,7 @@ jobs:
 
           twse_market_data = fetch_json(TWSE_MARKET_API)
           tpex_market_payload = fetch_json(TPEX_MARKET_API)
+          twse_holiday_payload = fetch_json(TWSE_HOLIDAY_API, required=True)
 
           # fixed 是 TPEx BrokerComparableVolume 的必要組成，
           # 因此提前抓取並把它當成 TPEx 日期的重要同步訊號。
@@ -519,6 +573,9 @@ jobs:
 
           if not isinstance(twse_market_data, list) or len(twse_market_data) < 500:
               raise RuntimeError("TWSE market data too small")
+
+          if not isinstance(twse_holiday_payload, list):
+              raise RuntimeError("TWSE holiday schedule has an invalid format")
 
           tpex_market_data = unwrap_records(tpex_market_payload)
           if len(tpex_market_data) < 500:
@@ -603,11 +660,51 @@ jobs:
           print("Synchronized trade date:", trade_date)
           print("Gregorian date:", gregorian_date)
 
+          taipei_now = datetime.now(ZoneInfo("Asia/Taipei"))
+          today_iso = taipei_now.strftime("%Y-%m-%d")
+          is_live_trading_date = is_twse_trading_date(
+              today_iso,
+              twse_holiday_payload,
+          )
+          candidate_session_date = (
+              today_iso
+              if is_live_trading_date and roc_to_iso(trade_date) < today_iso
+              else ""
+          )
+
           # 同一天且已經是 V4，就不重新寫 updatedAt，也不製造多餘 commit。
           if (
               existing_meta.get("tradeDate") == trade_date
               and existing_meta.get("volumeMode") == VOLUME_MODE
           ):
+              if (
+                  existing_meta.get("validForTradingDate")
+                  != candidate_session_date
+              ):
+                  with open("stocks.json", encoding="utf-8") as file:
+                      existing_payload = json.load(file)
+
+                  existing_payload["validForTradingDate"] = (
+                      candidate_session_date
+                  )
+                  if candidate_session_date:
+                      existing_payload["candidateDataUpdatedAt"] = (
+                          taipei_now.strftime("%Y-%m-%d %H:%M:%S")
+                      )
+
+                  with open("stocks.json", "w", encoding="utf-8") as file:
+                      json.dump(
+                          existing_payload,
+                          file,
+                          ensure_ascii=False,
+                          indent=2,
+                      )
+
+                  print(
+                      "Candidate data applicability:",
+                      candidate_session_date or "DATA_STALE",
+                  )
+
               print("")
               print("==============================")
               print("SKIP UPDATE - ALREADY CURRENT")
@@ -1063,8 +1160,6 @@ jobs:
           # 11. Output
           # ==================================================
 
-          taipei_now = datetime.now(ZoneInfo("Asia/Taipei"))
-
           output = {
               # 真正行情交易日期，不使用 Actions 執行日期冒充
               "tradeDate": trade_date,
@@ -1072,6 +1167,12 @@ jobs:
 
               # stocks.json 真正產生時間（台灣時間）
               "updatedAt": taipei_now.strftime("%Y-%m-%d %H:%M:%S"),
+              "candidateDataUpdatedAt": (
+                  taipei_now.strftime("%Y-%m-%d %H:%M:%S")
+                  if candidate_session_date
+                  else ""
+              ),
+              "validForTradingDate": candidate_session_date,
 
               # 兩市場日期同步狀態
               "marketTradeDates": {

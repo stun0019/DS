@@ -26,6 +26,12 @@ import {
   buildPerformanceReport
 } from "./performance.js";
 
+import {
+  applyReplaySlippage,
+  calculateSlippageCost,
+  normalizeSlippageTicks
+} from "./slippage.js";
+
 
 function asNumber(
   value
@@ -344,6 +350,9 @@ function baseLog(
         : null,
     entry:
       nextState.entry,
+    slippageTicks: 0,
+    rawEntry: null,
+    filledEntry: null,
     stop:
       nextState.stop,
     tp1:
@@ -376,8 +385,11 @@ function baseLog(
       ??
       null,
     exitTime: null,
+    rawExit: null,
+    filledExit: null,
     exitPrice: null,
     exitReason: null,
+    slippageCost: null,
     result: null,
     pnl: null,
     rMultiple: null
@@ -390,7 +402,8 @@ function createOpenTrade(
   stock,
   side,
   state,
-  bar
+  bar,
+  slippageTicks
 ) {
 
   const riskPlan =
@@ -403,6 +416,61 @@ function createOpenTrade(
       ? 1
 
       : riskPlan.maxLots;
+
+
+  const rawEntry =
+    state.entry;
+
+
+  const filledEntry =
+    applyReplaySlippage(
+      {
+        price:
+          rawEntry,
+        side,
+        leg:
+          "entry",
+        slippageTicks
+      }
+    );
+
+
+  const filledStop =
+    applyReplaySlippage(
+      {
+        price:
+          state.stop,
+        side,
+        leg:
+          "exit",
+        slippageTicks
+      }
+    );
+
+
+  const filledStopOutcome =
+    calculateDayTradeCosts(
+      {
+        entry:
+          filledEntry,
+        exit:
+          filledStop,
+        side,
+        shares:
+          riskPlan.lotSize
+      }
+    );
+
+
+  const filledRiskPerLot =
+    filledStopOutcome
+
+      ? Math.max(
+          0,
+          -filledStopOutcome.netPnlAfterRebate
+        )
+
+      : riskPlan.riskPerLot;
 
 
   return {
@@ -432,7 +500,10 @@ function createOpenTrade(
       ??
       bar.timestamp,
     entry:
-      state.entry,
+      filledEntry,
+    slippageTicks,
+    rawEntry,
+    filledEntry,
     stop:
       state.stop,
     tp1:
@@ -446,12 +517,14 @@ function createOpenTrade(
       *
       riskPlan.lotSize,
     initialRisk:
-      riskPlan.riskPerLot
+      filledRiskPerLot
       *
       lots,
     cashRiskPerLot:
       riskPlan.cashRiskPerLot,
     riskPerLot:
+      filledRiskPerLot,
+    rawRiskPerLot:
       riskPlan.riskPerLot
   };
 
@@ -593,13 +666,32 @@ function closeTrade(
   exit
 ) {
 
+  const rawExit =
+    exit.price;
+
+
+  const filledExit =
+    applyReplaySlippage(
+      {
+        price:
+          rawExit,
+        side:
+          trade.side,
+        leg:
+          "exit",
+        slippageTicks:
+          trade.slippageTicks
+      }
+    );
+
+
   const costs =
     calculateDayTradeCosts(
       {
         entry:
-          trade.entry,
+          trade.filledEntry,
         exit:
-          exit.price,
+          filledExit,
         side:
           trade.side,
         shares:
@@ -617,8 +709,10 @@ function closeTrade(
     ...trade,
     exitTime:
       bar.timestamp,
+    rawExit,
+    filledExit,
     exitPrice:
-      exit.price,
+      filledExit,
     exitReason:
       exit.reason,
     grossPnl:
@@ -645,6 +739,21 @@ function closeTrade(
       costs?.transactionTax
       ??
       0,
+    slippageCost:
+      calculateSlippageCost(
+        {
+          side:
+            trade.side,
+          rawEntry:
+            trade.rawEntry,
+          filledEntry:
+            trade.filledEntry,
+          rawExit,
+          filledExit,
+          shares:
+            trade.shares
+        }
+      ),
     netPnl,
     rMultiple:
       trade.initialRisk > 0
@@ -691,7 +800,9 @@ export function replayCandidate(
     maxRiskAmount =
       null,
     exitTarget =
-      "tp1"
+      "tp1",
+    slippageTicks =
+      0
   }
 ) {
 
@@ -700,6 +811,12 @@ export function replayCandidate(
       stock?.Code
       ??
       ""
+    );
+
+
+  const normalizedSlippageTicks =
+    normalizeSlippageTicks(
+      slippageTicks
     );
 
 
@@ -867,6 +984,10 @@ export function replayCandidate(
                 "EXIT",
               exitTime:
                 closedTrade.exitTime,
+              rawExit:
+                closedTrade.rawExit,
+              filledExit:
+                closedTrade.filledExit,
               exitPrice:
                 closedTrade.exitPrice,
               exitReason:
@@ -877,6 +998,14 @@ export function replayCandidate(
                 closedTrade.netPnl,
               rMultiple:
                 closedTrade.rMultiple,
+              slippageTicks:
+                closedTrade.slippageTicks,
+              rawEntry:
+                closedTrade.rawEntry,
+              filledEntry:
+                closedTrade.filledEntry,
+              slippageCost:
+                closedTrade.slippageCost,
               triggerReason:
                 `出場：${closedTrade.exitReason}`
             }
@@ -904,7 +1033,8 @@ export function replayCandidate(
             stock,
             side,
             nextState,
-            bar
+            bar,
+            normalizedSlippageTicks
           );
 
         hasEntered =
@@ -915,6 +1045,14 @@ export function replayCandidate(
             ...stateLog,
             eventType:
               "ENTRY",
+            slippageTicks:
+              openTrade.slippageTicks,
+            rawEntry:
+              openTrade.rawEntry,
+            filledEntry:
+              openTrade.filledEntry,
+            entry:
+              openTrade.filledEntry,
             triggerReason:
               "Direction Confirmation + Risk Pass，建立模擬部位"
           }
@@ -978,6 +1116,10 @@ export function replayCandidate(
         ),
         exitTime:
           closedTrade.exitTime,
+        rawExit:
+          closedTrade.rawExit,
+        filledExit:
+          closedTrade.filledExit,
         exitPrice:
           closedTrade.exitPrice,
         exitReason:
@@ -988,6 +1130,14 @@ export function replayCandidate(
           closedTrade.netPnl,
         rMultiple:
           closedTrade.rMultiple,
+        slippageTicks:
+          closedTrade.slippageTicks,
+        rawEntry:
+          closedTrade.rawEntry,
+        filledEntry:
+          closedTrade.filledEntry,
+        slippageCost:
+          closedTrade.slippageCost,
         triggerReason:
           "收盤結束 Replay 部位"
       }
@@ -1139,9 +1289,16 @@ export function runBacktest(
     maxRiskAmount =
       null,
     exitTarget =
-      "tp1"
+      "tp1",
+    slippageTicks =
+      0
   } = {}
 ) {
+
+  const normalizedSlippageTicks =
+    normalizeSlippageTicks(
+      slippageTicks
+    );
 
   const snapshots =
     Array.isArray(
@@ -1281,7 +1438,11 @@ export function runBacktest(
                 exitTarget:
                   session.exitTarget
                   ??
-                  exitTarget
+                  exitTarget,
+                slippageTicks:
+                  session.slippageTicks
+                  ??
+                  normalizedSlippageTicks
               }
             )
         );
@@ -1308,6 +1469,10 @@ export function runBacktest(
             session.date,
           previousTradingDate:
             snapshot.date,
+          slippageTicks:
+            session.slippageTicks
+            ??
+            normalizedSlippageTicks,
           candidateCount:
             candidates.length,
           candidates:
@@ -1333,6 +1498,10 @@ export function runBacktest(
 
 
   return {
+    settings: {
+      slippageTicks:
+        normalizedSlippageTicks
+    },
     range: {
       from:
         from

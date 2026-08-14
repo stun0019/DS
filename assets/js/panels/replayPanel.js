@@ -5,6 +5,13 @@ import {
   formatSignedNumber
 } from "../utils/format.js";
 
+import {
+  HISTORICAL_SOURCE_TYPE,
+  JsonHistorical5mProvider,
+  getHistoricalSourceLabel,
+  importHistorical5mFile
+} from "../replay/historical5mProvider.js";
+
 
 function formatPercentValue(
   value
@@ -93,8 +100,50 @@ function metric(
 }
 
 
+function renderSourceBadge(
+  replayState
+) {
+
+  if (
+    !replayState.dataset
+  ) {
+
+    return "";
+
+  }
+
+
+  const sourceType =
+    replayState.dataset.metadata?.sourceType
+    ??
+    HISTORICAL_SOURCE_TYPE.SAMPLE_MOCK;
+
+
+  const className =
+    sourceType ===
+      HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA
+
+      ? "real"
+
+      : "sample";
+
+
+  return `
+    <span class="replay-source-badge ${className}">
+      ${escapeHtml(
+        getHistoricalSourceLabel(
+          sourceType
+        )
+      )}
+    </span>
+  `;
+
+}
+
+
 function renderSummary(
-  summary
+  summary,
+  settings = {}
 ) {
 
   return `
@@ -116,6 +165,8 @@ function renderSummary(
         ${metric("勝 / 敗", `${summary.wins} / ${summary.losses}`)}
         ${metric("勝率", formatPercentValue(summary.winRate))}
         ${metric("總 P&L", formatCurrency(summary.totalPnl), summary.totalPnl >= 0 ? "positive" : "negative")}
+        ${metric("滑價設定", `${settings.slippageTicks ?? 0} Tick`)}
+        ${metric("滑價成本", formatCurrency(summary.totalSlippageCost), summary.totalSlippageCost > 0 ? "warning" : "")}
         ${metric("平均 P&L", formatCurrency(summary.averagePnl), summary.averagePnl >= 0 ? "positive" : "negative")}
         ${metric("總 R", formatR(summary.totalR), summary.totalR >= 0 ? "positive" : "negative")}
         ${metric("平均 R", formatR(summary.averageR), summary.averageR >= 0 ? "positive" : "negative")}
@@ -147,6 +198,7 @@ function renderDailyTable(
           <td>${formatPercentValue(day.winRate)}</td>
           <td class="${day.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(day.totalPnl)}</td>
           <td>${formatR(day.totalR)}</td>
+          <td>${formatCurrency(day.totalSlippageCost)}</td>
           <td>${formatCurrency(day.maxDrawdown)}</td>
         </tr>
       `
@@ -172,6 +224,7 @@ function renderDailyTable(
               <th>勝率</th>
               <th>P&L</th>
               <th>R</th>
+              <th>滑價成本</th>
               <th>最大回撤</th>
             </tr>
           </thead>
@@ -183,6 +236,7 @@ function renderDailyTable(
               <td>${formatPercentValue(summary.winRate)}</td>
               <td class="${summary.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(summary.totalPnl)}</td>
               <td>${formatR(summary.totalR)}</td>
+              <td>${formatCurrency(summary.totalSlippageCost)}</td>
               <td>${formatCurrency(summary.maxDrawdown)}</td>
             </tr>
           </tbody>
@@ -207,11 +261,13 @@ function renderTrades(
           <td><span class="replay-side ${trade.side}">${trade.side.toUpperCase()}</span></td>
           <td>${formatPrice(trade.observation)}</td>
           <td>${formatTime(trade.breakoutTime)}</td>
-          <td>${formatTime(trade.entryTime)}<small>${formatPrice(trade.entry)}</small></td>
+          <td>${formatTime(trade.entryTime)}<small>Raw ${formatPrice(trade.rawEntry)} / Filled ${formatPrice(trade.filledEntry)}</small></td>
           <td>${formatPrice(trade.stop)}</td>
           <td>${formatPrice(trade.tp1)} / ${formatPrice(trade.tp2)}</td>
-          <td>${formatTime(trade.exitTime)}<small>${formatPrice(trade.exitPrice)}</small></td>
+          <td>${formatTime(trade.exitTime)}<small>Raw ${formatPrice(trade.rawExit)} / Filled ${formatPrice(trade.filledExit)}</small></td>
           <td>${escapeHtml(trade.exitReason)}</td>
+          <td>${trade.slippageTicks}</td>
+          <td>${formatCurrency(trade.slippageCost)}</td>
           <td>${trade.maxLots}</td>
           <td>${formatCurrency(trade.grossPnl)}</td>
           <td>${formatCurrency(trade.tradingCost)}</td>
@@ -242,8 +298,8 @@ function renderTrades(
                 <thead>
                   <tr>
                     <th>日期</th><th>股票</th><th>方向</th><th>Observation</th>
-                    <th>Breakout</th><th>Entry</th><th>Stop</th><th>TP1 / TP2</th>
-                    <th>Exit</th><th>原因</th><th>張數</th><th>毛損益</th>
+                    <th>Breakout</th><th>Entry Raw / Filled</th><th>Stop</th><th>TP1 / TP2</th>
+                    <th>Exit Raw / Filled</th><th>原因</th><th>滑價 Tick</th><th>滑價成本</th><th>張數</th><th>毛損益</th>
                     <th>交易成本</th><th>月退</th><th>證交稅</th><th>淨 P&L</th><th>R</th>
                   </tr>
                 </thead>
@@ -390,7 +446,7 @@ function renderEmptyState() {
   return `
     <section class="replay-empty-state">
       <span class="replay-empty-icon">5m</span>
-      <h2>載入 Replay JSON 開始回測</h2>
+      <h2>載入 Historical 5m JSON / CSV 開始回測</h2>
       <p>資料必須包含 dailySnapshots 與 sessions；每根盤中 K 棒需提供 timestamp、timeframeMinutes: 5、isComplete 與 OHLC。</p>
       <p>引擎會逐根送入同一套 Signal / Structure / Risk 邏輯，不會一次讀取整天資料，也不會使用當日或未來盤後資料。</p>
     </section>
@@ -417,11 +473,12 @@ export function renderReplayPanel(
       <section class="replay-toolbar">
         <div class="replay-upload-group">
           <label class="replay-upload-button">
-            載入 Replay JSON
-            <input type="file" accept="application/json,.json" data-role="replay-file">
+            載入 Historical 5m
+            <input type="file" accept="application/json,text/csv,.json,.csv" data-role="replay-file">
           </label>
           <button type="button" class="replay-sample-button" data-role="replay-sample">載入模擬範例</button>
           <span>${escapeHtml(replayState.fileName || "尚未載入資料")}</span>
+          ${renderSourceBadge(replayState)}
         </div>
 
         <div class="replay-range-controls" aria-label="回測日期區間">
@@ -435,6 +492,11 @@ export function renderReplayPanel(
             <option value="tp1" ${replayState.exitTarget === "tp1" ? "selected" : ""}>TP1 全數出場</option>
             <option value="tp2" ${replayState.exitTarget === "tp2" ? "selected" : ""}>TP2 全數出場</option>
           </select>
+          <select data-role="replay-slippage" aria-label="Replay 滑價 Tick">
+            <option value="0" ${replayState.slippageTicks === 0 ? "selected" : ""}>0 Tick 滑價</option>
+            <option value="1" ${replayState.slippageTicks === 1 ? "selected" : ""}>1 Tick 滑價</option>
+            <option value="2" ${replayState.slippageTicks === 2 ? "selected" : ""}>2 Tick 滑價</option>
+          </select>
           <button type="button" class="replay-run-button" data-role="replay-run">重新計算</button>
         </div>
       </section>
@@ -446,7 +508,7 @@ export function renderReplayPanel(
 
       ${report
         ? `
-            ${renderSummary(report.summary)}
+            ${renderSummary(report.summary, report.settings)}
             ${renderDailyTable(report.daily, report.summary)}
             ${renderTrades(report.trades)}
             ${renderInstruments(report.instruments)}
@@ -483,8 +545,8 @@ export function renderReplayPanel(
 
       try {
         const dataset =
-          JSON.parse(
-            await file.text()
+          await importHistorical5mFile(
+            file
           );
 
 
@@ -537,7 +599,10 @@ export function renderReplayPanel(
 
 
         onLoadDataset(
-          await response.json(),
+          new JsonHistorical5mProvider()
+          .toReplayDataset(
+            await response.text()
+          ),
           "replay-sample.json"
         );
       }
@@ -599,7 +664,13 @@ export function renderReplayPanel(
           exitTarget:
             root.querySelector(
               '[data-role="replay-target"]'
-            ).value
+            ).value,
+          slippageTicks:
+            Number(
+              root.querySelector(
+                '[data-role="replay-slippage"]'
+              ).value
+            )
         }
       );
     }

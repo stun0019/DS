@@ -60,6 +60,7 @@ export function renderExecutionBar(
   {
     stocks = [],
     metadata = {},
+    candidateDataFreshness = null,
     riskSettings = {},
     onRiskChange = () => {}
   } = {}
@@ -110,6 +111,24 @@ export function renderExecutionBar(
           )}
           折月退
         </span>
+
+        ${candidateDataFreshness?.status === "DATA_STALE"
+          ? `
+              <span
+                class="system-pill data-stale"
+                title="${escapeHtml(candidateDataFreshness.reason || "候選資料過期")}"
+              >
+                候選資料過期
+              </span>
+            `
+          : candidateDataFreshness?.status === "FRESH"
+            ? `
+                <span class="system-pill data-fresh">
+                  候選資料已確認
+                </span>
+              `
+            : ""
+        }
       </div>
 
 

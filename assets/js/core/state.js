@@ -9,6 +9,9 @@ export const state = {
 
   pageReadAt: "",
 
+  candidateDataFreshness:
+    null,
+
   currentView: "long",
 
   currentItems: [],
@@ -25,7 +28,8 @@ export const state = {
     mode: "week",
     from: "",
     to: "",
-    exitTarget: "tp1"
+    exitTarget: "tp1",
+    slippageTicks: 0
   },
 
   sortState: {
@@ -96,6 +100,18 @@ export function setMaxRiskAmount(
 }
 
 
+export function setCandidateDataFreshness(
+  freshness
+) {
+
+  state.candidateDataFreshness =
+    freshness
+    ??
+    null;
+
+}
+
+
 export function setReplayDataset(
   dataset,
   fileName =
@@ -134,7 +150,8 @@ export function setReplayRange(
     mode,
     from,
     to,
-    exitTarget
+    exitTarget,
+    slippageTicks
   }
 ) {
 
@@ -157,6 +174,19 @@ export function setReplayRange(
     exitTarget
     ??
     state.replay.exitTarget;
+
+  state.replay.slippageTicks =
+    slippageTicks ===
+      undefined
+    ||
+    slippageTicks ===
+      null
+
+      ? state.replay.slippageTicks
+
+      : Number(
+          slippageTicks
+        );
 
 }
 

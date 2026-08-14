@@ -2,6 +2,8 @@
   "tradeDate": "1150813",
   "tradeDateISO": "2026-08-13",
   "updatedAt": "2026-08-14 08:15:22",
+  "candidateDataUpdatedAt": "2026-08-14 08:15:22",
+  "validForTradingDate": "2026-08-14",
   "marketTradeDates": {
     "TWSE": "1150813",
     "TPEX": "1150813"

@@ -21,6 +21,9 @@ export const LIVE_STATUS = {
   RISK_BLOCKED:
     "RISK_BLOCKED",
 
+  DATA_STALE:
+    "DATA_STALE",
+
   INVALIDATED:
     "INVALIDATED"
 
@@ -278,6 +281,11 @@ export function getLiveStatusLabel(
     case LIVE_STATUS.RISK_BLOCKED:
 
       return "風險超標";
+
+
+    case LIVE_STATUS.DATA_STALE:
+
+      return "候選資料過期";
 
 
     case LIVE_STATUS.INVALIDATED:

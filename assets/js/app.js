@@ -10,6 +10,7 @@ import {
   setStocks,
   setCurrentItems,
   setMaxRiskAmount,
+  setCandidateDataFreshness,
   setReplayDataset,
   setReplayRange,
   setReplayReport
@@ -81,8 +82,13 @@ import {
 } from "./live/candidateIndex.js";
 
 import {
-  applyLiveQuoteToState
+  applyLiveQuoteToState,
+  getTradingSessionDate
 } from "./live/signalEngine.js";
+
+import {
+  evaluateCandidateDataFreshness
+} from "./live/candidateDataFreshness.js";
 
 import {
   resetLiveStates
@@ -91,6 +97,10 @@ import {
 import {
   runBacktest
 } from "./replay/replayEngine.js";
+
+import {
+  normalizeReplayDataset
+} from "./replay/historical5mProvider.js";
 
 
 const panelRoot =
@@ -367,7 +377,9 @@ function rerunReplay(
     to =
       state.replay.to,
     exitTarget =
-      state.replay.exitTarget
+      state.replay.exitTarget,
+    slippageTicks =
+      state.replay.slippageTicks
   } = {}
 ) {
 
@@ -400,7 +412,8 @@ function rerunReplay(
         range.from,
       to:
         range.to,
-      exitTarget
+      exitTarget,
+      slippageTicks
     }
   );
 
@@ -420,7 +433,8 @@ function rerunReplay(
             null,
           maxRiskAmount:
             state.riskSettings.maxRiskAmount,
-          exitTarget
+          exitTarget,
+          slippageTicks
         }
       );
 
@@ -485,8 +499,47 @@ function handleReplayDataset(
   }
 
 
+  let normalizedDataset;
+
+
+  try {
+
+    normalizedDataset =
+      normalizeReplayDataset(
+        dataset,
+        {
+          adapter:
+            dataset.metadata?.adapter
+            ??
+            "UI_IMPORT"
+        }
+      );
+
+  }
+
+  catch (
+    error
+  ) {
+
+    setReplayDataset(
+      null,
+      fileName
+    );
+
+    setReplayReport(
+      null,
+      error.message
+    );
+
+    renderCurrentView();
+
+    return;
+
+  }
+
+
   setReplayDataset(
-    dataset,
+    normalizedDataset,
     fileName
   );
 
@@ -660,6 +713,27 @@ function handleRiskChange(
 }
 
 
+function renderExecutionControls() {
+
+  renderExecutionBar(
+    executionRoot,
+    {
+      stocks:
+        state.stocks,
+      metadata:
+        state.metadata,
+      candidateDataFreshness:
+        state.candidateDataFreshness,
+      riskSettings:
+        state.riskSettings,
+      onRiskChange:
+        handleRiskChange
+    }
+  );
+
+}
+
+
 function renderCurrentView(
   {
     renderShell = true
@@ -672,19 +746,7 @@ function renderCurrentView(
     updateViewHeader();
 
 
-    renderExecutionBar(
-      executionRoot,
-      {
-        stocks:
-          state.stocks,
-        metadata:
-          state.metadata,
-        riskSettings:
-          state.riskSettings,
-        onRiskChange:
-          handleRiskChange
-      }
-    );
+    renderExecutionControls();
   }
 
 
@@ -844,6 +906,40 @@ function handleLiveQuote(
   }
 
 
+  const candidateDataFreshness =
+    evaluateCandidateDataFreshness(
+      state.metadata,
+      getTradingSessionDate(
+        quote.timestamp
+      )
+    );
+
+
+  const freshnessChanged =
+    candidateDataFreshness.status !==
+      state.candidateDataFreshness?.status
+    ||
+    candidateDataFreshness.reason !==
+      state.candidateDataFreshness?.reason
+    ||
+    candidateDataFreshness.liveSessionDate !==
+      state.candidateDataFreshness?.liveSessionDate;
+
+
+  setCandidateDataFreshness(
+    candidateDataFreshness
+  );
+
+
+  if (
+    freshnessChanged
+  ) {
+
+    renderExecutionControls();
+
+  }
+
+
   candidateSides.forEach(
     side => {
 
@@ -853,7 +949,8 @@ function handleLiveQuote(
         quote,
         {
           maxRiskAmount:
-            state.riskSettings.maxRiskAmount
+            state.riskSettings.maxRiskAmount,
+          candidateDataFreshness
         }
       );
 
@@ -943,7 +1040,13 @@ function initializeReplayApi() {
 
 
       setReplayDataset(
-        dataset,
+        normalizeReplayDataset(
+          dataset,
+          {
+            adapter:
+              "PROGRAMMATIC_IMPORT"
+          }
+        ),
         options.name
         ||
         "程式載入"
@@ -1119,6 +1222,16 @@ async function refreshData() {
       result.stocks,
       result.metadata,
       result.pageReadAt
+    );
+
+
+    setCandidateDataFreshness(
+      evaluateCandidateDataFreshness(
+        result.metadata,
+        getTradingSessionDate(
+          new Date()
+        )
+      )
     );
 
 
