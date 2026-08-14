@@ -29,7 +29,22 @@ export const state = {
     from: "",
     to: "",
     exitTarget: "tp1",
-    slippageTicks: 0
+    slippageTicks: 0,
+    autoProgress: null,
+    autoRunning: false,
+    ui: {
+      dataMode: "auto",
+      activeTab: "overview",
+      candidateDate: "",
+      candidateSide: "all",
+      candidateSearch: "",
+      tradeSide: "all",
+      tradeResult: "all",
+      tradeSearch: "",
+      candidatePage: 1,
+      tradePage: 1,
+      logLimit: 100
+    }
   },
 
   sortState: {
@@ -187,6 +202,37 @@ export function setReplayRange(
       : Number(
           slippageTicks
         );
+
+}
+
+
+export function setReplayProgress(
+  progress,
+  running =
+    false
+) {
+
+  state.replay.autoProgress =
+    progress
+    ??
+    null;
+
+  state.replay.autoRunning =
+    Boolean(
+      running
+    );
+
+}
+
+
+export function setReplayUiState(
+  patch
+) {
+
+  state.replay.ui = {
+    ...state.replay.ui,
+    ...patch
+  };
 
 }
 

@@ -648,6 +648,84 @@ export function parseHistorical5mCsv(
       )
     );
 
+  const declaredUniverseModes =
+    new Set(
+      rows.map(
+        row =>
+          csvValue(
+            row,
+            "universeMode"
+          )
+      )
+      .filter(
+        Boolean
+      )
+    );
+
+  const declaredUniverseValidation =
+    new Set(
+      rows.map(
+        row =>
+          csvOptionalBoolean(
+            row,
+            "universeValidated"
+          )
+      )
+      .filter(
+        value =>
+          value !==
+            undefined
+      )
+    );
+
+  const declaredUniverseStockCounts =
+    new Set(
+      rows.map(
+        row =>
+          csvOptionalNumber(
+            row,
+            "universeStockCount"
+          )
+      )
+      .filter(
+        value =>
+          value !==
+            undefined
+      )
+    );
+
+  const declaredTwseStockCounts =
+    new Set(
+      rows.map(
+        row =>
+          csvOptionalNumber(
+            row,
+            "twseStockCount"
+          )
+      )
+      .filter(
+        value =>
+          value !==
+            undefined
+      )
+    );
+
+  const declaredTpexStockCounts =
+    new Set(
+      rows.map(
+        row =>
+          csvOptionalNumber(
+            row,
+            "tpexStockCount"
+          )
+      )
+      .filter(
+        value =>
+          value !==
+            undefined
+      )
+    );
+
 
   if (
     declaredSourceTypes.size > 1
@@ -666,6 +744,27 @@ export function parseHistorical5mCsv(
 
     throw new Error(
       "Historical 5m CSV 的 volumeMode 不一致"
+    );
+
+  }
+
+
+  if (
+    [
+      declaredUniverseModes,
+      declaredUniverseValidation,
+      declaredUniverseStockCounts,
+      declaredTwseStockCounts,
+      declaredTpexStockCounts
+    ].some(
+      values =>
+        values.size >
+          1
+    )
+  ) {
+
+    throw new Error(
+      "Historical 5m CSV 的 Universe metadata 不一致"
     );
 
   }
@@ -929,6 +1028,23 @@ export function parseHistorical5mCsv(
     ??
     "";
 
+  const universeMode =
+    [...declaredUniverseModes][0]
+    ??
+    "";
+
+  const universeValidated =
+    [...declaredUniverseValidation][0];
+
+  const universeStockCount =
+    [...declaredUniverseStockCounts][0];
+
+  const twseStockCount =
+    [...declaredTwseStockCounts][0];
+
+  const tpexStockCount =
+    [...declaredTpexStockCounts][0];
+
   const normalizedSessions =
     [...sessions.values()]
     .sort(
@@ -974,6 +1090,19 @@ export function parseHistorical5mCsv(
 
             ? {
                 volumeMode
+              }
+
+            : {}
+        ),
+        ...(
+          universeMode
+
+            ? {
+                universeMode,
+                universeValidated,
+                universeStockCount,
+                twseStockCount,
+                tpexStockCount
               }
 
             : {}

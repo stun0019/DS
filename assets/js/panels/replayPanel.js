@@ -6,18 +6,36 @@ import {
 } from "../utils/format.js";
 
 import {
-  HISTORICAL_SOURCE_TYPE,
   JsonHistorical5mProvider,
-  getHistoricalSourceLabel,
   importHistorical5mFile
 } from "../replay/historical5mProvider.js";
 
+import {
+  REPLAY_DATA_MODE,
+  REPLAY_TABS,
+  createReplayUiState,
+  filterCandidateAudits,
+  filterReplayTrades,
+  getReplayDataSourceState,
+  paginateReplayRows
+} from "../replay/replayUiState.js";
 
-function formatPercentValue(
+
+const TAB_LABELS = {
+  overview: "Overview",
+  candidates: "Candidates",
+  trades: "Trades",
+  daily: "Daily",
+  periods: "Weekly / Monthly",
+  logs: "Logs"
+};
+
+
+function formatPercent(
   value
 ) {
 
-  return `${Number(value || 0).toFixed(1)}%`;
+  return `${Number(value ?? 0).toFixed(1)}%`;
 
 }
 
@@ -26,72 +44,41 @@ function formatR(
   value
 ) {
 
-  return `${formatSignedNumber(value)}R`;
+  return `${formatSignedNumber(value ?? 0)}R`;
 
 }
 
 
-function formatOptionalCurrency(
+function formatProfitFactor(
   value
 ) {
 
   return value ===
     null
-  ||
-  value ===
-    undefined
 
-    ? "-"
+    ? "∞"
 
-    : formatCurrency(
+    : Number(
         value
+        ??
+        0
+      )
+      .toFixed(
+        2
       );
 
 }
 
 
-function formatTime(
-  timestamp
-) {
-
-  if (
-    !timestamp
-  ) {
-
-    return "-";
-
-  }
-
-
-  return new Date(
-    timestamp
-  )
-  .toLocaleTimeString(
-    "zh-TW",
-    {
-      timeZone:
-        "Asia/Taipei",
-      hour12:
-        false,
-      hour:
-        "2-digit",
-      minute:
-        "2-digit"
-    }
-  );
-
-}
-
-
-function metric(
+function kpi(
   label,
   value,
-  className =
+  tone =
     ""
 ) {
 
   return `
-    <div class="replay-metric ${className}">
+    <div class="replay-kpi ${tone}">
       <span>${label}</span>
       <strong>${value}</strong>
     </div>
@@ -100,45 +87,408 @@ function metric(
 }
 
 
-function renderSourceBadge(
+function statusBadge(
+  label,
+  value,
+  tone =
+    "neutral"
+) {
+
+  return `
+    <span class="replay-status-badge ${tone}">
+      <small>${label}</small>
+      <strong>${escapeHtml(value)}</strong>
+    </span>
+  `;
+
+}
+
+
+function renderHeader(
   replayState
 ) {
 
+  const source =
+    getReplayDataSourceState(
+      {
+        dataset:
+          replayState.dataset,
+        progress:
+          replayState.autoProgress,
+        error:
+          replayState.error
+      }
+    );
+
+  const sourceTone =
+    source.sourceType ===
+      "REAL_HISTORICAL_DATA"
+
+      ? "valid"
+
+      : "warning";
+
+  const validationTone =
+    source.validationStatus ===
+      "VALIDATED"
+
+      ? "valid"
+
+      : source.validationStatus ===
+          "FAILED"
+
+        ? "invalid"
+
+        : "neutral";
+
+
+  return `
+    <header class="replay-header">
+      <div>
+        <span class="replay-overline">HISTORICAL BACKTEST</span>
+        <h2>Replay 回測</h2>
+        <p>D-1 公司股票母體 → Candidate → Completed 5m → Replay</p>
+      </div>
+      <div class="replay-header-status">
+        ${statusBadge("SOURCE", source.sourceLabel, sourceTone)}
+        ${statusBadge("VALIDATION", source.validationStatus, validationTone)}
+        ${statusBadge("VOLUME", source.volumeMode)}
+        ${statusBadge("UNIVERSE", source.universeMode, source.universeValidated ? "valid" : "warning")}
+      </div>
+    </header>
+  `;
+
+}
+
+
+function renderControls(
+  replayState,
+  uiState,
+  riskSettings
+) {
+
+  const modeButton =
+    (
+      value,
+      label
+    ) => `
+      <button
+        type="button"
+        class="${uiState.dataMode === value ? "active" : ""}"
+        data-replay-data-mode="${value}"
+      >${label}</button>
+    `;
+
+  const rangeButton =
+    (
+      value,
+      label
+    ) => `
+      <button
+        type="button"
+        class="${replayState.mode === value ? "active" : ""}"
+        data-replay-range="${value}"
+      >${label}</button>
+    `;
+
+
+  return `
+    <section class="replay-control-panel">
+      <div class="replay-control-row source-row">
+        <div class="replay-control-group">
+          <label>資料模式</label>
+          <div class="replay-segmented">
+            ${modeButton(REPLAY_DATA_MODE.AUTO, "自動歷史資料")}
+            ${modeButton(REPLAY_DATA_MODE.IMPORT, "JSON / CSV")}
+            ${modeButton(REPLAY_DATA_MODE.SAMPLE, "模擬範例")}
+          </div>
+        </div>
+
+        <div class="replay-secondary-actions">
+          <label class="replay-file-button ${uiState.dataMode === REPLAY_DATA_MODE.IMPORT ? "" : "muted"}">
+            匯入資料
+            <input type="file" accept="application/json,text/csv,.json,.csv" data-role="replay-file">
+          </label>
+          <button type="button" data-role="replay-sample">載入範例</button>
+          <button type="button" data-role="replay-clear">清除</button>
+          <span class="replay-file-name">${escapeHtml(replayState.fileName || "尚未載入資料")}</span>
+        </div>
+      </div>
+
+      <div class="replay-control-grid">
+        <div class="replay-control-group range-group">
+          <label>日期範圍</label>
+          <div class="replay-range-presets">
+            ${rangeButton("today", "今日")}
+            ${rangeButton("week", "本週")}
+            ${rangeButton("month1", "1 個月")}
+            ${rangeButton("month3", "3 個月")}
+            ${rangeButton("custom", "自訂")}
+          </div>
+          <div class="replay-date-inputs">
+            <input type="date" data-role="replay-from" value="${escapeHtml(replayState.from)}" aria-label="開始日期">
+            <span>→</span>
+            <input type="date" data-role="replay-to" value="${escapeHtml(replayState.to)}" aria-label="結束日期">
+          </div>
+        </div>
+
+        <label class="replay-field">
+          <span>Exit Mode</span>
+          <select data-role="replay-target">
+            <option value="tp1" ${replayState.exitTarget === "tp1" ? "selected" : ""}>TP1</option>
+            <option value="tp2" ${replayState.exitTarget === "tp2" ? "selected" : ""}>TP2</option>
+          </select>
+        </label>
+
+        <label class="replay-field">
+          <span>Slippage</span>
+          <select data-role="replay-slippage">
+            ${[0, 1, 2].map(value => `<option value="${value}" ${replayState.slippageTicks === value ? "selected" : ""}>${value} Tick</option>`).join("")}
+          </select>
+        </label>
+
+        <label class="replay-field">
+          <span>單筆風險</span>
+          <input type="number" min="0" step="1000" data-role="replay-risk" value="${riskSettings?.maxRiskAmount ?? ""}" placeholder="未設定">
+        </label>
+
+        <button type="button" class="replay-primary-action" data-role="replay-run" ${replayState.autoRunning ? "disabled" : ""}>
+          ${replayState.autoRunning ? "資料準備中…" : "開始歷史回測"}
+        </button>
+      </div>
+    </section>
+  `;
+
+}
+
+
+function renderProgress(
+  progress
+) {
+
   if (
-    !replayState.dataset
+    !progress
   ) {
 
     return "";
 
   }
 
+  const percent =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(
+          progress.progressPercent
+          ??
+          0
+        )
+      )
+    );
 
-  const sourceType =
-    replayState.dataset.metadata?.sourceType
-    ??
-    HISTORICAL_SOURCE_TYPE.SAMPLE_MOCK;
-
-
-  const className =
-    sourceType ===
-      HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA
-
-      ? "real"
-
-      : "sample";
+  const finished =
+    progress.stage ===
+      "COMPLETED";
 
 
   return `
-    <span class="replay-source-badge ${className}">
-      ${escapeHtml(
-        getHistoricalSourceLabel(
-          sourceType
-        )
-      )}
-    </span>
-    <small class="replay-source-disclaimer">
-      來源宣告，非系統行情真實性驗證
-    </small>
+    <section class="replay-progress-panel ${finished ? "completed" : ""}">
+      <div class="replay-progress-heading">
+        <div>
+          <span>HISTORICAL DATA PREPARATION</span>
+          <strong>${escapeHtml(progress.stage ?? "PREPARING")}</strong>
+        </div>
+        <strong>${percent}%</strong>
+      </div>
+      <div class="replay-progress-track"><span style="width:${percent}%"></span></div>
+      <div class="replay-progress-details">
+        <span>日期 <strong>${escapeHtml(progress.currentDate ?? "-")}</strong></span>
+        <span>Candidate <strong>${escapeHtml([progress.currentCode, progress.currentName].filter(Boolean).join(" ") || "-")}</strong></span>
+        <span>Sessions <strong>${progress.completedSessions ?? 0} / ${progress.totalSessions ?? 0}</strong></span>
+        <span>Validated <strong>${progress.validatedSessions ?? progress.completedSessions ?? 0} / ${progress.totalSessions ?? 0}</strong></span>
+      </div>
+    </section>
+  `;
+
+}
+
+
+function renderKpis(
+  summary
+) {
+
+  return `
+    <section class="replay-kpi-grid">
+      ${kpi("實際出手", summary.actualTrades)}
+      ${kpi("勝率", formatPercent(summary.winRate))}
+      ${kpi("Net P&L", formatCurrency(summary.totalPnl), summary.totalPnl >= 0 ? "positive" : "negative")}
+      ${kpi("Total R", formatR(summary.totalR), summary.totalR >= 0 ? "positive" : "negative")}
+      ${kpi("Profit Factor", formatProfitFactor(summary.profitFactor))}
+      ${kpi("Max Drawdown", formatCurrency(summary.maxDrawdown), "negative")}
+      ${kpi("平均 R", formatR(summary.averageR), summary.averageR >= 0 ? "positive" : "negative")}
+      ${kpi("Slippage Cost", formatCurrency(summary.totalSlippageCost), "warning")}
+    </section>
+  `;
+
+}
+
+
+function lineChart(
+  values,
+  {
+    title,
+    valueFormatter =
+      formatCurrency,
+    tone =
+      "accent"
+  }
+) {
+
+  if (
+    values.length ===
+      0
+  ) {
+
+    return `
+      <section class="replay-chart-card">
+        <header><h3>${title}</h3><span>尚無交易</span></header>
+        <div class="replay-chart-empty">沒有可繪製的資料</div>
+      </section>
+    `;
+
+  }
+
+  const cumulative = [];
+  let total =
+    0;
+
+  values.forEach(
+    value => {
+
+      total +=
+        Number(
+          value
+          ??
+          0
+        );
+
+      cumulative.push(
+        total
+      );
+
+    }
+  );
+
+  const minimum =
+    Math.min(
+      0,
+      ...cumulative
+    );
+
+  const maximum =
+    Math.max(
+      0,
+      ...cumulative
+    );
+
+  const range =
+    Math.max(
+      1,
+      maximum
+      -
+      minimum
+    );
+
+  const points =
+    cumulative.map(
+      (
+        value,
+        index
+      ) => {
+
+        const x =
+          cumulative.length ===
+            1
+
+            ? 50
+
+            : index
+              /
+              (
+                cumulative.length
+                -
+                1
+              )
+              *
+              100;
+
+        const y =
+          88
+          -
+          (
+            value
+            -
+            minimum
+          )
+          /
+          range
+          *
+          72;
+
+
+        return `${x.toFixed(2)},${y.toFixed(2)}`;
+
+      }
+    )
+    .join(" ");
+
+
+  return `
+    <section class="replay-chart-card">
+      <header><h3>${title}</h3><strong class="${total >= 0 ? "positive-text" : "negative-text"}">${valueFormatter(total)}</strong></header>
+      <svg class="replay-line-chart ${tone}" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="${title}">
+        <line x1="0" y1="88" x2="100" y2="88"></line>
+        <line x1="0" y1="52" x2="100" y2="52"></line>
+        <line x1="0" y1="16" x2="100" y2="16"></line>
+        <polyline points="${points}"></polyline>
+      </svg>
+    </section>
+  `;
+
+}
+
+
+function dailyBarChart(
+  daily
+) {
+
+  const maximum =
+    Math.max(
+      1,
+      ...daily.map(
+        row =>
+          Math.abs(
+            Number(
+              row.totalPnl
+              ??
+              0
+            )
+          )
+      )
+    );
+
+
+  return `
+    <section class="replay-chart-card">
+      <header><h3>Daily P&L</h3><span>${daily.length} Sessions</span></header>
+      <div class="replay-bar-chart">
+        ${daily.map(row => {
+          const value = Number(row.totalPnl ?? 0);
+          return `<div class="replay-bar-column" title="${escapeHtml(row.date)} ${formatCurrency(value)}"><span class="${value >= 0 ? "positive" : "negative"}" style="height:${Math.max(4, Math.abs(value) / maximum * 82)}%"></span><small>${escapeHtml(row.date.slice(5))}</small></div>`;
+        }).join("") || '<div class="replay-chart-empty">尚無每日績效</div>'}
+      </div>
+    </section>
   `;
 
 }
@@ -148,17 +498,74 @@ function renderDatasetSummary(
   dataset
 ) {
 
-  const stats =
-    dataset?.metadata?.historicalStats;
-
   const metadata =
     dataset?.metadata
     ??
     {};
 
+  const stats =
+    metadata.historicalStats
+    ??
+    {};
+
+
+  return `
+    <section class="replay-validation-card">
+      <header><h3>Source / Validation</h3><span>${escapeHtml(stats.dataFrom ?? "-")} → ${escapeHtml(stats.dataTo ?? "-")}</span></header>
+      <dl>
+        <div><dt>Validation</dt><dd>${escapeHtml(metadata.validationStatus ?? "-")}</dd></div>
+        <div><dt>Universe</dt><dd>${metadata.universeValidated ? "VALIDATED" : "NOT VALIDATED"}</dd></div>
+        <div><dt>Snapshots</dt><dd>${stats.dailySnapshotCount ?? 0}</dd></div>
+        <div><dt>Sessions</dt><dd>${stats.sessionCount ?? 0}</dd></div>
+        <div><dt>5m Bars</dt><dd>${Number(stats.fiveMinuteBarCount ?? 0).toLocaleString("zh-TW")}</dd></div>
+        <div><dt>Stocks</dt><dd>${Number(stats.stockCount ?? 0).toLocaleString("zh-TW")}</dd></div>
+        <div><dt>TWSE</dt><dd>${Number(metadata.twseStockCount ?? 0).toLocaleString("zh-TW")}</dd></div>
+        <div><dt>TPEx</dt><dd>${Number(metadata.tpexStockCount ?? 0).toLocaleString("zh-TW")}</dd></div>
+      </dl>
+    </section>
+  `;
+
+}
+
+
+function renderOverview(
+  report,
+  dataset
+) {
+
+  return `
+    <div class="replay-overview-grid">
+      <div class="replay-chart-grid">
+        ${lineChart(report.trades.map(trade => trade.netPnl), {title: "Equity Curve"})}
+        ${dailyBarChart(report.daily)}
+        ${lineChart(report.trades.map(trade => trade.rMultiple), {title: "Cumulative R", valueFormatter: formatR, tone: "r"})}
+      </div>
+      <div class="replay-side-summary">
+        <section class="replay-breakdown-card">
+          <header><h3>Trade Breakdown</h3></header>
+          <dl>
+            <div><dt>Long / Short</dt><dd>${report.summary.longTrades} / ${report.summary.shortTrades}</dd></div>
+            <div><dt>Wins / Losses</dt><dd>${report.summary.wins} / ${report.summary.losses}</dd></div>
+            <div><dt>TP1 / TP2 / Stop</dt><dd>${report.summary.tp1Count} / ${report.summary.tp2Count} / ${report.summary.stopCount}</dd></div>
+            <div><dt>Risk Blocked</dt><dd>${report.summary.riskBlockedCount}</dd></div>
+          </dl>
+        </section>
+        ${renderDatasetSummary(dataset)}
+      </div>
+    </div>
+  `;
+
+}
+
+
+function pagination(
+  key,
+  page
+) {
 
   if (
-    !stats
+    page.totalPages <=
+      1
   ) {
 
     return "";
@@ -166,193 +573,73 @@ function renderDatasetSummary(
   }
 
 
-  const dataRange =
-    stats.dataFrom
-    &&
-    stats.dataTo
-
-      ? `${stats.dataFrom} → ${stats.dataTo}`
-
-      : "-";
-
-
   return `
-    <section class="replay-section">
-      <div class="replay-section-heading">
-        <div>
-          <span class="replay-kicker">HISTORICAL DATASET</span>
-          <h2>歷史資料範圍</h2>
-        </div>
-        <span class="replay-range-label">${escapeHtml(dataRange)}</span>
-      </div>
-
-      <div class="replay-metrics-grid">
-        ${metric(
-          "Source Type",
-          escapeHtml(
-            getHistoricalSourceLabel(
-              metadata.sourceType
-            )
-          )
-        )}
-        ${metric(
-          "Validation Status",
-          escapeHtml(
-            metadata.validationStatus
-            ??
-            "-"
-          )
-        )}
-        ${metric(
-          "Volume Mode",
-          escapeHtml(
-            metadata.volumeMode
-            ??
-            "VOLUME_MODE_UNDECLARED"
-          )
-        )}
-        ${metric("資料期間", escapeHtml(dataRange))}
-        ${metric("Daily Snapshot", stats.dailySnapshotCount)}
-        ${metric("Session", stats.sessionCount)}
-        ${metric("5m Bar", stats.fiveMinuteBarCount)}
-        ${metric("股票數", stats.stockCount)}
-      </div>
-    </section>
+    <div class="replay-pagination">
+      <button type="button" data-page-key="${key}" data-page="${page.currentPage - 1}" ${page.currentPage === 1 ? "disabled" : ""}>上一頁</button>
+      <span>${page.currentPage} / ${page.totalPages} · ${page.totalRows} 筆</span>
+      <button type="button" data-page-key="${key}" data-page="${page.currentPage + 1}" ${page.currentPage === page.totalPages ? "disabled" : ""}>下一頁</button>
+    </div>
   `;
 
 }
 
 
-function renderCandidateAudits(
-  audits = []
+function table(
+  headers,
+  rows,
+  emptyMessage
 ) {
+
+  return rows
+
+    ? `
+        <div class="replay-table-wrap">
+          <table class="replay-table">
+            <thead><tr>${headers.map(header => `<th>${header}</th>`).join("")}</tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `
+
+    : `<div class="replay-tab-empty">${emptyMessage}</div>`;
+
+}
+
+
+function renderCandidates(
+  dataset,
+  uiState
+) {
+
+  const filtered =
+    filterCandidateAudits(
+      dataset?.candidateAudits,
+      uiState
+    );
+
+  const page =
+    paginateReplayRows(
+      filtered,
+      uiState.candidatePage,
+      50
+    );
+
+  const dates =
+    [...new Set((dataset?.candidateAudits ?? []).map(audit => audit.date))];
 
   const rows =
-    audits.flatMap(
-      audit => [
-        ...(
-          audit.long
-          ??
-          []
-        ),
-        ...(
-          audit.short
-          ??
-          []
-        )
-      ]
-      .map(
-        candidate => `
-          <tr>
-            <td>${escapeHtml(audit.date)}</td>
-            <td>${escapeHtml(audit.previousTradingDate)}</td>
-            <td><span class="replay-side ${candidate.side}">${candidate.side.toUpperCase()}</span></td>
-            <td><strong>${escapeHtml(candidate.code)}</strong><small>${escapeHtml(candidate.name)}</small></td>
-            <td>${candidate.strategyScore}</td>
-            <td>${candidate.liquidityRank}</td>
-            <td>${formatPrice(candidate.observation)}</td>
-            <td>${formatPrice(candidate.previousHigh)}</td>
-            <td>${formatPrice(candidate.previousLow)}</td>
-          </tr>
-        `
-      )
-    )
-    .join("");
-
-
-  return `
-    <section class="replay-section">
-      <div class="replay-section-heading">
-        <div>
-          <span class="replay-kicker">CANDIDATE AUDIT</span>
-          <h2>每日 Long / Short Top10</h2>
-        </div>
-        <span class="replay-range-label">D-1 Snapshot → D Candidate</span>
-      </div>
-
-      ${rows
-        ? `
-            <div class="replay-table-wrap">
-              <table class="replay-table">
-                <thead>
-                  <tr>
-                    <th>交易日</th><th>D-1 Snapshot</th><th>方向</th><th>股票</th>
-                    <th>Strategy Score</th><th>Liquidity Rank</th><th>Observation</th>
-                    <th>昨日 High</th><th>昨日 Low</th>
-                  </tr>
-                </thead>
-                <tbody>${rows}</tbody>
-              </table>
-            </div>
-          `
-        : '<div class="replay-empty-inline">此資料區間沒有候選。</div>'
-      }
-    </section>
-  `;
-
-}
-
-
-function renderSummary(
-  summary,
-  settings = {}
-) {
-
-  return `
-    <section class="replay-section">
-      <div class="replay-section-heading">
-        <div>
-          <span class="replay-kicker">PERFORMANCE</span>
-          <h2>回測績效摘要</h2>
-        </div>
-        <span class="replay-range-label">完成 ${summary.tradingDays} 個交易日</span>
-      </div>
-
-      <div class="replay-metrics-grid">
-        ${metric("交易日數", summary.tradingDays)}
-        ${metric("總候選數", summary.totalCandidates)}
-        ${metric("實際出手", summary.actualTrades)}
-        ${metric("未出手候選", summary.noTradeCandidates)}
-        ${metric("Long / Short", `${summary.longTrades} / ${summary.shortTrades}`)}
-        ${metric("勝 / 敗", `${summary.wins} / ${summary.losses}`)}
-        ${metric("勝率", formatPercentValue(summary.winRate))}
-        ${metric("總 P&L", formatCurrency(summary.totalPnl), summary.totalPnl >= 0 ? "positive" : "negative")}
-        ${metric("滑價設定", `${settings.slippageTicks ?? 0} Tick`)}
-        ${metric("滑價成本", formatCurrency(summary.totalSlippageCost), summary.totalSlippageCost > 0 ? "warning" : "")}
-        ${metric("平均 P&L", formatCurrency(summary.averagePnl), summary.averagePnl >= 0 ? "positive" : "negative")}
-        ${metric("總 R", formatR(summary.totalR), summary.totalR >= 0 ? "positive" : "negative")}
-        ${metric("平均 R", formatR(summary.averageR), summary.averageR >= 0 ? "positive" : "negative")}
-        ${metric("Profit Factor", summary.profitFactor === null ? "∞" : Number(summary.profitFactor).toFixed(2))}
-        ${metric("最大單筆獲利", formatCurrency(summary.maxWin), "positive")}
-        ${metric("最大單筆虧損", formatCurrency(summary.maxLoss), "negative")}
-        ${metric("最大回撤", formatCurrency(summary.maxDrawdown), "negative")}
-        ${metric("TP1 / TP2 / Stop", `${summary.tp1Count} / ${summary.tp2Count} / ${summary.stopCount}`)}
-        ${metric("RISK_BLOCKED", summary.riskBlockedCount, "warning")}
-        ${metric("INVALIDATED", summary.invalidatedCount, "negative")}
-      </div>
-    </section>
-  `;
-
-}
-
-
-function renderDailyTable(
-  daily,
-  summary
-) {
-
-  const rows =
-    daily.map(
-      day => `
+    page.rows.map(
+      candidate => `
         <tr>
-          <td>${escapeHtml(day.date)}</td>
-          <td>${day.candidateCount}</td>
-          <td>${day.actualTrades}</td>
-          <td>${formatPercentValue(day.winRate)}</td>
-          <td class="${day.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(day.totalPnl)}</td>
-          <td>${formatR(day.totalR)}</td>
-          <td>${formatCurrency(day.totalSlippageCost)}</td>
-          <td>${formatCurrency(day.maxDrawdown)}</td>
+          <td>${escapeHtml(candidate.date)}</td>
+          <td>${escapeHtml(candidate.previousTradingDate)}</td>
+          <td><span class="replay-side ${candidate.side}">${candidate.side.toUpperCase()}</span></td>
+          <td><strong>${escapeHtml(candidate.code)}</strong><small>${escapeHtml(candidate.name)}</small></td>
+          <td>${candidate.strategyScore}</td>
+          <td>${candidate.liquidityRank}</td>
+          <td>${formatPrice(candidate.observation)}</td>
+          <td>${formatPrice(candidate.previousHigh)}</td>
+          <td>${formatPrice(candidate.previousLow)}</td>
         </tr>
       `
     )
@@ -360,127 +647,56 @@ function renderDailyTable(
 
 
   return `
-    <section class="replay-section">
-      <div class="replay-section-heading">
-        <div>
-          <span class="replay-kicker">DAILY</span>
-          <h2>每日績效</h2>
-        </div>
-      </div>
-
-      <div class="replay-table-wrap">
-        <table class="replay-table">
-          <thead>
-            <tr>
-              <th>日期</th>
-              <th>候選數</th>
-              <th>出手次數</th>
-              <th>勝率</th>
-              <th>P&L</th>
-              <th>R</th>
-              <th>滑價成本</th>
-              <th>最大回撤</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-            <tr class="replay-total-row">
-              <td>區間合計</td>
-              <td>${summary.totalCandidates}</td>
-              <td>${summary.actualTrades}</td>
-              <td>${formatPercentValue(summary.winRate)}</td>
-              <td class="${summary.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(summary.totalPnl)}</td>
-              <td>${formatR(summary.totalR)}</td>
-              <td>${formatCurrency(summary.totalSlippageCost)}</td>
-              <td>${formatCurrency(summary.maxDrawdown)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  `;
-
-}
-
-
-function renderPeriodTable(
-  title,
-  kicker,
-  periods
-) {
-
-  const rows =
-    periods.map(
-      period => `
-        <tr>
-          <td>${escapeHtml(period.period)}</td>
-          <td>${escapeHtml(period.from)} → ${escapeHtml(period.to)}</td>
-          <td>${period.tradingDays}</td>
-          <td>${period.candidateCount}</td>
-          <td>${period.actualTrades}</td>
-          <td>${formatPercentValue(period.winRate)}</td>
-          <td class="${period.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(period.totalPnl)}</td>
-          <td>${formatR(period.totalR)}</td>
-          <td>${formatCurrency(period.maxDrawdown)}</td>
-        </tr>
-      `
-    )
-    .join("");
-
-
-  return `
-    <section class="replay-section">
-      <div class="replay-section-heading">
-        <div>
-          <span class="replay-kicker">${kicker}</span>
-          <h2>${title}</h2>
-        </div>
-      </div>
-
-      <div class="replay-table-wrap">
-        <table class="replay-table">
-          <thead>
-            <tr>
-              <th>期間</th><th>涵蓋日期</th><th>交易日</th><th>候選</th><th>出手</th>
-              <th>勝率</th><th>P&L</th><th>R</th><th>最大回撤</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </section>
+    <div class="replay-tab-toolbar">
+      <select data-filter="candidateDate"><option value="">全部日期</option>${dates.map(date => `<option value="${date}" ${uiState.candidateDate === date ? "selected" : ""}>${date}</option>`).join("")}</select>
+      <select data-filter="candidateSide"><option value="all">Long + Short</option><option value="long" ${uiState.candidateSide === "long" ? "selected" : ""}>Long</option><option value="short" ${uiState.candidateSide === "short" ? "selected" : ""}>Short</option></select>
+      <input type="search" data-filter="candidateSearch" value="${escapeHtml(uiState.candidateSearch)}" placeholder="搜尋代號或名稱">
+    </div>
+    ${table(["Date", "D-1 Snapshot", "Side", "Code / Name", "Score", "Liquidity", "Observation", "High", "Low"], rows, "沒有符合條件的 Candidate")}
+    ${pagination("candidatePage", page)}
   `;
 
 }
 
 
 function renderTrades(
-  trades
+  report,
+  uiState
 ) {
 
+  const filtered =
+    filterReplayTrades(
+      report.trades,
+      uiState
+    );
+
+  const page =
+    paginateReplayRows(
+      filtered,
+      uiState.tradePage,
+      30
+    );
+
   const rows =
-    trades.map(
+    page.rows.map(
       trade => `
         <tr>
           <td>${escapeHtml(trade.date)}</td>
           <td><strong>${escapeHtml(trade.code)}</strong><small>${escapeHtml(trade.name)}</small></td>
           <td><span class="replay-side ${trade.side}">${trade.side.toUpperCase()}</span></td>
-          <td>${formatPrice(trade.observation)}</td>
-          <td>${formatTime(trade.breakoutTime)}</td>
-          <td>${formatTime(trade.entryTime)}<small>Raw ${formatPrice(trade.rawEntry)} / Filled ${formatPrice(trade.filledEntry)}</small></td>
-          <td>${formatPrice(trade.stop)}</td>
+          <td>${formatPrice(trade.rawEntry)} / ${formatPrice(trade.filledEntry)}</td>
+          <td>${formatPrice(trade.structuralStop ?? trade.stop)}</td>
           <td>${formatPrice(trade.tp1)} / ${formatPrice(trade.tp2)}</td>
-          <td>${formatTime(trade.exitTime)}<small>Raw ${formatPrice(trade.rawExit)} / Filled ${formatPrice(trade.filledExit)}</small></td>
-          <td>${escapeHtml(trade.exitReason)}</td>
-          <td>${trade.slippageTicks}</td>
-          <td>${formatCurrency(trade.slippageCost)}</td>
-          <td>${trade.maxLots}</td>
+          <td>${formatPrice(trade.rawExit)} / ${formatPrice(trade.filledExit)}</td>
+          <td>${trade.lots}</td>
           <td>${formatCurrency(trade.grossPnl)}</td>
-          <td>${formatCurrency(trade.tradingCost)}</td>
+          <td>${formatCurrency(trade.originalCommission)}</td>
           <td>${formatCurrency(trade.monthlyRebate)}</td>
           <td>${formatCurrency(trade.transactionTax)}</td>
+          <td>${formatCurrency(trade.slippageCost)}</td>
           <td class="${trade.netPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(trade.netPnl)}</td>
           <td>${formatR(trade.rMultiple)}</td>
+          <td>${escapeHtml(trade.exitReason)}</td>
         </tr>
       `
     )
@@ -488,168 +704,201 @@ function renderTrades(
 
 
   return `
-    <section class="replay-section">
-      <div class="replay-section-heading">
-        <div>
-          <span class="replay-kicker">TRADE JOURNAL</span>
-          <h2>每筆交易紀錄</h2>
-        </div>
-        <span class="replay-range-label">${trades.length} 筆</span>
-      </div>
-
-      ${trades.length > 0
-        ? `
-            <div class="replay-table-wrap wide">
-              <table class="replay-table">
-                <thead>
-                  <tr>
-                    <th>日期</th><th>股票</th><th>方向</th><th>Observation</th>
-                    <th>Breakout</th><th>Entry Raw / Filled</th><th>Stop</th><th>TP1 / TP2</th>
-                    <th>Exit Raw / Filled</th><th>原因</th><th>滑價 Tick</th><th>滑價成本</th><th>張數</th><th>毛損益</th>
-                    <th>交易成本</th><th>月退</th><th>證交稅</th><th>淨 P&L</th><th>R</th>
-                  </tr>
-                </thead>
-                <tbody>${rows}</tbody>
-              </table>
-            </div>
-          `
-        : '<div class="replay-empty-inline">此區間沒有實際出手。</div>'
-      }
-    </section>
+    <div class="replay-tab-toolbar">
+      <select data-filter="tradeSide"><option value="all">Long + Short</option><option value="long" ${uiState.tradeSide === "long" ? "selected" : ""}>Long</option><option value="short" ${uiState.tradeSide === "short" ? "selected" : ""}>Short</option></select>
+      <select data-filter="tradeResult"><option value="all">Win + Loss</option><option value="WIN" ${uiState.tradeResult === "WIN" ? "selected" : ""}>Win</option><option value="LOSS" ${uiState.tradeResult === "LOSS" ? "selected" : ""}>Loss</option></select>
+      <input type="search" data-filter="tradeSearch" value="${escapeHtml(uiState.tradeSearch)}" placeholder="搜尋代號或名稱">
+    </div>
+    ${table(["Date", "Code / Name", "Side", "Raw / Filled Entry", "Stop", "TP1 / TP2", "Raw / Filled Exit", "Lots", "Gross P&L", "Commission", "Rebate", "Tax", "Slippage", "Net P&L", "R", "Exit"], rows, "尚無完成交易")}
+    ${pagination("tradePage", page)}
   `;
 
 }
 
 
-function renderInstruments(
-  instruments
+function performanceRows(
+  rows,
+  firstColumn
 ) {
 
-  const rows =
-    instruments.map(
-      item => `
-        <tr>
-          <td><strong>${escapeHtml(item.code)}</strong></td>
-          <td>${escapeHtml(item.name)}</td>
-          <td>${item.actualTrades}</td>
-          <td>${item.longTrades}</td>
-          <td>${item.shortTrades}</td>
-          <td>${item.wins}</td>
-          <td>${item.losses}</td>
-          <td>${formatPercentValue(item.winRate)}</td>
-          <td class="${item.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(item.totalPnl)}</td>
-          <td>${formatR(item.totalR)}</td>
-        </tr>
-      `
-    )
-    .join("");
-
-
-  return `
-    <section class="replay-section">
-      <div class="replay-section-heading">
-        <div>
-          <span class="replay-kicker">INSTRUMENTS</span>
-          <h2>交易標的統計</h2>
-        </div>
-      </div>
-
-      ${instruments.length > 0
-        ? `
-            <div class="replay-table-wrap">
-              <table class="replay-table">
-                <thead>
-                  <tr><th>股票</th><th>名稱</th><th>出手</th><th>Long</th><th>Short</th><th>勝</th><th>敗</th><th>勝率</th><th>P&L</th><th>總 R</th></tr>
-                </thead>
-                <tbody>${rows}</tbody>
-              </table>
-            </div>
-          `
-        : '<div class="replay-empty-inline">尚無標的績效。</div>'
-      }
-    </section>
-  `;
+  return rows.map(
+    row => `
+      <tr>
+        <td>${escapeHtml(row[firstColumn])}</td>
+        <td>${row.tradingDays ?? 1}</td>
+        <td>${row.candidateCount}</td>
+        <td>${row.actualTrades}</td>
+        <td>${row.wins}</td>
+        <td>${row.losses}</td>
+        <td>${formatPercent(row.winRate)}</td>
+        <td class="${row.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(row.totalPnl)}</td>
+        <td>${formatR(row.totalR)}</td>
+        <td>${formatProfitFactor(row.profitFactor)}</td>
+        <td>${formatCurrency(row.maxDrawdown)}</td>
+      </tr>
+    `
+  )
+  .join("");
 
 }
 
 
-function renderLogBox(
-  logs
+function renderDaily(
+  report
 ) {
 
-  const entries =
-    logs.map(
-      log => {
+  return table(
+    ["Date", "Days", "Candidates", "Trades", "Wins", "Losses", "Win Rate", "P&L", "R", "PF", "Drawdown"],
+    performanceRows(report.daily, "date"),
+    "尚無每日績效"
+  );
 
-        const candle =
-          log.candle
-          ??
-          {};
-
-        const swing =
-          log.swing
-
-            ? `${log.swing.type} ${formatPrice(log.swing.price)}`
-
-            : "-";
+}
 
 
-        return `
-          <article class="replay-log-entry ${String(log.newStatus || "").toLowerCase()}">
-            <div class="replay-log-main">
-              <time>${formatTime(log.timestamp)}</time>
-              <strong>${escapeHtml(log.code)} ${escapeHtml(log.name)}</strong>
-              <span class="replay-side ${log.side}">${String(log.side || "").toUpperCase()}</span>
-              <span class="replay-transition">${escapeHtml(log.previousStatus)} → ${escapeHtml(log.newStatus)}</span>
-            </div>
+function renderPeriods(
+  report
+) {
 
-            <div class="replay-log-grid">
-              <span>5分K <strong>O ${formatPrice(candle.open)} H ${formatPrice(candle.high)} L ${formatPrice(candle.low)} C ${formatPrice(candle.close)}</strong></span>
-              <span>Observation <strong>${formatPrice(log.observation)}</strong></span>
-              <span>Pullback <strong>${log.pullback ? "YES" : "-"}</strong></span>
-              <span>Swing <strong>${escapeHtml(swing)}</strong></span>
-              <span>Direction <strong>${log.directionConfirmation ? `YES @ ${formatPrice(log.directionConfirmation.price)}` : "-"}</strong></span>
-              <span>Entry / Stop <strong>${formatPrice(log.entry)} / ${formatPrice(log.stop)}</strong></span>
-              <span>TP1 / TP2 <strong>${formatPrice(log.tp1)} / ${formatPrice(log.tp2)}</strong></span>
-              <span>maxLots <strong>${log.maxLots ?? "-"}</strong></span>
-              <span>現金 / 淨風險 <strong>${formatOptionalCurrency(log.cashRiskPerLot)} / ${formatOptionalCurrency(log.riskPerLot)}</strong></span>
-              ${log.eventType === "ENTRY" || log.eventType === "ENTRY_REJECTED_RISK"
-                ? `
-                    <span>Raw / Filled Entry <strong>${formatPrice(log.rawEntry)} / ${formatPrice(log.filledEntry)}</strong></span>
-                    <span>Structural / Expected Stop <strong>${formatPrice(log.structuralStop)} / ${formatPrice(log.expectedFilledStop)}</strong></span>
-                    <span>Raw / Filled 現金風險 <strong>${formatOptionalCurrency(log.rawCashRiskPerLot)} / ${formatOptionalCurrency(log.filledCashRiskPerLot)}</strong></span>
-                    <span>Raw / Filled Lots <strong>${log.rawMaxLots ?? "-"} / ${log.filledMaxLots ?? "-"}</strong></span>
-                    <span>風險上限 / 滑價 <strong>${formatOptionalCurrency(log.maxRiskAmount)} / ${log.slippageTicks ?? 0} Tick</strong></span>
-                  `
-                : ""
-              }
-            </div>
-
-            <div class="replay-log-reason">
-              ${escapeHtml(log.triggerReason || "-")}
-              ${log.blockReason ? `<span>阻擋：${escapeHtml(log.blockReason)}</span>` : ""}
-              ${log.exitReason ? `<span>出場 ${escapeHtml(log.exitReason)} @ ${formatPrice(log.exitPrice)}｜${formatCurrency(log.pnl)}｜${formatR(log.rMultiple)}</span>` : ""}
-            </div>
-          </article>
-        `;
-
-      }
-    )
-    .join("");
+  const headers =
+    ["Period", "Days", "Candidates", "Trades", "Wins", "Losses", "Win Rate", "P&L", "R", "PF", "Drawdown"];
 
 
   return `
-    <section class="replay-section replay-log-section">
-      <div class="replay-section-heading">
-        <div>
-          <span class="replay-kicker">STATE STREAM</span>
-          <h2>Replay LogBox</h2>
-        </div>
-        <span class="replay-range-label">${logs.length} 筆狀態／交易事件</span>
-      </div>
+    <section class="replay-period-block"><h3>Weekly</h3>${table(headers, performanceRows(report.weekly, "period"), "尚無每週績效")}</section>
+    <section class="replay-period-block"><h3>Monthly</h3>${table(headers, performanceRows(report.monthly, "period"), "尚無每月績效")}</section>
+  `;
 
-      <div class="replay-logbox" role="log" aria-label="Replay 狀態變化紀錄">
-        ${entries || '<div class="replay-empty-inline">此區間沒有 Replay Log。</div>'}
+}
+
+
+function renderLogs(
+  report,
+  uiState
+) {
+
+  const logs =
+    report.logs.slice(
+      -uiState.logLimit
+    )
+    .reverse();
+
+
+  return `
+    <div class="replay-log-list">
+      ${logs.map(log => `
+        <details class="replay-log-row">
+          <summary>
+            <span>${escapeHtml(log.date ?? String(log.timestamp ?? "").slice(0, 10))}</span>
+            <strong>${escapeHtml(log.code ?? "-")}</strong>
+            <span class="replay-side ${log.side}">${String(log.side ?? "").toUpperCase()}</span>
+            <span>${escapeHtml(log.eventType ?? "STATE")}</span>
+            <span>${escapeHtml(log.previousStatus ?? "-")} → ${escapeHtml(log.newStatus ?? "-")}</span>
+            <span>${escapeHtml(log.triggerReason ?? log.blockReason ?? log.exitReason ?? "-")}</span>
+          </summary>
+          <div class="replay-log-detail">
+            <span>5m OHLC <strong>O ${formatPrice(log.candle?.open)} H ${formatPrice(log.candle?.high)} L ${formatPrice(log.candle?.low)} C ${formatPrice(log.candle?.close)}</strong></span>
+            <span>Observation <strong>${formatPrice(log.observation)}</strong></span>
+            <span>Pullback <strong>${log.pullback ? "YES" : "-"}</strong></span>
+            <span>Swing <strong>${log.swing ? `${escapeHtml(log.swing.type)} ${formatPrice(log.swing.price)}` : "-"}</strong></span>
+            <span>Direction <strong>${log.directionConfirmation ? formatPrice(log.directionConfirmation.price) : "-"}</strong></span>
+            <span>Entry / Stop <strong>${formatPrice(log.entry)} / ${formatPrice(log.stop)}</strong></span>
+            <span>TP1 / TP2 <strong>${formatPrice(log.tp1)} / ${formatPrice(log.tp2)}</strong></span>
+            <span>Lots / Slippage <strong>${log.maxLots ?? log.lots ?? "-"} / ${log.slippageTicks ?? 0} Tick</strong></span>
+          </div>
+        </details>
+      `).join("") || '<div class="replay-tab-empty">尚無 Replay Logs</div>'}
+    </div>
+    ${report.logs.length > uiState.logLimit ? `<button type="button" class="replay-show-more" data-role="replay-more-logs">顯示更多（目前 ${uiState.logLimit} / ${report.logs.length}）</button>` : ""}
+  `;
+
+}
+
+
+function renderTabContent(
+  activeTab,
+  report,
+  dataset,
+  uiState
+) {
+
+  switch (
+    activeTab
+  ) {
+
+    case "candidates":
+      return renderCandidates(
+        dataset,
+        uiState
+      );
+
+    case "trades":
+      return renderTrades(
+        report,
+        uiState
+      );
+
+    case "daily":
+      return renderDaily(
+        report
+      );
+
+    case "periods":
+      return renderPeriods(
+        report
+      );
+
+    case "logs":
+      return renderLogs(
+        report,
+        uiState
+      );
+
+    case "overview":
+    default:
+      return renderOverview(
+        report,
+        dataset
+      );
+
+  }
+
+}
+
+
+function renderResults(
+  replayState,
+  uiState
+) {
+
+  const report =
+    replayState.report;
+
+
+  if (
+    !report
+  ) {
+
+    return `
+      <section class="replay-empty-state">
+        <span>5m</span>
+        <h2>選擇日期並開始歷史回測</h2>
+        <p>自動模式會依 Trading Calendar 取得 D-1 Daily、建立公司股票 Universe、選出 Long / Short Candidate，再只取得候選股的 D 日 Intraday。</p>
+        <p>JSON / CSV 保留為 Advanced / Offline Import；SAMPLE / MOCK 不代表真實歷史績效。</p>
+      </section>
+    `;
+
+  }
+
+
+  return `
+    ${renderKpis(report.summary)}
+    <section class="replay-results-shell">
+      <nav class="replay-tabs" aria-label="Replay 結果">
+        ${REPLAY_TABS.map(tab => `<button type="button" data-replay-tab="${tab}" class="${uiState.activeTab === tab ? "active" : ""}">${TAB_LABELS[tab]}</button>`).join("")}
+      </nav>
+      <div class="replay-tab-content">
+        ${renderTabContent(uiState.activeTab, report, replayState.dataset, uiState)}
       </div>
     </section>
   `;
@@ -657,16 +906,36 @@ function renderLogBox(
 }
 
 
-function renderEmptyState() {
+function collectControlValues(
+  root
+) {
 
-  return `
-    <section class="replay-empty-state">
-      <span class="replay-empty-icon">5m</span>
-      <h2>載入 Historical 5m JSON / CSV 開始回測</h2>
-      <p>資料必須包含 dailySnapshots 與 sessions；每根盤中 K 棒需提供 timestamp、timeframeMinutes: 5、isComplete 與 OHLC。</p>
-      <p>引擎會逐根送入同一套 Signal / Structure / Risk 邏輯，不會一次讀取整天資料，也不會使用當日或未來盤後資料。</p>
-    </section>
-  `;
+  return {
+    mode:
+      "custom",
+    from:
+      root.querySelector(
+        '[data-role="replay-from"]'
+      ).value,
+    to:
+      root.querySelector(
+        '[data-role="replay-to"]'
+      ).value,
+    exitTarget:
+      root.querySelector(
+        '[data-role="replay-target"]'
+      ).value,
+    slippageTicks:
+      Number(
+        root.querySelector(
+          '[data-role="replay-slippage"]'
+        ).value
+      ),
+    maxRiskAmount:
+      root.querySelector(
+        '[data-role="replay-risk"]'
+      ).value
+  };
 
 }
 
@@ -675,85 +944,139 @@ export function renderReplayPanel(
   root,
   replayState,
   {
+    riskSettings =
+      {},
     onLoadDataset,
-    onRangeChange
+    onRangeChange,
+    onAutoRun,
+    onClear,
+    onRiskChange,
+    onUiChange
   }
 ) {
 
-  const report =
-    replayState.report;
-
+  const uiState =
+    createReplayUiState(
+      replayState.ui
+    );
 
   root.innerHTML = `
     <div class="replay-panel">
-      <section class="replay-toolbar">
-        <div class="replay-upload-group">
-          <label class="replay-upload-button">
-            載入 Historical 5m
-            <input type="file" accept="application/json,text/csv,.json,.csv" data-role="replay-file">
-          </label>
-          <button type="button" class="replay-sample-button" data-role="replay-sample">載入模擬範例</button>
-          <span>${escapeHtml(replayState.fileName || "尚未載入資料")}</span>
-          ${renderSourceBadge(replayState)}
-        </div>
-
-        <div class="replay-range-controls" aria-label="回測日期區間">
-          <button type="button" data-mode="today" class="${replayState.mode === "today" ? "active" : ""}">今日</button>
-          <button type="button" data-mode="week" class="${replayState.mode === "week" ? "active" : ""}">本週</button>
-          <button type="button" data-mode="month1" class="${replayState.mode === "month1" ? "active" : ""}">最近 1 個月</button>
-          <button type="button" data-mode="month3" class="${replayState.mode === "month3" ? "active" : ""}">最近 3 個月</button>
-          <button type="button" data-mode="custom" class="${replayState.mode === "custom" ? "active" : ""}">自訂</button>
-          <input type="date" data-role="replay-from" value="${escapeHtml(replayState.from)}" aria-label="回測開始日期">
-          <span>→</span>
-          <input type="date" data-role="replay-to" value="${escapeHtml(replayState.to)}" aria-label="回測結束日期">
-          <select data-role="replay-target" aria-label="回測出場目標">
-            <option value="tp1" ${replayState.exitTarget === "tp1" ? "selected" : ""}>TP1 全數出場</option>
-            <option value="tp2" ${replayState.exitTarget === "tp2" ? "selected" : ""}>TP2 全數出場</option>
-          </select>
-          <select data-role="replay-slippage" aria-label="Replay 滑價 Tick">
-            <option value="0" ${replayState.slippageTicks === 0 ? "selected" : ""}>0 Tick 滑價</option>
-            <option value="1" ${replayState.slippageTicks === 1 ? "selected" : ""}>1 Tick 滑價</option>
-            <option value="2" ${replayState.slippageTicks === 2 ? "selected" : ""}>2 Tick 滑價</option>
-          </select>
-          <button type="button" class="replay-run-button" data-role="replay-run">重新計算</button>
-        </div>
-      </section>
-
-      ${replayState.error
-        ? `<div class="error-message replay-error">${escapeHtml(replayState.error)}</div>`
-        : ""
-      }
-
-      ${report
-        ? `
-            ${renderDatasetSummary(replayState.dataset)}
-            ${renderSummary(report.summary, report.settings)}
-            ${renderDailyTable(report.daily, report.summary)}
-            ${renderPeriodTable("每週績效", "WEEKLY", report.weekly ?? [])}
-            ${renderPeriodTable("每月績效", "MONTHLY", report.monthly ?? [])}
-            ${renderCandidateAudits(replayState.dataset?.candidateAudits)}
-            ${renderTrades(report.trades)}
-            ${renderInstruments(report.instruments)}
-            ${renderLogBox(report.logs)}
-          `
-        : renderEmptyState()
-      }
+      ${renderHeader(replayState)}
+      ${renderControls(replayState, uiState, riskSettings)}
+      ${renderProgress(replayState.autoProgress)}
+      ${replayState.error ? `<section class="replay-error-panel"><strong>${escapeHtml(replayState.autoProgress?.errorCode ?? "REPLAY_FAILED")}</strong><span>${escapeHtml(replayState.autoProgress?.errorContext?.date ?? replayState.autoProgress?.currentDate ?? "-")} · ${escapeHtml(replayState.error)}</span></section>` : ""}
+      ${renderResults(replayState, uiState)}
     </div>
   `;
 
+  root.querySelectorAll(
+    "[data-replay-data-mode]"
+  )
+  .forEach(
+    button =>
+      button.addEventListener(
+        "click",
+        () =>
+          onUiChange(
+            {
+              dataMode:
+                button.dataset.replayDataMode
+            }
+          )
+      )
+  );
 
-  const fileInput =
-    root.querySelector(
-      '[data-role="replay-file"]'
-    );
+  root.querySelectorAll(
+    "[data-replay-range]"
+  )
+  .forEach(
+    button =>
+      button.addEventListener(
+        "click",
+        () =>
+          onRangeChange(
+            {
+              mode:
+                button.dataset.replayRange
+            }
+          )
+      )
+  );
 
+  root.querySelectorAll(
+    "[data-replay-tab]"
+  )
+  .forEach(
+    button =>
+      button.addEventListener(
+        "click",
+        () =>
+          onUiChange(
+            {
+              activeTab:
+                button.dataset.replayTab
+            }
+          )
+      )
+  );
 
-  fileInput.addEventListener(
+  root.querySelectorAll(
+    "[data-filter]"
+  )
+  .forEach(
+    input =>
+      input.addEventListener(
+        "change",
+        () =>
+          onUiChange(
+            {
+              [input.dataset.filter]:
+                input.value,
+              ...(
+                input.dataset.filter.startsWith("candidate")
+
+                  ? {
+                      candidatePage: 1
+                    }
+
+                  : {
+                      tradePage: 1
+                    }
+              )
+            }
+          )
+      )
+  );
+
+  root.querySelectorAll(
+    "[data-page-key]"
+  )
+  .forEach(
+    button =>
+      button.addEventListener(
+        "click",
+        () =>
+          onUiChange(
+            {
+              [button.dataset.pageKey]:
+                Number(
+                  button.dataset.page
+                )
+            }
+          )
+      )
+  );
+
+  root.querySelector(
+    '[data-role="replay-file"]'
+  )
+  .addEventListener(
     "change",
-    async () => {
+    async event => {
 
       const file =
-        fileInput.files?.[0];
+        event.target.files?.[0];
 
 
       if (
@@ -766,30 +1089,27 @@ export function renderReplayPanel(
 
 
       try {
-        const dataset =
+        onLoadDataset(
           await importHistorical5mFile(
             file
-          );
-
-
-        onLoadDataset(
-          dataset,
+          ),
           file.name
         );
       }
       catch (
         error
       ) {
+
         onLoadDataset(
           null,
           file.name,
           error
         );
+
       }
 
     }
   );
-
 
   root.querySelector(
     '[data-role="replay-sample"]'
@@ -820,6 +1140,14 @@ export function renderReplayPanel(
         }
 
 
+        onUiChange(
+          {
+            dataMode:
+              REPLAY_DATA_MODE.SAMPLE
+          },
+          false
+        );
+
         onLoadDataset(
           new JsonHistorical5mProvider()
           .toReplayDataset(
@@ -831,39 +1159,25 @@ export function renderReplayPanel(
       catch (
         error
       ) {
+
         onLoadDataset(
           null,
           "replay-sample.json",
           error
         );
+
       }
 
     }
   );
 
-
-  root
-  .querySelectorAll(
-    "[data-mode]"
+  root.querySelector(
+    '[data-role="replay-clear"]'
   )
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-          onRangeChange(
-            {
-              mode:
-                button.dataset.mode
-            }
-          );
-        }
-      );
-
-    }
+  .addEventListener(
+    "click",
+    onClear
   );
-
 
   root.querySelector(
     '[data-role="replay-run"]'
@@ -871,31 +1185,52 @@ export function renderReplayPanel(
   .addEventListener(
     "click",
     () => {
-      onRangeChange(
-        {
-          mode:
-            "custom",
-          from:
-            root.querySelector(
-              '[data-role="replay-from"]'
-            ).value,
-          to:
-            root.querySelector(
-              '[data-role="replay-to"]'
-            ).value,
-          exitTarget:
-            root.querySelector(
-              '[data-role="replay-target"]'
-            ).value,
-          slippageTicks:
-            Number(
-              root.querySelector(
-                '[data-role="replay-slippage"]'
-              ).value
-            )
-        }
+
+      const values =
+        collectControlValues(
+          root
+        );
+
+      onRiskChange(
+        values.maxRiskAmount
       );
+
+
+      if (
+        uiState.dataMode ===
+          REPLAY_DATA_MODE.AUTO
+      ) {
+
+        onAutoRun(
+          values
+        );
+
+      }
+      else {
+
+        onRangeChange(
+          values
+        );
+
+      }
+
     }
+  );
+
+  root.querySelector(
+    '[data-role="replay-more-logs"]'
+  )
+  ?.addEventListener(
+    "click",
+    () =>
+      onUiChange(
+        {
+          logLimit:
+            uiState.logLimit
+            +
+            100
+        }
+      )
   );
 
 

@@ -12,8 +12,10 @@ import {
   setMaxRiskAmount,
   setCandidateDataFreshness,
   setReplayDataset,
+  setReplayProgress,
   setReplayRange,
-  setReplayReport
+  setReplayReport,
+  setReplayUiState
 } from "./core/state.js";
 
 import {
@@ -62,6 +64,10 @@ import {
 } from "./panels/replayPanel.js";
 
 import {
+  renderDashboardPanel
+} from "./panels/dashboardPanel.js";
+
+import {
   renderAllStocksPanel
 } from "./panels/allStocksPanel.js";
 
@@ -101,6 +107,14 @@ import {
 import {
   normalizeReplayDataset
 } from "./replay/historical5mProvider.js";
+
+import {
+  HISTORICAL_AUTO_STAGE
+} from "./replay/historicalAutoBacktest.js";
+
+import {
+  resolveReplayControlRange
+} from "./replay/replayUiState.js";
 
 
 const panelRoot =
@@ -151,6 +165,12 @@ const menuBtn =
   );
 
 
+const viewHeadingRoot =
+  document.querySelector(
+    ".view-heading"
+  );
+
+
 const validViews =
   Object.keys(
     VIEW_CONFIG
@@ -162,6 +182,10 @@ let liveProvider =
 
 
 let liveRenderTimer =
+  null;
+
+
+let historicalAutoPipeline =
   null;
 
 
@@ -233,8 +257,33 @@ function updateViewHeader() {
 
   summaryRoot.classList.toggle(
     "hidden",
-    state.currentView ===
-    "replay"
+    [
+      "dashboard",
+      "replay"
+    ].includes(
+      state.currentView
+    )
+  );
+
+  executionRoot.classList.toggle(
+    "hidden",
+    [
+      "dashboard",
+      "replay"
+    ].includes(
+      state.currentView
+    )
+  );
+
+
+  viewHeadingRoot?.classList.toggle(
+    "hidden",
+    [
+      "dashboard",
+      "replay"
+    ].includes(
+      state.currentView
+    )
   );
 
 }
@@ -364,95 +413,15 @@ function resolveReplayRange(
   to
 ) {
 
-  const dates =
-    getReplaySessionDates();
-
-  const latest =
-    dates[
-      dates.length - 1
-    ]
-    ??
-    "";
-
-
-  if (
-    mode ===
-    "today"
-  ) {
-
-    return {
-      from:
-        latest,
-      to:
-        latest
-    };
-
-  }
-
-
-  if (
-    mode ===
-    "week"
-  ) {
-
-    return {
-      from:
-        latest
-
-          ? getWeekStart(
-              latest
-            )
-
-          : "",
-      to:
-        latest
-    };
-
-  }
-
-
-  if (
-    mode ===
-      "month1"
-    ||
-    mode ===
-      "month3"
-  ) {
-
-    return {
-      from:
-        latest
-
-          ? getMonthRangeStart(
-              latest,
-              mode ===
-                "month1"
-
-                ? 1
-
-                : 3
-            )
-
-          : "",
-      to:
-        latest
-    };
-
-  }
-
-
-  return {
-    from:
-      from
-      ||
-      dates[0]
-      ||
-      "",
-    to:
-      to
-      ||
-      latest
-  };
+  return resolveReplayControlRange(
+    {
+      mode,
+      from,
+      to,
+      sessionDates:
+        getReplaySessionDates()
+    }
+  );
 
 }
 
@@ -471,20 +440,6 @@ function rerunReplay(
       state.replay.slippageTicks
   } = {}
 ) {
-
-  if (
-    !state.replay.dataset
-  ) {
-
-    setReplayReport(
-      null,
-      null
-    );
-
-    return null;
-
-  }
-
 
   const range =
     resolveReplayRange(
@@ -505,6 +460,19 @@ function rerunReplay(
       slippageTicks
     }
   );
+
+  if (
+    !state.replay.dataset
+  ) {
+
+    setReplayReport(
+      null,
+      null
+    );
+
+    return null;
+
+  }
 
 
   try {
@@ -692,6 +660,21 @@ function renderCurrentPanel() {
     state.currentView
   ) {
 
+    case "dashboard":
+
+      return renderDashboardPanel(
+        panelRoot,
+        state.stocks,
+        {
+          metadata:
+            state.metadata,
+          freshness:
+            state.candidateDataFreshness,
+          onNavigate:
+            navigateTo
+        }
+      );
+
     case "long":
 
       return renderLongPanel(
@@ -732,10 +715,20 @@ function renderCurrentPanel() {
         panelRoot,
         state.replay,
         {
+          riskSettings:
+            state.riskSettings,
           onLoadDataset:
             handleReplayDataset,
           onRangeChange:
-            handleReplayRangeChange
+            handleReplayRangeChange,
+          onAutoRun:
+            handleReplayAutoRun,
+          onClear:
+            handleReplayClear,
+          onRiskChange:
+            handleRiskChange,
+          onUiChange:
+            handleReplayUiChange
         }
       );
 
@@ -819,6 +812,213 @@ function renderExecutionControls() {
         handleRiskChange
     }
   );
+
+}
+
+
+function handleReplayUiChange(
+  patch,
+  shouldRender =
+    true
+) {
+
+  setReplayUiState(
+    patch
+  );
+
+
+  if (
+    shouldRender
+  ) {
+
+    renderCurrentView();
+
+  }
+
+}
+
+
+function handleReplayClear() {
+
+  setReplayDataset(
+    null,
+    ""
+  );
+
+  setReplayReport(
+    null,
+    null
+  );
+
+  setReplayProgress(
+    null,
+    false
+  );
+
+  renderCurrentView();
+
+}
+
+
+async function handleReplayAutoRun(
+  options
+) {
+
+  setReplayRange(
+    options
+  );
+
+  setReplayDataset(
+    null,
+    ""
+  );
+
+  setReplayReport(
+    null,
+    null
+  );
+
+
+  if (
+    !historicalAutoPipeline
+  ) {
+
+    const progress = {
+      stage:
+        HISTORICAL_AUTO_STAGE.FAILED,
+      errorCode:
+        "AUTO_PROVIDER_NOT_CONFIGURED",
+      errorMessage:
+        "尚未設定正式歷史 Daily / Eligibility / Intraday Provider；系統不會以假資料冒充真實績效。",
+      progressPercent: 0,
+      completedSessions: 0,
+      validatedSessions: 0
+    };
+
+    setReplayProgress(
+      progress,
+      false
+    );
+
+    setReplayReport(
+      null,
+      progress.errorMessage
+    );
+
+    renderCurrentView();
+
+    return null;
+
+  }
+
+
+  historicalAutoPipeline.onProgress =
+    progress => {
+
+      const running =
+        ![
+          HISTORICAL_AUTO_STAGE.COMPLETED,
+          HISTORICAL_AUTO_STAGE.FAILED
+        ].includes(
+          progress.stage
+        );
+
+      setReplayProgress(
+        progress,
+        running
+      );
+
+      renderCurrentView(
+        {
+          renderShell: false
+        }
+      );
+
+    };
+
+
+  try {
+
+    const result =
+      await historicalAutoPipeline.run(
+        {
+          fromDate:
+            options.from,
+          toDate:
+            options.to,
+          tradingCalendar:
+            state.metadata.tradingCalendar,
+          replayOptions: {
+            from:
+              options.from,
+            to:
+              options.to,
+            maxRiskAmount:
+              state.riskSettings.maxRiskAmount,
+            exitTarget:
+              options.exitTarget,
+            slippageTicks:
+              options.slippageTicks
+          }
+        }
+      );
+
+    setReplayDataset(
+      result.dataset,
+      "Auto Historical Collector"
+    );
+
+    setReplayReport(
+      result.report,
+      null
+    );
+
+    setReplayProgress(
+      result.progress,
+      false
+    );
+
+    renderCurrentView();
+
+
+    return result.report;
+
+  }
+  catch (
+    error
+  ) {
+
+    setReplayProgress(
+      historicalAutoPipeline.progress
+      ??
+      {
+        stage:
+          HISTORICAL_AUTO_STAGE.FAILED,
+        errorCode:
+          error.code
+          ??
+          "HISTORICAL_AUTO_BACKTEST_FAILED",
+        errorMessage:
+          error.message
+      },
+      false
+    );
+
+    setReplayReport(
+      null,
+      error.message
+      ??
+      String(
+        error
+      )
+    );
+
+    renderCurrentView();
+
+
+    return null;
+
+  }
 
 }
 
@@ -908,7 +1108,7 @@ function navigateTo(
   ) {
 
     view =
-      "long";
+      "dashboard";
 
   }
 
@@ -1162,16 +1362,44 @@ function initializeReplayApi() {
     },
 
 
-    clear() {
-      setReplayDataset(
-        null,
-        ""
-      );
+    configureHistoricalAutoPipeline(
+      pipeline
+    ) {
 
-      setReplayReport(
-        null,
-        null
+      if (
+        !pipeline
+        ||
+        typeof pipeline.run !==
+          "function"
+      ) {
+
+        throw new TypeError(
+          "Historical auto pipeline must expose run(options)"
+        );
+
+      }
+
+
+      historicalAutoPipeline =
+        pipeline;
+
+
+      return true;
+
+    },
+
+
+    hasHistoricalAutoPipeline() {
+      return Boolean(
+        historicalAutoPipeline
       );
+    },
+
+
+    clear() {
+      setReplayDataset(null, "");
+      setReplayReport(null, null);
+      setReplayProgress(null, false);
 
 
       if (

@@ -65,14 +65,19 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 
 ## Replay／Backtest 資料
 
-從側邊選單進入「Replay 回測」後可載入 JSON／CSV，或在瀏覽器 Console 呼叫 `stockDaybydayReplay.run(dataset, options)`。Replay Dataset 統一由 `Historical5mProvider` 轉換，引擎本身不綁定資料來源。資料結構：
+從側邊選單進入「Replay 回測」後，主要操作是選日期、風險、滑價與 TP1／TP2，再啟動 Auto Historical Backtest；JSON／CSV 保留為 Advanced／Offline Import，也可在瀏覽器 Console 呼叫 `stockDaybydayReplay.run(dataset, options)`。Replay Dataset 統一由 `Historical5mProvider` 轉換，引擎本身不綁定資料來源。資料結構：
 
 ```js
 {
   metadata: {
     sourceType: "REAL_HISTORICAL_DATA",
     adapter: "JSON_IMPORT",
-    volumeMode: "BROKER_COMPARABLE_V4"
+    volumeMode: "BROKER_COMPARABLE_V4",
+    universeMode: "TWSE_TPEX_COMPANY_EQUITY_ONLY",
+    universeValidated: true,
+    universeStockCount: 1700,
+    twseStockCount: 1000,
+    tpexStockCount: 700
   },
   dailySnapshots: [
     { date: "2026-08-13", stocks: [/* 當日盤後股票資料 */] }
@@ -103,6 +108,18 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 
 `HistoricalDatasetBuilder` 會先把匯入資料組成上述 contract，並逐日使用 `previousTradingDate` 的 Snapshot 呼叫正式 Candidate Selector。成功輸出會附帶 `candidateAudits`、`validationLogs` 與 `metadata.historicalStats`；Audit 包含代號、名稱、方向、Strategy Score、Liquidity Rank、Observation、昨日 High／Low。若資料附有正式 Trading Calendar，Builder 也會核對真正的上一交易日。
 
+### Historical Universe 與自動回測
+
+REAL Historical Snapshot 必須先由 `HistoricalUniverseBuilder` 對每個 D-1 執行「TWSE 官方歷史行情 ∩ 當日 TWSE 公司白名單」與「TPEx 官方歷史行情 ∩ 當日 TPEx 公司白名單」。ETF、ETN、權證、基金、債券及其他非公司股票在 Candidate Selector 前排除；兩個市場任一白名單無法驗證、日期不一致或母體計數不符時，資料不得宣告 `universeValidated: true`，正式 Dataset 會 fail closed。
+
+自動流程固定為：`HistoricalDailyCollector → HistoricalUniverseBuilder → HistoricalEligibilityProvider → 共用 Candidate Selector → HistoricalIntradayProvider → FiveMinuteBarAggregator → HistoricalDatasetBuilder → 既有 Replay Engine`。每個 Session D 都透過既有 Trading Calendar 取得真正的 previous trading date，不能以 calendar day - 1 代替；Daily／Universe／Eligibility 都必須是該 D-1 的歷史狀態，禁止以今天的狀態倒灌過去。
+
+Intraday 只向 Provider 要求每日 Long Top10 與 Short Top10，絕不抓全市場。Provider 若回傳 1m，獨立 Aggregator 只把五根連續、已完成的一分鐘 K 聚合成 completed 5m；不完整區間會在進 Replay 前被拒絕。Cache 是可替換 Provider abstraction，key 包含 date、market、code、timeframe、source、volumeMode；目前前端只提供記憶體／Null 實作，不把 server-side cache 寫入 GitHub Pages。
+
+`ShioajiHistoricalAdapter` 目前只有 server-side `requestKbars` 邊界，不含 API Key、Secret 或登入資料。正式自動模式可透過 `stockDaybydayReplay.configureHistoricalAutoPipeline(pipeline)` 注入已在受信任後端設定好的 Daily／Eligibility／Intraday Provider；未設定時 UI 會顯示 `AUTO_PROVIDER_NOT_CONFIGURED`，不會以 Sample／Mock 取代真實歷史績效。
+
+Replay 頁面現在使用集中式控制列、資料準備進度、8 項核心 KPI、原生 SVG／CSS Equity、Cumulative R 與 Daily P&L 圖，以及 Overview／Candidates／Trades／Daily／Weekly Monthly／Logs 分頁。Candidates 與 Trades 使用篩選和分頁，Logs 預設只載入最近 100 筆，避免大型 Dataset 一次渲染全部資料。Dashboard 首頁則提供資料新鮮度、市場數量及 Long／Short 候選摘要；Desktop 使用固定側欄，Tablet／Mobile 使用可收合 Drawer。
+
 REAL Snapshot 的每檔股票必須包含 `Code`、完整 OHLC、`Change`、布林型態的 `DayTradeEligible`／`SellFirstDayTradeAllowed`，以及至少一個受支援成交量欄位：`BrokerComparableVolume`、`AdjustedTradeVolume`、`RegularTradeVolume`、`NonOddLotTradeVolume`、`TradeVolume`。缺欄、空陣列、非有限數字、負成交量或不合理 OHLC 一律拒絕，不會用 0 補值。成交量 fallback 維持上述順序；匯入未宣告 `volumeMode` 時會明確標為 `VOLUME_MODE_UNDECLARED`，不推測或重算。
 
 Liquidity Rank 固定依 `Volume DESC → Code ASC`；Candidate 固定依 `Strategy Score DESC → Liquidity Rank ASC → Code ASC`。因此 JSON／CSV 股票列順序不會改變 Long／Short Top10 或 Candidate Audit。驗證成功的 metadata 會標記 `validationStatus: "VALIDATED"`、`snapshotSchemaValidated: true` 與 `candidateSelectionDeterministic: true`，Replay UI 同時顯示來源、驗證狀態、成交量模式與資料筆數摘要。
@@ -114,6 +131,8 @@ JSON 只有在 `metadata.sourceType` 明確填入 `REAL_HISTORICAL_DATA` 時才�
 ## 重要限制
 
 - 官方「可先賣」資格不等同券商當下保證有券；實際券源仍需由券商 API 確認。
+- 專案目前未附正式歷史公司白名單、歷史當沖資格服務或 Shioaji 憑證；因此 Auto Historical Backtest 已完成管線與 UI，但在部署端注入可驗證 Provider 前會拒絕執行，JSON／CSV 仍是可用的離線管道。
+- 公開靜態前端不保存 Secret，也不提供永久伺服器快取；正式 Shioaji 與持久 Cache 必須放在本機／受信任後端。
 - TPEx SSL fallback 僅限憑證驗證失敗，並辨識 `CERTIFICATE_VERIFY_FAILED` 與 `Missing Subject Key Identifier`；啟用時會輸出安全警告。
 - 單筆風險上限預設不設定，使用者可在頁面輸入；`maxLots` 採月退前 `cashRiskPerLot` 保守計算。若結果為 0，UI 顯示「風險超標」；即使後續 `maxLots >= 1`，仍需新的 Direction Confirmation 才能 Entry Ready。未設定上限時不套用張數阻擋，但方向確認仍為必要條件。
 - 交易成本依使用者提供的月退比例連續估算，未套用逐筆最低手續費與券商個別取整方式，實際金額以對帳單為準。

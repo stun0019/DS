@@ -36,6 +36,10 @@ import {
   TRADING_CALENDAR_SOURCE
 } from "../assets/js/utils/tradingCalendar.js";
 
+import {
+  HISTORICAL_UNIVERSE_MODE
+} from "../assets/js/replay/historicalUniverse.js";
+
 
 function clone(
   value
@@ -229,6 +233,13 @@ function rawHistoricalInput() {
         HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA,
       adapter:
         "TEST_ADAPTER",
+      universeMode:
+        HISTORICAL_UNIVERSE_MODE,
+      universeValidated:
+        true,
+      universeStockCount: 24,
+      twseStockCount: 12,
+      tpexStockCount: 12,
       tradingCalendar:
         tradingCalendar()
     },
@@ -969,20 +980,38 @@ test(
   "JSON and separated CSV records use the same validated contract",
   () => {
 
+    const longStock =
+      createLongStocks(
+        "CSV",
+        1
+      )[0];
+
+    const tpexStock = {
+      ...createShortStocks(
+        "CSV",
+        1
+      )[0],
+      DayTradeEligible: false
+    };
+
     const input = {
       metadata: {
         sourceType:
-          HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA
+          HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA,
+        universeMode:
+          HISTORICAL_UNIVERSE_MODE,
+        universeValidated: true,
+        universeStockCount: 2,
+        twseStockCount: 1,
+        tpexStockCount: 1
       },
       dailySnapshots: [
         {
           date:
             "2026-08-17",
           stocks: [
-            createLongStocks(
-              "CSV",
-              1
-            )[0]
+            longStock,
+            tpexStock
           ]
         }
       ],
@@ -998,6 +1027,12 @@ test(
                 "2026-08-18",
                 "CSVL01"
               )
+            ],
+            CSVS01: [
+              fiveMinuteBar(
+                "2026-08-18",
+                "CSVS01"
+              )
             ]
           }
         }
@@ -1010,13 +1045,15 @@ test(
         input
       );
 
-    const csv = [
-      "sourceType,recordType,snapshotDate,sessionDate,previousTradingDate,code,name,market,openingPrice,highestPrice,lowestPrice,closingPrice,change,tradeVolume,dayTradeEligible,sellFirstDayTradeAllowed,timestamp,timeframeMinutes,isComplete,open,high,low,close,volume",
-      "REAL_HISTORICAL_DATA,SNAPSHOT,2026-08-17,,,CSVL01,CSV 多方 1,TWSE,100,112,98,110,0.5,1000000,true,true,,,,,,,,",
-      "REAL_HISTORICAL_DATA,BAR,,2026-08-18,2026-08-17,CSVL01,,,,,,,,,,,2026-08-18T09:00:00+08:00,5,true,100,101,99,100,1000"
-    ].join(
-      "\n"
-    );
+    const csv =
+      orderedCsvDataset(
+        [
+          longStock,
+          tpexStock
+        ],
+        false,
+        HISTORICAL_VOLUME_MODE_UNDECLARED
+      );
 
     const csvDataset =
       parseHistorical5mCsv(
@@ -1056,9 +1093,73 @@ function orderedCsvDataset(
     "BROKER_COMPARABLE_V4"
 ) {
 
+  const universeStocks = [
+    ...stocks
+  ];
+
+
+  if (
+    !universeStocks.some(
+      stock =>
+        stock.Market ===
+          "TWSE"
+    )
+  ) {
+
+    universeStocks.push(
+      {
+        ...createLongStocks("ZZTW", 1)[0],
+        Code: "ZZTW_DUMMY",
+        DayTradeEligible: false
+      }
+    );
+
+  }
+
+
+  if (
+    !universeStocks.some(
+      stock =>
+        stock.Market ===
+          "TPEX"
+    )
+  ) {
+
+    universeStocks.push(
+      {
+        ...createShortStocks("ZZTP", 1)[0],
+        Code: "ZZTP_DUMMY",
+        DayTradeEligible: false
+      }
+    );
+
+  }
+
+  const universeStockCount =
+    universeStocks.length;
+
+  const twseStockCount =
+    universeStocks.filter(
+      stock =>
+        stock.Market ===
+          "TWSE"
+    ).length;
+
+  const tpexStockCount =
+    universeStocks.filter(
+      stock =>
+        stock.Market ===
+          "TPEX"
+    ).length;
+
   const headers = [
     "sourceType",
     "volumeMode",
+    "universeMode",
+    "universeValidated",
+    "universeStockCount",
+    "twseStockCount",
+    "tpexStockCount",
     "recordType",
     "snapshotDate",
     "sessionDate",
@@ -1088,10 +1189,17 @@ function orderedCsvDataset(
     HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA;
 
   const snapshotRows =
-    stocks.map(
+    universeStocks.map(
       stock => ({
         sourceType,
         volumeMode,
+        universeMode:
+          HISTORICAL_UNIVERSE_MODE,
+        universeValidated:
+          true,
+        universeStockCount,
+        twseStockCount,
+        tpexStockCount,
         recordType:
           "SNAPSHOT",
         snapshotDate:
@@ -1130,10 +1238,17 @@ function orderedCsvDataset(
     );
 
   const barRows =
-    stocks.map(
+    universeStocks.map(
       stock => ({
         sourceType,
         volumeMode,
+        universeMode:
+          HISTORICAL_UNIVERSE_MODE,
+        universeValidated:
+          true,
+        universeStockCount,
+        twseStockCount,
+        tpexStockCount,
         recordType:
           "BAR",
         sessionDate:

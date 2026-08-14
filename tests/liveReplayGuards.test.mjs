@@ -49,6 +49,10 @@ import {
   isTradingDate
 } from "../assets/js/utils/tradingCalendar.js";
 
+import {
+  HISTORICAL_UNIVERSE_MODE
+} from "../assets/js/replay/historicalUniverse.js";
+
 
 function assertClose(
   actual,
@@ -74,6 +78,7 @@ function createStock() {
   return {
     Code: "GUARD",
     Name: "Guard 測試",
+    Market: "TWSE",
     OpeningPrice: 104,
     HighestPrice: 110,
     LowestPrice: 100,
@@ -457,6 +462,53 @@ function replayDataset() {
       }
     ]
   };
+
+}
+
+
+function validatedRealDataset(
+  source
+) {
+
+  const dataset =
+    JSON.parse(
+      JSON.stringify(
+        source
+      )
+    );
+
+  const tpexStock = {
+    ...createStock(),
+    Code: "GUARD_TPEX",
+    Name: "Guard 上櫃測試",
+    Market: "TPEX",
+    DayTradeEligible: false
+  };
+
+
+  dataset.dailySnapshots.forEach(
+    snapshot => {
+
+      snapshot.stocks.push(
+        tpexStock
+      );
+
+    }
+  );
+
+  dataset.metadata = {
+    sourceType:
+      HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA,
+    universeMode:
+      HISTORICAL_UNIVERSE_MODE,
+    universeValidated: true,
+    universeStockCount: 2,
+    twseStockCount: 1,
+    tpexStockCount: 1
+  };
+
+
+  return dataset;
 
 }
 
@@ -1638,13 +1690,9 @@ test(
 
     const explicitReal =
       jsonProvider.toReplayDataset(
-        {
-          ...baseDataset,
-          metadata: {
-            sourceType:
-              HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA
-          }
-        }
+        validatedRealDataset(
+          baseDataset
+        )
       );
 
 
@@ -1695,8 +1743,9 @@ test(
   () => {
 
     const csv = [
-      "sourceType,sessionDate,previousTradingDate,code,name,market,openingPrice,highestPrice,lowestPrice,closingPrice,change,tradeVolume,dayTradeEligible,sellFirstDayTradeAllowed,timestamp,timeframeMinutes,isComplete,open,high,low,close,volume",
-      "REAL_HISTORICAL_DATA,2026-08-18,2026-08-17,2330,台積電,TWSE,104,110,100,109,5,2000000,true,true,2026-08-18T09:00:00+08:00,5,true,110,112,109,111.5,1800"
+      "sourceType,universeMode,universeValidated,universeStockCount,twseStockCount,tpexStockCount,sessionDate,previousTradingDate,code,name,market,openingPrice,highestPrice,lowestPrice,closingPrice,change,tradeVolume,dayTradeEligible,sellFirstDayTradeAllowed,timestamp,timeframeMinutes,isComplete,open,high,low,close,volume",
+      `REAL_HISTORICAL_DATA,${HISTORICAL_UNIVERSE_MODE},true,2,1,1,2026-08-18,2026-08-17,2330,台積電,TWSE,104,110,100,109,5,2000000,true,true,2026-08-18T09:00:00+08:00,5,true,110,112,109,111.5,1800`,
+      `REAL_HISTORICAL_DATA,${HISTORICAL_UNIVERSE_MODE},true,2,1,1,2026-08-18,2026-08-17,8069,元太,TPEX,110,112,98,100,-2,750000,false,true,2026-08-18T09:00:00+08:00,5,true,100,101,99,100,1000`
     ].join(
       "\n"
     );

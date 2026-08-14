@@ -15,6 +15,10 @@ import {
 } from "../data/stockData.js";
 
 import {
+  HISTORICAL_UNIVERSE_MODE
+} from "./historicalUniverse.js";
+
+import {
   getPreviousTradingDate,
   normalizeTradingDate
 } from "../utils/tradingCalendar.js";
@@ -45,6 +49,253 @@ const REQUIRED_SNAPSHOT_BOOLEAN_FIELDS = [
   "DayTradeEligible",
   "SellFirstDayTradeAllowed"
 ];
+
+
+function normalizeUniverseMetadata(
+  metadata,
+  snapshots
+) {
+
+  const isReal =
+    metadata.sourceType ===
+      "REAL_HISTORICAL_DATA";
+
+  const observedCodes =
+    new Set();
+
+  const observedMarkets = {
+    TWSE:
+      new Set(),
+    TPEX:
+      new Set()
+  };
+
+
+  snapshots.forEach(
+    snapshot => {
+
+      snapshot.stocks.forEach(
+        stock => {
+
+          const code =
+            String(
+              stock.Code
+              ??
+              ""
+            );
+
+          const market =
+            String(
+              stock.Market
+              ??
+              ""
+            )
+            .toUpperCase();
+
+          observedCodes.add(
+            code
+          );
+
+
+          if (
+            observedMarkets[market]
+          ) {
+
+            observedMarkets[market]
+            .add(
+              code
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  if (
+    !isReal
+    &&
+    metadata.universeValidated !==
+      true
+  ) {
+
+    return {
+      universeMode:
+        metadata.universeMode
+        ??
+        "UNIVERSE_MODE_UNDECLARED",
+      universeValidated:
+        false,
+      universeStockCount:
+        observedCodes.size,
+      twseStockCount:
+        observedMarkets.TWSE.size,
+      tpexStockCount:
+        observedMarkets.TPEX.size
+    };
+
+  }
+
+
+  const universeStockCount =
+    Number(
+      metadata.universeStockCount
+    );
+
+  const twseStockCount =
+    Number(
+      metadata.twseStockCount
+    );
+
+  const tpexStockCount =
+    Number(
+      metadata.tpexStockCount
+    );
+
+
+  if (
+    metadata.universeValidated !==
+      true
+  ) {
+
+    reject(
+      "UNIVERSE_NOT_VALIDATED",
+      "REAL historical dataset requires a validated company-equity universe"
+    );
+
+  }
+
+
+  if (
+    metadata.universeMode !==
+      HISTORICAL_UNIVERSE_MODE
+    ||
+    !Number.isInteger(
+      universeStockCount
+    )
+    ||
+    !Number.isInteger(
+      twseStockCount
+    )
+    ||
+    !Number.isInteger(
+      tpexStockCount
+    )
+    ||
+    universeStockCount <=
+      0
+    ||
+    twseStockCount <=
+      0
+    ||
+    tpexStockCount <=
+      0
+    ||
+    universeStockCount !==
+      twseStockCount
+      +
+      tpexStockCount
+  ) {
+
+    reject(
+      "INVALID_UNIVERSE_METADATA",
+      "Historical universe metadata is incomplete or inconsistent"
+    );
+
+  }
+
+
+  snapshots.forEach(
+    snapshot => {
+
+      const datedUniverse =
+        metadata.universeByDate?.[
+          snapshot.date
+        ];
+
+      const expectedUniverseStockCount =
+        Number(
+          datedUniverse?.universeStockCount
+          ??
+          universeStockCount
+        );
+
+      const expectedTwseStockCount =
+        Number(
+          datedUniverse?.twseStockCount
+          ??
+          twseStockCount
+        );
+
+      const expectedTpexStockCount =
+        Number(
+          datedUniverse?.tpexStockCount
+          ??
+          tpexStockCount
+        );
+
+      const snapshotTwseCount =
+        snapshot.stocks.filter(
+          stock =>
+            stock.Market ===
+              "TWSE"
+        ).length;
+
+      const snapshotTpexCount =
+        snapshot.stocks.filter(
+          stock =>
+            stock.Market ===
+              "TPEX"
+        ).length;
+
+
+      if (
+        datedUniverse
+        &&
+        (
+          datedUniverse.universeValidated !==
+            true
+          ||
+          datedUniverse.universeMode !==
+            HISTORICAL_UNIVERSE_MODE
+        )
+        ||
+        snapshot.stocks.length !==
+          expectedUniverseStockCount
+        ||
+        snapshotTwseCount !==
+          expectedTwseStockCount
+        ||
+        snapshotTpexCount !==
+          expectedTpexStockCount
+      ) {
+
+        reject(
+          "INCOMPLETE_HISTORICAL_UNIVERSE",
+          "Snapshot stock counts do not match validated universe metadata",
+          snapshot.date
+        );
+
+      }
+
+    }
+  );
+
+
+  return {
+    universeMode:
+      HISTORICAL_UNIVERSE_MODE,
+    universeValidated:
+      true,
+    universeStockCount,
+    twseStockCount,
+    tpexStockCount
+  };
+
+}
 
 
 export class HistoricalDatasetValidationError
@@ -1550,6 +1801,12 @@ export function buildHistoricalReplayDataset(
       input.dailySnapshots
     );
 
+  const universeMetadata =
+    normalizeUniverseMetadata(
+      metadata,
+      dailySnapshots
+    );
+
   const {
     normalizedSessions,
     candidateAudits,
@@ -1611,6 +1868,7 @@ export function buildHistoricalReplayDataset(
   return {
     metadata: {
       ...metadata,
+      ...universeMetadata,
       historicalStats,
       validationStatus:
         "VALIDATED",

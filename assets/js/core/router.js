@@ -23,7 +23,7 @@ export function getInitialView(
   }
 
 
-  return "long";
+  return "dashboard";
 
 }
 

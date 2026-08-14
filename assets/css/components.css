@@ -894,6 +894,26 @@
 }
 
 
+@media (min-width: 1181px) {
+  .drawer {
+    width: 236px;
+    padding: 22px 13px;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .drawer-overlay,
+  .drawer-close,
+  .menu-btn {
+    display: none;
+  }
+
+  body.menu-open {
+    overflow: auto;
+  }
+}
+
+
 .system-pill.data-fresh {
   border:
     1px solid

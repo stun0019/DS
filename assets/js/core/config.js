@@ -87,6 +87,22 @@ export const TRADING_COST_CONFIG = {
 
 export const VIEW_CONFIG = {
 
+  dashboard: {
+
+    name:
+      "候選儀表板",
+
+    description:
+      "台股盤後候選掃描器",
+
+    chip:
+      "MARKET",
+
+    chipClass:
+      "rules"
+
+  },
+
   long: {
 
     name:
