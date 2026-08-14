@@ -1,3 +1,8 @@
+import {
+  buildHistoricalReplayDataset
+} from "./historicalDatasetBuilder.js";
+
+
 export const HISTORICAL_SOURCE_TYPE = {
   SAMPLE_MOCK:
     "SAMPLE_MOCK",
@@ -90,7 +95,8 @@ export function normalizeReplayDataset(
     );
 
 
-  return {
+  return buildHistoricalReplayDataset(
+    {
     ...dataset,
     metadata: {
       ...(
@@ -105,7 +111,8 @@ export function normalizeReplayDataset(
         ),
       adapter
     }
-  };
+    }
+  );
 
 }
 
@@ -394,6 +401,118 @@ function csvBoolean(
 }
 
 
+function stockFromCsvRow(
+  row,
+  code
+) {
+
+  return {
+    Code:
+      code,
+    Name:
+      csvValue(
+        row,
+        "name"
+      ),
+    Market:
+      csvValue(
+        row,
+        "market"
+      ),
+    OpeningPrice:
+      csvNumber(
+        row,
+        "openingPrice"
+      ),
+    HighestPrice:
+      csvNumber(
+        row,
+        "highestPrice"
+      ),
+    LowestPrice:
+      csvNumber(
+        row,
+        "lowestPrice"
+      ),
+    ClosingPrice:
+      csvNumber(
+        row,
+        "closingPrice"
+      ),
+    Change:
+      csvNumber(
+        row,
+        "change"
+      ),
+    TradeVolume:
+      csvNumber(
+        row,
+        "tradeVolume"
+      ),
+    DayTradeEligible:
+      csvBoolean(
+        row,
+        "dayTradeEligible"
+      ),
+    SellFirstDayTradeAllowed:
+      csvBoolean(
+        row,
+        "sellFirstDayTradeAllowed"
+      )
+  };
+
+}
+
+
+function barFromCsvRow(
+  row,
+  code,
+  timestamp
+) {
+
+  return {
+    code,
+    timestamp,
+    timeframeMinutes:
+      csvNumber(
+        row,
+        "timeframeMinutes"
+      ),
+    isComplete:
+      csvBoolean(
+        row,
+        "isComplete"
+      ),
+    open:
+      csvNumber(
+        row,
+        "open"
+      ),
+    high:
+      csvNumber(
+        row,
+        "high"
+      ),
+    low:
+      csvNumber(
+        row,
+        "low"
+      ),
+    close:
+      csvNumber(
+        row,
+        "close"
+      ),
+    volume:
+      csvNumber(
+        row,
+        "volume"
+      )
+  };
+
+}
+
+
 export function parseHistorical5mCsv(
   text
 ) {
@@ -442,6 +561,45 @@ export function parseHistorical5mCsv(
       index
     ) => {
 
+      const recordType =
+        (
+          csvValue(
+            row,
+            "recordType"
+          )
+          ||
+          "COMBINED"
+        )
+        .toUpperCase();
+
+      const includesSnapshot =
+        recordType ===
+          "SNAPSHOT"
+        ||
+        recordType ===
+          "COMBINED";
+
+      const includesBar =
+        recordType ===
+          "BAR"
+        ||
+        recordType ===
+          "COMBINED";
+
+
+      if (
+        !includesSnapshot
+        &&
+        !includesBar
+      ) {
+
+        throw new Error(
+          `Historical CSV 第 ${index + 2} 列 recordType 必須為 SNAPSHOT、BAR 或 COMBINED`
+        );
+
+      }
+
+
       const sessionDate =
         csvValue(
           row,
@@ -453,6 +611,14 @@ export function parseHistorical5mCsv(
           row,
           "previousTradingDate"
         );
+
+      const snapshotDate =
+        csvValue(
+          row,
+          "snapshotDate"
+        )
+        ||
+        previousTradingDate;
 
       const code =
         csvValue(
@@ -468,13 +634,25 @@ export function parseHistorical5mCsv(
 
 
       if (
-        !sessionDate
-        ||
-        !previousTradingDate
-        ||
         !code
         ||
-        !timestamp
+        (
+          includesSnapshot
+          &&
+          !snapshotDate
+        )
+        ||
+        (
+          includesBar
+          &&
+          (
+            !sessionDate
+            ||
+            !previousTradingDate
+            ||
+            !timestamp
+          )
+        )
       ) {
 
         throw new Error(
@@ -485,78 +663,73 @@ export function parseHistorical5mCsv(
 
 
       if (
-        !snapshots.has(
-          previousTradingDate
-        )
+        includesSnapshot
       ) {
 
-        snapshots.set(
-          previousTradingDate,
-          new Map()
+        if (
+          !snapshots.has(
+            snapshotDate
+          )
+        ) {
+
+          snapshots.set(
+            snapshotDate,
+            new Map()
+          );
+
+
+        }
+
+
+        const snapshotStock =
+          stockFromCsvRow(
+            row,
+            code
+          );
+
+        const existingStock =
+          snapshots.get(
+            snapshotDate
+          ).get(
+            code
+          );
+
+
+        if (
+          existingStock
+          &&
+          JSON.stringify(
+            existingStock
+          ) !==
+            JSON.stringify(
+              snapshotStock
+            )
+        ) {
+
+          throw new Error(
+            `${snapshotDate} Snapshot ${code} 的盤後資料不一致`
+          );
+
+        }
+
+
+        snapshots.get(
+          snapshotDate
+        ).set(
+          code,
+          snapshotStock
         );
 
       }
 
 
-      snapshots.get(
-        previousTradingDate
-      ).set(
-        code,
-        {
-          Code:
-            code,
-          Name:
-            csvValue(
-              row,
-              "name"
-            ),
-          Market:
-            csvValue(
-              row,
-              "market"
-            ),
-          OpeningPrice:
-            csvNumber(
-              row,
-              "openingPrice"
-            ),
-          HighestPrice:
-            csvNumber(
-              row,
-              "highestPrice"
-            ),
-          LowestPrice:
-            csvNumber(
-              row,
-              "lowestPrice"
-            ),
-          ClosingPrice:
-            csvNumber(
-              row,
-              "closingPrice"
-            ),
-          Change:
-            csvNumber(
-              row,
-              "change"
-            ),
-          TradeVolume:
-            csvNumber(
-              row,
-              "tradeVolume"
-            ),
-          DayTradeEligible:
-            csvBoolean(
-              row,
-              "dayTradeEligible"
-            ),
-          SellFirstDayTradeAllowed:
-            csvBoolean(
-              row,
-              "sellFirstDayTradeAllowed"
-            )
-        }
-      );
+      if (
+        !includesBar
+      ) {
+
+        return;
+
+      }
 
 
       if (
@@ -612,45 +785,11 @@ export function parseHistorical5mCsv(
       session.barsByCode[
         code
       ].push(
-        {
+        barFromCsvRow(
+          row,
           code,
-          timestamp,
-          timeframeMinutes:
-            csvNumber(
-              row,
-              "timeframeMinutes"
-            ),
-          isComplete:
-            csvBoolean(
-              row,
-              "isComplete"
-            ),
-          open:
-            csvNumber(
-              row,
-              "open"
-            ),
-          high:
-            csvNumber(
-              row,
-              "high"
-            ),
-          low:
-            csvNumber(
-              row,
-              "low"
-            ),
-          close:
-            csvNumber(
-              row,
-              "close"
-            ),
-          volume:
-            csvNumber(
-              row,
-              "volume"
-            )
-        }
+          timestamp
+        )
       );
 
     }
@@ -679,27 +818,9 @@ export function parseHistorical5mCsv(
             stocks:
               [...stocks.values()]
           })
-        )
-        .sort(
-          (
-            first,
-            second
-          ) =>
-            first.date.localeCompare(
-              second.date
-            )
         ),
       sessions:
         [...sessions.values()]
-        .sort(
-          (
-            first,
-            second
-          ) =>
-            first.date.localeCompare(
-              second.date
-            )
-        )
     },
     {
       adapter:

@@ -299,6 +299,65 @@ function getWeekStart(
 }
 
 
+function getMonthRangeStart(
+  dateValue,
+  months
+) {
+
+  const date =
+    new Date(
+      `${dateValue}T00:00:00Z`
+    );
+
+  const originalDay =
+    date.getUTCDate();
+
+
+  date.setUTCDate(
+    1
+  );
+
+  date.setUTCMonth(
+    date.getUTCMonth()
+    -
+    months
+  );
+
+  const daysInTargetMonth =
+    new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth() + 1,
+        0
+      )
+    )
+    .getUTCDate();
+
+
+  date.setUTCDate(
+    Math.min(
+      originalDay,
+      daysInTargetMonth
+    )
+  );
+
+  date.setUTCDate(
+    date.getUTCDate()
+    +
+    1
+  );
+
+
+  return date
+  .toISOString()
+  .slice(
+    0,
+    10
+  );
+
+}
+
+
 function resolveReplayRange(
   mode,
   from,
@@ -342,6 +401,36 @@ function resolveReplayRange(
 
           ? getWeekStart(
               latest
+            )
+
+          : "",
+      to:
+        latest
+    };
+
+  }
+
+
+  if (
+    mode ===
+      "month1"
+    ||
+    mode ===
+      "month3"
+  ) {
+
+    return {
+      from:
+        latest
+
+          ? getMonthRangeStart(
+              latest,
+              mode ===
+                "month1"
+
+                ? 1
+
+                : 3
             )
 
           : "",

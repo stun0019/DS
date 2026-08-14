@@ -144,6 +144,126 @@ function renderSourceBadge(
 }
 
 
+function renderDatasetSummary(
+  dataset
+) {
+
+  const stats =
+    dataset?.metadata?.historicalStats;
+
+
+  if (
+    !stats
+  ) {
+
+    return "";
+
+  }
+
+
+  const dataRange =
+    stats.dataFrom
+    &&
+    stats.dataTo
+
+      ? `${stats.dataFrom} → ${stats.dataTo}`
+
+      : "-";
+
+
+  return `
+    <section class="replay-section">
+      <div class="replay-section-heading">
+        <div>
+          <span class="replay-kicker">HISTORICAL DATASET</span>
+          <h2>歷史資料範圍</h2>
+        </div>
+        <span class="replay-range-label">${escapeHtml(dataRange)}</span>
+      </div>
+
+      <div class="replay-metrics-grid">
+        ${metric("資料期間", escapeHtml(dataRange))}
+        ${metric("Daily Snapshot", stats.dailySnapshotCount)}
+        ${metric("Session", stats.sessionCount)}
+        ${metric("5m Bar", stats.fiveMinuteBarCount)}
+        ${metric("股票數", stats.stockCount)}
+      </div>
+    </section>
+  `;
+
+}
+
+
+function renderCandidateAudits(
+  audits = []
+) {
+
+  const rows =
+    audits.flatMap(
+      audit => [
+        ...(
+          audit.long
+          ??
+          []
+        ),
+        ...(
+          audit.short
+          ??
+          []
+        )
+      ]
+      .map(
+        candidate => `
+          <tr>
+            <td>${escapeHtml(audit.date)}</td>
+            <td>${escapeHtml(audit.previousTradingDate)}</td>
+            <td><span class="replay-side ${candidate.side}">${candidate.side.toUpperCase()}</span></td>
+            <td><strong>${escapeHtml(candidate.code)}</strong><small>${escapeHtml(candidate.name)}</small></td>
+            <td>${candidate.strategyScore}</td>
+            <td>${candidate.liquidityRank}</td>
+            <td>${formatPrice(candidate.observation)}</td>
+            <td>${formatPrice(candidate.previousHigh)}</td>
+            <td>${formatPrice(candidate.previousLow)}</td>
+          </tr>
+        `
+      )
+    )
+    .join("");
+
+
+  return `
+    <section class="replay-section">
+      <div class="replay-section-heading">
+        <div>
+          <span class="replay-kicker">CANDIDATE AUDIT</span>
+          <h2>每日 Long / Short Top10</h2>
+        </div>
+        <span class="replay-range-label">D-1 Snapshot → D Candidate</span>
+      </div>
+
+      ${rows
+        ? `
+            <div class="replay-table-wrap">
+              <table class="replay-table">
+                <thead>
+                  <tr>
+                    <th>交易日</th><th>D-1 Snapshot</th><th>方向</th><th>股票</th>
+                    <th>Strategy Score</th><th>Liquidity Rank</th><th>Observation</th>
+                    <th>昨日 High</th><th>昨日 Low</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          `
+        : '<div class="replay-empty-inline">此資料區間沒有候選。</div>'
+      }
+    </section>
+  `;
+
+}
+
+
 function renderSummary(
   summary,
   settings = {}
@@ -197,6 +317,7 @@ function renderDailyTable(
       day => `
         <tr>
           <td>${escapeHtml(day.date)}</td>
+          <td>${day.candidateCount}</td>
           <td>${day.actualTrades}</td>
           <td>${formatPercentValue(day.winRate)}</td>
           <td class="${day.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(day.totalPnl)}</td>
@@ -213,8 +334,8 @@ function renderDailyTable(
     <section class="replay-section">
       <div class="replay-section-heading">
         <div>
-          <span class="replay-kicker">DAILY / WEEKLY</span>
-          <h2>每日與本週績效</h2>
+          <span class="replay-kicker">DAILY</span>
+          <h2>每日績效</h2>
         </div>
       </div>
 
@@ -223,6 +344,7 @@ function renderDailyTable(
           <thead>
             <tr>
               <th>日期</th>
+              <th>候選數</th>
               <th>出手次數</th>
               <th>勝率</th>
               <th>P&L</th>
@@ -235,6 +357,7 @@ function renderDailyTable(
             ${rows}
             <tr class="replay-total-row">
               <td>區間合計</td>
+              <td>${summary.totalCandidates}</td>
               <td>${summary.actualTrades}</td>
               <td>${formatPercentValue(summary.winRate)}</td>
               <td class="${summary.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(summary.totalPnl)}</td>
@@ -243,6 +366,57 @@ function renderDailyTable(
               <td>${formatCurrency(summary.maxDrawdown)}</td>
             </tr>
           </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+
+}
+
+
+function renderPeriodTable(
+  title,
+  kicker,
+  periods
+) {
+
+  const rows =
+    periods.map(
+      period => `
+        <tr>
+          <td>${escapeHtml(period.period)}</td>
+          <td>${escapeHtml(period.from)} → ${escapeHtml(period.to)}</td>
+          <td>${period.tradingDays}</td>
+          <td>${period.candidateCount}</td>
+          <td>${period.actualTrades}</td>
+          <td>${formatPercentValue(period.winRate)}</td>
+          <td class="${period.totalPnl >= 0 ? "positive-text" : "negative-text"}">${formatCurrency(period.totalPnl)}</td>
+          <td>${formatR(period.totalR)}</td>
+          <td>${formatCurrency(period.maxDrawdown)}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+
+  return `
+    <section class="replay-section">
+      <div class="replay-section-heading">
+        <div>
+          <span class="replay-kicker">${kicker}</span>
+          <h2>${title}</h2>
+        </div>
+      </div>
+
+      <div class="replay-table-wrap">
+        <table class="replay-table">
+          <thead>
+            <tr>
+              <th>期間</th><th>涵蓋日期</th><th>交易日</th><th>候選</th><th>出手</th>
+              <th>勝率</th><th>P&L</th><th>R</th><th>最大回撤</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
         </table>
       </div>
     </section>
@@ -497,6 +671,8 @@ export function renderReplayPanel(
         <div class="replay-range-controls" aria-label="回測日期區間">
           <button type="button" data-mode="today" class="${replayState.mode === "today" ? "active" : ""}">今日</button>
           <button type="button" data-mode="week" class="${replayState.mode === "week" ? "active" : ""}">本週</button>
+          <button type="button" data-mode="month1" class="${replayState.mode === "month1" ? "active" : ""}">最近 1 個月</button>
+          <button type="button" data-mode="month3" class="${replayState.mode === "month3" ? "active" : ""}">最近 3 個月</button>
           <button type="button" data-mode="custom" class="${replayState.mode === "custom" ? "active" : ""}">自訂</button>
           <input type="date" data-role="replay-from" value="${escapeHtml(replayState.from)}" aria-label="回測開始日期">
           <span>→</span>
@@ -521,8 +697,12 @@ export function renderReplayPanel(
 
       ${report
         ? `
+            ${renderDatasetSummary(replayState.dataset)}
             ${renderSummary(report.summary, report.settings)}
             ${renderDailyTable(report.daily, report.summary)}
+            ${renderPeriodTable("每週績效", "WEEKLY", report.weekly ?? [])}
+            ${renderPeriodTable("每月績效", "MONTHLY", report.monthly ?? [])}
+            ${renderCandidateAudits(replayState.dataset?.candidateAudits)}
             ${renderTrades(report.trades)}
             ${renderInstruments(report.instruments)}
             ${renderLogBox(report.logs)}

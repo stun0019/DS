@@ -69,6 +69,10 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 
 ```js
 {
+  metadata: {
+    sourceType: "REAL_HISTORICAL_DATA",
+    adapter: "JSON_IMPORT"
+  },
   dailySnapshots: [
     { date: "2026-08-13", stocks: [/* 當日盤後股票資料 */] }
   ],
@@ -96,9 +100,11 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 }
 ```
 
-Replay 會驗證 K 棒時間嚴格遞增且間隔不少於 5 分鐘，每一步只送入當前 K 棒；`previousTradingDate` 對應的快照必須早於回測日。出場目標可選 TP1 或 TP2；若同一根 K 同時碰到 Stop 與目標，採保守原則先判定 Stop。滑價可選 0、1、2 Tick，買賣成交價一律透過台股 Tick Engine 往不利方向調整。Structural Stop 不變，但 Position Sizing 會以 Filled Entry、Expected Filled Stop 與交易成本重新計算；若滑價後可交易張數為 0，只記錄 `ENTRY_REJECTED_RISK`，不建立交易。P&L、R 與所有績效都使用 Filled Price 與 Actual Shares。
+`HistoricalDatasetBuilder` 會先把匯入資料組成上述 contract，並逐日使用 `previousTradingDate` 的 Snapshot 呼叫正式 Candidate Selector。成功輸出會附帶 `candidateAudits`、`validationLogs` 與 `metadata.historicalStats`；Audit 包含代號、名稱、方向、Strategy Score、Liquidity Rank、Observation、昨日 High／Low。若資料附有正式 Trading Calendar，Builder 也會核對真正的上一交易日。
 
-JSON 只有在 `metadata.sourceType` 明確填入 `REAL_HISTORICAL_DATA` 時才顯示 REAL；未標記資料一律顯示 `SAMPLE / MOCK`。CSV 每列代表一根 5 分 K，需提供 `sessionDate`、`previousTradingDate`、股票盤後 OHLC／成交量／當沖資格、`timestamp`、`timeframeMinutes`、`isComplete` 與盤中 OHLCV；每一列都必須明確且一致宣告 `REAL_HISTORICAL_DATA` 才能顯示 REAL，空白與 REAL 混合會拒絕匯入。`sourceType` 只是匯入資料的來源宣告，不代表系統已向行情供應商驗證真實性。
+Builder 會拒絕缺少 Snapshot／5m、同日或未來 Snapshot、未來 Candle、代號不一致、日期倒退、重複或亂序 K、低於 5 分鐘及未完成 K。只有所有 Session 驗證通過後才會交給既有 `runBacktest`；Replay 每一步仍只送入當前 K 棒。出場目標可選 TP1 或 TP2；若同一根 K 同時碰到 Stop 與目標，採保守原則先判定 Stop。滑價可選 0、1、2 Tick，買賣成交價一律透過台股 Tick Engine 往不利方向調整。Structural Stop 不變，但 Position Sizing 會以 Filled Entry、Expected Filled Stop 與交易成本重新計算；若滑價後可交易張數為 0，只記錄 `ENTRY_REJECTED_RISK`，不建立交易。P&L、R 與所有績效都使用 Filled Price 與 Actual Shares。
+
+JSON 只有在 `metadata.sourceType` 明確填入 `REAL_HISTORICAL_DATA` 時才顯示 REAL；未標記資料一律顯示 `SAMPLE / MOCK`。CSV 可沿用每列同時包含 Snapshot 與 Bar 的 `COMBINED` 格式，也可用 `recordType=SNAPSHOT` 與 `recordType=BAR` 分開提供完整盤後股票母體及候選 5m。每一列都必須明確且一致宣告 `REAL_HISTORICAL_DATA` 才能顯示 REAL，空白與 REAL 混合會拒絕匯入。`sourceType` 只是匯入資料的來源宣告，不代表系統已向行情供應商驗證真實性。
 
 ## 重要限制
 

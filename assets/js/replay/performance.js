@@ -283,6 +283,139 @@ function buildDailyRows(
 }
 
 
+function getWeekStart(
+  value
+) {
+
+  const date =
+    new Date(
+      `${value}T00:00:00Z`
+    );
+
+  const offset =
+    (
+      date.getUTCDay()
+      +
+      6
+    )
+    %
+    7;
+
+
+  date.setUTCDate(
+    date.getUTCDate()
+    -
+    offset
+  );
+
+
+  return date.toISOString()
+  .slice(
+    0,
+    10
+  );
+
+}
+
+
+function buildPeriodRows(
+  sessionResults,
+  trades,
+  getPeriodKey
+) {
+
+  const groups =
+    new Map();
+
+
+  sessionResults.forEach(
+    session => {
+
+      const period =
+        getPeriodKey(
+          session.date
+        );
+
+
+      if (
+        !groups.has(
+          period
+        )
+      ) {
+
+        groups.set(
+          period,
+          []
+        );
+
+      }
+
+
+      groups.get(
+        period
+      )
+      .push(
+        session
+      );
+
+    }
+  );
+
+
+  return [
+    ...groups.entries()
+  ]
+  .map(
+    ([
+      period,
+      sessions
+    ]) => {
+
+      const dates =
+        new Set(
+          sessions.map(
+            session =>
+              session.date
+          )
+        );
+
+      const periodTrades =
+        trades.filter(
+          trade =>
+            dates.has(
+              trade.date
+            )
+        );
+
+
+      return {
+        period,
+        from:
+          sessions[0].date,
+        to:
+          sessions[
+            sessions.length - 1
+          ].date,
+        tradingDays:
+          sessions.length,
+        candidateCount:
+          sum(
+            sessions.map(
+              session =>
+                session.candidateCount
+            )
+          ),
+        ...summarizeTrades(
+          periodTrades
+        )
+      };
+
+    }
+  );
+
+}
+
+
 function buildInstrumentRows(
   trades
 ) {
@@ -416,6 +549,22 @@ export function buildPerformanceReport(
       buildDailyRows(
         sessionResults,
         trades
+      ),
+    weekly:
+      buildPeriodRows(
+        sessionResults,
+        trades,
+        getWeekStart
+      ),
+    monthly:
+      buildPeriodRows(
+        sessionResults,
+        trades,
+        date =>
+          date.slice(
+            0,
+            7
+          )
       ),
     instruments:
       buildInstrumentRows(
