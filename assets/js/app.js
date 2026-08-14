@@ -1,5 +1,6 @@
 import {
-  VIEW_CONFIG
+  VIEW_CONFIG,
+  LIVE_CONFIG
 } from "./core/config.js";
 
 import {
@@ -59,46 +60,74 @@ import {
   renderTpexPanel
 } from "./panels/tpexPanel.js";
 
+import {
+  isLongCandidate,
+  isShortCandidate
+} from "./strategy/candidateRules.js";
+
+import {
+  MockLiveDataProvider
+} from "./live/mockProvider.js";
+
+import {
+  applyLiveQuoteToState
+} from "./live/signalEngine.js";
+
+import {
+  resetLiveStates
+} from "./live/liveState.js";
+
 
 const panelRoot =
   document.getElementById(
     "panelRoot"
   );
 
+
 const summaryRoot =
   document.getElementById(
     "summaryRoot"
   );
+
 
 const viewName =
   document.getElementById(
     "viewName"
   );
 
+
 const viewDescription =
   document.getElementById(
     "viewDescription"
   );
+
 
 const viewChip =
   document.getElementById(
     "viewChip"
   );
 
+
 const reloadBtn =
   document.getElementById(
     "reloadBtn"
   );
+
 
 const menuBtn =
   document.getElementById(
     "menuBtn"
   );
 
+
 const validViews =
   Object.keys(
     VIEW_CONFIG
   );
+
+
+let liveProvider =
+  null;
 
 
 function updateViewHeader() {
@@ -291,6 +320,7 @@ function renderCurrentView() {
   renderSummary(
     summaryRoot,
     {
+
       metadata:
         state.metadata,
 
@@ -301,6 +331,7 @@ function renderCurrentView() {
         state.stocks,
 
       countLabel
+
     }
   );
 
@@ -350,6 +381,175 @@ function navigateTo(
 }
 
 
+function findStockByCode(
+  code
+) {
+
+  const target =
+    String(
+      code || ""
+    );
+
+
+  return state.stocks.find(
+    stock =>
+      String(
+        stock.Code || ""
+      ) ===
+      target
+  );
+
+}
+
+
+function handleLiveQuote(
+  quote
+) {
+
+  const stock =
+    findStockByCode(
+      quote.code
+    );
+
+
+  if (
+    !stock
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    isLongCandidate(
+      stock
+    )
+  ) {
+
+    applyLiveQuoteToState(
+      stock,
+      "long",
+      quote
+    );
+
+  }
+
+
+  if (
+    isShortCandidate(
+      stock
+    )
+  ) {
+
+    applyLiveQuoteToState(
+      stock,
+      "short",
+      quote
+    );
+
+  }
+
+
+  renderCurrentView();
+
+}
+
+
+function initializeLiveProvider() {
+
+  if (
+    LIVE_CONFIG.mode !==
+    "mock"
+  ) {
+
+    return;
+
+  }
+
+
+  liveProvider =
+    new MockLiveDataProvider();
+
+
+  liveProvider.subscribe(
+    handleLiveQuote
+  );
+
+
+  liveProvider.start();
+
+
+  /*
+  V3.0 Mock 測試工具
+
+  Chrome Console：
+
+  stockDaybydayMock.push({
+    code: "2327",
+    open: 650,
+    high: 664,
+    low: 648,
+    last: 663,
+    volume: 8000
+  });
+  */
+  window.stockDaybydayMock = {
+
+    push(
+      quote
+    ) {
+
+      liveProvider.pushQuote(
+        quote
+      );
+
+    },
+
+
+    play(
+      quotes,
+      intervalMs = 1000
+    ) {
+
+      return liveProvider.play(
+        quotes,
+        {
+          intervalMs
+        }
+      );
+
+    },
+
+
+    reset() {
+
+      resetLiveStates();
+
+
+      renderCurrentView();
+
+    },
+
+
+    stop() {
+
+      liveProvider.stop();
+
+    },
+
+
+    start() {
+
+      liveProvider.start();
+
+    }
+
+  };
+
+}
+
+
 async function refreshData() {
 
   panelRoot.innerHTML =
@@ -369,6 +569,9 @@ async function refreshData() {
     assignLiquidityRanks(
       result.stocks
     );
+
+
+    resetLiveStates();
 
 
     setStocks(
@@ -403,10 +606,15 @@ async function refreshData() {
     renderSummary(
       summaryRoot,
       {
+
         metadata: {},
+
         pageReadAt: "-",
+
         stocks: [],
+
         countLabel: "-"
+
       }
     );
 
@@ -460,6 +668,9 @@ bindHashNavigation(
 
   }
 );
+
+
+initializeLiveProvider();
 
 
 refreshData();
