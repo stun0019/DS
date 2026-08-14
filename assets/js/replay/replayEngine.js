@@ -1,8 +1,4 @@
 import {
-  assignLiquidityRanks
-} from "../data/stockData.js";
-
-import {
   applyLiveQuoteToState,
   getTradingSessionDate
 } from "../live/signalEngine.js";
@@ -14,9 +10,8 @@ import {
 } from "../live/liveState.js";
 
 import {
-  isLongCandidate,
-  isShortCandidate
-} from "../strategy/candidateRules.js";
+  getCandidatesBySide
+} from "../strategy/candidateSelector.js";
 
 import {
   calculateDayTradeCosts
@@ -1240,60 +1235,28 @@ export function runBacktest(
         );
 
 
-      assignLiquidityRanks(
-        stocks
-      );
-
-
-      const candidates =
-        stocks
-        .flatMap(
-          stock => [
-            isLongCandidate(
-              stock
-            )
-
-              ? {
-                  stock,
-                  side:
-                    "long"
-                }
-
-              : null,
-            isShortCandidate(
-              stock
-            )
-
-              ? {
-                  stock,
-                  side:
-                    "short"
-                }
-
-              : null
-          ]
-        )
-        .filter(
-          Boolean
-        )
-        .sort(
-          (
-            first,
-            second
-          ) =>
-            String(
-              first.stock.Code
-            )
-            .localeCompare(
-              String(
-                second.stock.Code
-              )
-            )
-            ||
-            first.side.localeCompare(
-              second.side
-            )
+      const candidatesBySide =
+        getCandidatesBySide(
+          stocks
         );
+
+
+      const candidates = [
+        ...candidatesBySide.long.map(
+          stock => ({
+            stock,
+            side:
+              "long"
+          })
+        ),
+        ...candidatesBySide.short.map(
+          stock => ({
+            stock,
+            side:
+              "short"
+          })
+        )
+      ];
 
 
       const candidateResults =

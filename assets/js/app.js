@@ -73,9 +73,8 @@ import {
 } from "./panels/tpexPanel.js";
 
 import {
-  isLongCandidate,
-  isShortCandidate
-} from "./strategy/candidateRules.js";
+  getCandidateSidesForCode
+} from "./strategy/candidateSelector.js";
 
 import {
   MockLiveDataProvider
@@ -821,42 +820,38 @@ function handleLiveQuote(
   }
 
 
+  const candidateSides =
+    getCandidateSidesForCode(
+      state.stocks,
+      stock.Code
+    );
+
+
   if (
-    isLongCandidate(
-      stock
-    )
+    candidateSides.length ===
+    0
   ) {
 
-    applyLiveQuoteToState(
-      stock,
-      "long",
-      quote,
-      {
-        maxRiskAmount:
-          state.riskSettings.maxRiskAmount
-      }
-    );
+    return;
 
   }
 
 
-  if (
-    isShortCandidate(
-      stock
-    )
-  ) {
+  candidateSides.forEach(
+    side => {
 
-    applyLiveQuoteToState(
-      stock,
-      "short",
-      quote,
-      {
-        maxRiskAmount:
-          state.riskSettings.maxRiskAmount
-      }
-    );
+      applyLiveQuoteToState(
+        stock,
+        side,
+        quote,
+        {
+          maxRiskAmount:
+            state.riskSettings.maxRiskAmount
+        }
+      );
 
-  }
+    }
+  );
 
 
   scheduleLiveRender();

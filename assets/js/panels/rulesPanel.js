@@ -1,3 +1,8 @@
+import {
+  STRATEGY
+} from "../core/config.js";
+
+
 export function renderRulesPanel(
   root
 ) {
@@ -290,7 +295,7 @@ export function renderRulesPanel(
           <div>
 
             <div class="rules-step-title">
-              候選 Top 10
+              候選 Top ${STRATEGY.candidateLimit}
             </div>
 
             <div class="rules-step-description">
@@ -315,7 +320,7 @@ export function renderRulesPanel(
             →
             評分
             →
-            Top 10
+            Top ${STRATEGY.candidateLimit}
 
           </div>
 

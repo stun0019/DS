@@ -3,12 +3,8 @@ import {
 } from "../core/config.js";
 
 import {
-  isLongCandidate
-} from "../strategy/candidateRules.js";
-
-import {
-  calculateLongScore
-} from "../strategy/scoring.js";
+  getLongCandidates
+} from "../strategy/candidateSelector.js";
 
 import {
   renderStockPanel
@@ -25,32 +21,8 @@ export function renderLongPanel(
 ) {
 
   const candidates =
-    [...stocks]
-
-    .filter(
-      isLongCandidate
-    )
-
-    .sort(
-      (
-        a,
-        b
-      ) =>
-
-        calculateLongScore(
-          b
-        )
-
-        -
-
-        calculateLongScore(
-          a
-        )
-    )
-
-    .slice(
-      0,
-      STRATEGY.candidateLimit
+    getLongPanelCandidates(
+      stocks
     );
 
 
@@ -78,6 +50,17 @@ export function renderLongPanel(
       panelClass:
         "panel-candidate panel-long"
     }
+  );
+
+}
+
+
+export function getLongPanelCandidates(
+  stocks
+) {
+
+  return getLongCandidates(
+    stocks
   );
 
 }

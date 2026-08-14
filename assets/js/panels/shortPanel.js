@@ -3,12 +3,8 @@ import {
 } from "../core/config.js";
 
 import {
-  isShortCandidate
-} from "../strategy/candidateRules.js";
-
-import {
-  calculateShortScore
-} from "../strategy/scoring.js";
+  getShortCandidates
+} from "../strategy/candidateSelector.js";
 
 import {
   renderStockPanel
@@ -25,32 +21,8 @@ export function renderShortPanel(
 ) {
 
   const candidates =
-    [...stocks]
-
-    .filter(
-      isShortCandidate
-    )
-
-    .sort(
-      (
-        a,
-        b
-      ) =>
-
-        calculateShortScore(
-          b
-        )
-
-        -
-
-        calculateShortScore(
-          a
-        )
-    )
-
-    .slice(
-      0,
-      STRATEGY.candidateLimit
+    getShortPanelCandidates(
+      stocks
     );
 
 
@@ -78,6 +50,17 @@ export function renderShortPanel(
       panelClass:
         "panel-candidate panel-short"
     }
+  );
+
+}
+
+
+export function getShortPanelCandidates(
+  stocks
+) {
+
+  return getShortCandidates(
+    stocks
   );
 
 }
