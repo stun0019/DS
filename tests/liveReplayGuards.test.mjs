@@ -309,12 +309,33 @@ function replaySide(
       stock,
       side,
       sessionDate: "2026-08-18",
-      bars:
-        side === "long"
+      bars: [
+        ...(
+          side === "long"
 
-          ? longDirectionBars("2026-08-18")
+            ? longDirectionBars("2026-08-18")
 
-          : shortDirectionBars("2026-08-18"),
+            : shortDirectionBars("2026-08-18")
+        ),
+        fiveMinuteBar(
+          "2026-08-18T09:25:00+08:00",
+          side === "long"
+
+            ? {
+                open: 111.5,
+                high: 112,
+                low: 110,
+                close: 111
+              }
+
+            : {
+                open: 98.5,
+                high: 100,
+                low: 98,
+                close: 99
+              }
+        )
+      ],
       slippageTicks,
       maxRiskAmount
     }
@@ -1785,6 +1806,455 @@ test(
     assert.equal(
       implicitSample.metadata.sourceType,
       HISTORICAL_SOURCE_TYPE.SAMPLE_MOCK
+    );
+
+  }
+);
+
+
+test(
+  "final-bar ENTRY_READY is skipped without trade pnl cost or slippage",
+  () => {
+
+    const replay =
+      replayCandidate(
+        {
+          stock:
+            createStock(),
+          side:
+            "long",
+          sessionDate:
+            "2026-08-18",
+          bars: [
+            ...longDirectionBars(
+              "2026-08-18"
+            ),
+            fiveMinuteBar(
+              "2026-08-18T09:25:00+08:00",
+              {
+                isComplete: false,
+                open: 111.5,
+                high: 125,
+                low: 90,
+                close: 120
+              }
+            )
+          ],
+          slippageTicks:
+            2
+        }
+      );
+
+    const performance =
+      buildPerformanceReport(
+        {
+          sessionResults: [
+            {
+              date:
+                "2026-08-18",
+              candidateCount: 1
+            }
+          ],
+          trades:
+            replay.trades,
+          logs:
+            replay.logs
+        }
+      );
+
+    const skippedLogs =
+      replay.logs.filter(
+        log =>
+          log.eventType ===
+            "ENTRY_SKIPPED_END_OF_SESSION"
+      );
+
+
+    assert.equal(
+      replay.trades.length,
+      0
+    );
+
+    assert.equal(
+      performance.summary.actualTrades,
+      0
+    );
+
+    assert.equal(
+      performance.summary.totalPnl,
+      0
+    );
+
+    assert.equal(
+      performance.summary.totalR,
+      0
+    );
+
+    assert.equal(
+      performance.summary.totalSlippageCost,
+      0
+    );
+
+    assert.equal(
+      skippedLogs.length,
+      1
+    );
+
+    assert.equal(
+      Date.parse(
+        skippedLogs[0].timestamp
+      ),
+      Date.parse(
+        "2026-08-18T09:20:00+08:00"
+      )
+    );
+
+    assert.equal(
+      skippedLogs[0].rawEntry,
+      null
+    );
+
+    assert.equal(
+      skippedLogs[0].filledEntry,
+      null
+    );
+
+    assert.equal(
+      skippedLogs[0].slippageTicks,
+      null
+    );
+
+    assert.equal(
+      skippedLogs[0].slippageCost,
+      null
+    );
+
+    assert.equal(
+      skippedLogs[0].pnl,
+      null
+    );
+
+    assert.equal(
+      replay.logs.filter(
+        log =>
+          log.eventType ===
+            "ENTRY"
+      ).length,
+      0
+    );
+
+  }
+);
+
+
+test(
+  "penultimate-bar entry can close OTHER on the final bar",
+  () => {
+
+    const replay =
+      replaySide(
+        "long",
+        {
+          slippageTicks: 2
+        }
+      );
+
+    const trade =
+      replay.trades[0];
+
+
+    assert.equal(
+      replay.trades.length,
+      1
+    );
+
+    assert.equal(
+      trade.exitReason,
+      "OTHER"
+    );
+
+    assert.equal(
+      Date.parse(
+        trade.exitTime
+      ),
+      Date.parse(
+        "2026-08-18T09:25:00+08:00"
+      )
+    );
+
+    assert.ok(
+      Date.parse(
+        trade.entryTime
+      ) <
+        Date.parse(
+          trade.exitTime
+        )
+    );
+
+    assert.equal(
+      replay.logs.filter(
+        log =>
+          log.eventType ===
+            "EXIT"
+          &&
+          log.exitReason ===
+            "OTHER"
+      ).length,
+      1
+    );
+
+  }
+);
+
+
+test(
+  "every completed replay trade exits after its entry",
+  () => {
+
+    const trades = [
+      ...runBacktest(
+        replayDataset(),
+        {
+          slippageTicks: 2
+        }
+      ).trades,
+      ...replaySide(
+        "long"
+      ).trades,
+      ...replaySide(
+        "short"
+      ).trades
+    ];
+
+
+    assert.ok(
+      trades.length > 0
+    );
+
+    trades.forEach(
+      trade => {
+
+        assert.ok(
+          Date.parse(
+            trade.entryTime
+          ) <
+            Date.parse(
+              trade.exitTime
+            )
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "end-of-session skip preserves daily weekly and log reconciliation",
+  () => {
+
+    const completedReport =
+      runBacktest(
+        replayDataset(),
+        {
+          slippageTicks: 2
+        }
+      );
+
+    const skippedReplay =
+      replayCandidate(
+        {
+          stock:
+            createStock(),
+          side:
+            "long",
+          sessionDate:
+            "2026-08-20",
+          bars:
+            longDirectionBars(
+              "2026-08-20"
+            ),
+          slippageTicks:
+            2
+        }
+      );
+
+    const report =
+      buildPerformanceReport(
+        {
+          sessionResults: [
+            ...completedReport.sessions,
+            {
+              date:
+                "2026-08-20",
+              candidateCount: 1
+            }
+          ],
+          trades:
+            completedReport.trades,
+          logs: [
+            ...completedReport.logs,
+            ...skippedReplay.logs
+          ]
+        }
+      );
+
+    const entryLogs =
+      report.logs.filter(
+        log =>
+          log.eventType ===
+            "ENTRY"
+      );
+
+    const exitLogs =
+      report.logs.filter(
+        log =>
+          log.eventType ===
+            "EXIT"
+      );
+
+    const skippedLogs =
+      report.logs.filter(
+        log =>
+          log.eventType ===
+            "ENTRY_SKIPPED_END_OF_SESSION"
+      );
+
+    const totalPnl =
+      report.trades.reduce(
+        (
+          total,
+          trade
+        ) =>
+          total
+          +
+          trade.netPnl,
+        0
+      );
+
+    const totalR =
+      report.trades.reduce(
+        (
+          total,
+          trade
+        ) =>
+          total
+          +
+          trade.rMultiple,
+        0
+      );
+
+    const grossProfit =
+      report.trades.reduce(
+        (
+          total,
+          trade
+        ) =>
+          total
+          +
+          Math.max(
+            0,
+            trade.netPnl
+          ),
+        0
+      );
+
+    const grossLoss =
+      Math.abs(
+        report.trades.reduce(
+          (
+            total,
+            trade
+          ) =>
+            total
+            +
+            Math.min(
+              0,
+              trade.netPnl
+            ),
+          0
+        )
+      );
+
+
+    assert.equal(
+      skippedLogs.length,
+      1
+    );
+
+    assert.equal(
+      report.summary.actualTrades,
+      report.trades.length
+    );
+
+    assert.equal(
+      entryLogs.length,
+      report.trades.length
+    );
+
+    assert.equal(
+      exitLogs.length,
+      report.trades.length
+    );
+
+    assert.equal(
+      report.daily.reduce(
+        (
+          total,
+          day
+        ) =>
+          total
+          +
+          day.actualTrades,
+        0
+      ),
+      report.summary.actualTrades
+    );
+
+    assertClose(
+      report.summary.totalPnl,
+      totalPnl
+    );
+
+    assertClose(
+      report.summary.totalR,
+      totalR
+    );
+
+    assertClose(
+      report.daily.reduce(
+        (
+          total,
+          day
+        ) =>
+          total
+          +
+          day.totalPnl,
+        0
+      ),
+      report.summary.totalPnl
+    );
+
+    assertClose(
+      report.daily.reduce(
+        (
+          total,
+          day
+        ) =>
+          total
+          +
+          day.totalR,
+        0
+      ),
+      report.summary.totalR
+    );
+
+    assertClose(
+      report.summary.profitFactor,
+      grossProfit
+      /
+      grossLoss
     );
 
   }

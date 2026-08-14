@@ -699,11 +699,54 @@ function resolveExit(
 }
 
 
+function isExitAfterEntry(
+  entryTime,
+  exitTime
+) {
+
+  const entryTimestamp =
+    Date.parse(
+      entryTime
+    );
+
+  const exitTimestamp =
+    Date.parse(
+      exitTime
+    );
+
+
+  return Number.isFinite(
+    entryTimestamp
+  )
+  &&
+  Number.isFinite(
+    exitTimestamp
+  )
+  &&
+  exitTimestamp >
+    entryTimestamp;
+
+}
+
+
 function closeTrade(
   trade,
   bar,
   exit
 ) {
+
+  if (
+    !isExitAfterEntry(
+      trade.entryTime,
+      bar.timestamp
+    )
+  ) {
+
+    throw new Error(
+      "Replay exitTime must be later than entryTime"
+    );
+
+  }
 
   const rawExit =
     exit.price;
@@ -903,6 +946,20 @@ export function replayCandidate(
     sessionDate
   );
 
+  const lastExecutableBar =
+    normalizedBars.reduce(
+      (
+        latest,
+        bar
+      ) =>
+        bar.isComplete
+
+          ? bar
+
+          : latest,
+      null
+    );
+
 
   const replayStateCode =
     `__REPLAY__:${sessionDate}:${code}:${side}`;
@@ -987,8 +1044,12 @@ export function replayCandidate(
       if (
         openTrade
         &&
-        bar.timestamp >
-          openTrade.entryTime
+        bar.isComplete
+        &&
+        isExitAfterEntry(
+          openTrade.entryTime,
+          bar.timestamp
+        )
       ) {
 
         const exit =
@@ -1067,6 +1128,38 @@ export function replayCandidate(
           LIVE_STATUS.ENTRY_READY
       ) {
 
+        hasEntered =
+          true;
+
+        const hasLaterExecutableBar =
+          lastExecutableBar
+          &&
+          isExitAfterEntry(
+            bar.timestamp,
+            lastExecutableBar.timestamp
+          );
+
+
+        if (
+          !hasLaterExecutableBar
+        ) {
+
+          logs.push(
+            {
+              ...stateLog,
+              eventType:
+                "ENTRY_SKIPPED_END_OF_SESSION",
+              slippageTicks:
+                null,
+              triggerReason:
+                "ENTRY_READY occurred on the final executable bar"
+            }
+          );
+
+          return;
+
+        }
+
         const entryAttempt =
           createOpenTrade(
             stock,
@@ -1075,10 +1168,6 @@ export function replayCandidate(
             bar,
             normalizedSlippageTicks
           );
-
-        hasEntered =
-          true;
-
 
         if (
           entryAttempt.entryRejectedRisk
@@ -1127,16 +1216,20 @@ export function replayCandidate(
   );
 
 
+  const lastBar =
+    lastExecutableBar;
+
+
   if (
     openTrade
     &&
-    normalizedBars.length > 0
+    lastBar
+    &&
+    isExitAfterEntry(
+      openTrade.entryTime,
+      lastBar.timestamp
+    )
   ) {
-
-    const lastBar =
-      normalizedBars[
-        normalizedBars.length - 1
-      ];
 
     const closedTrade =
       closeTrade(
