@@ -18,8 +18,14 @@ import {
 } from "../assets/js/replay/replayEngine.js";
 
 import {
-  getCandidateSidesForCode
+  getCandidatesBySide,
+  getLongCandidates,
+  getShortCandidates
 } from "../assets/js/strategy/candidateSelector.js";
+
+import {
+  createLiveCandidateIndex
+} from "../assets/js/live/candidateIndex.js";
 
 import {
   isLongCandidate,
@@ -169,6 +175,38 @@ function getCodes(
     stock =>
       stock.Code
   );
+
+}
+
+
+function getIndexCodes(
+  candidateIndex,
+  side
+) {
+
+  return Array.from(
+    candidateIndex.entries()
+  )
+  .filter(
+    (
+      [
+        ,
+        sides
+      ]
+    ) =>
+      sides.has(
+        side
+      )
+  )
+  .map(
+    (
+      [
+        code
+      ]
+    ) =>
+      code
+  )
+  .sort();
 
 }
 
@@ -445,6 +483,10 @@ test(
     ];
 
 
+    const liveCandidateIndex =
+      createLiveCandidateIndex();
+
+
     [
       4,
       7
@@ -473,6 +515,11 @@ test(
                   stocks
                 )
               );
+
+
+            liveCandidateIndex.refreshIfNeeded(
+              stocks
+            );
 
 
             assert.equal(
@@ -561,9 +608,10 @@ test(
 
 
             assert.deepEqual(
-              getCandidateSidesForCode(
-                stocks,
-                selectedLongCode
+              Array.from(
+                liveCandidateIndex.get(
+                  selectedLongCode
+                )
               ),
               [
                 "long"
@@ -571,32 +619,327 @@ test(
             );
 
             assert.deepEqual(
-              getCandidateSidesForCode(
-                stocks,
-                selectedShortCode
+              Array.from(
+                liveCandidateIndex.get(
+                  selectedShortCode
+                )
               ),
               [
                 "short"
               ]
             );
 
-            assert.deepEqual(
-              getCandidateSidesForCode(
-                stocks,
+            assert.equal(
+              liveCandidateIndex.get(
                 excludedLongCode
               ),
-              []
+              null
             );
 
-            assert.deepEqual(
-              getCandidateSidesForCode(
-                stocks,
+            assert.equal(
+              liveCandidateIndex.get(
                 excludedShortCode
               ),
-              []
+              null
             );
 
           }
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "live candidate index codes match the shared candidate selector",
+  () => {
+
+    withCandidateLimit(
+      10,
+      () => {
+
+        const stocks = [
+          ...createLongStocks(),
+          ...createShortStocks()
+        ];
+
+
+        const candidateIndex =
+          createLiveCandidateIndex();
+
+
+        candidateIndex.rebuild(
+          stocks
+        );
+
+
+        assert.deepEqual(
+          getIndexCodes(
+            candidateIndex,
+            "long"
+          ),
+          getCodes(
+            getLongCandidates(
+              stocks
+            )
+          ).sort()
+        );
+
+        assert.deepEqual(
+          getIndexCodes(
+            candidateIndex,
+            "short"
+          ),
+          getCodes(
+            getShortCandidates(
+              stocks
+            )
+          ).sort()
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "quote bursts do not rerun the candidate selector",
+  () => {
+
+    withCandidateLimit(
+      10,
+      () => {
+
+        const stocks = [
+          ...createLongStocks(),
+          ...createShortStocks()
+        ];
+
+
+        let selectorCalls =
+          0;
+
+
+        const candidateIndex =
+          createLiveCandidateIndex(
+            {
+              selectCandidates(
+                sourceStocks
+              ) {
+
+                selectorCalls +=
+                  1;
+
+
+                return getCandidatesBySide(
+                  sourceStocks
+                );
+
+              }
+            }
+          );
+
+
+        candidateIndex.rebuild(
+          stocks
+        );
+
+
+        for (
+          let index = 0;
+          index < 10_000;
+          index += 1
+        ) {
+
+          assert.equal(
+            candidateIndex.refreshIfNeeded(
+              stocks
+            ),
+            false
+          );
+
+
+          candidateIndex.get(
+            stocks[
+              index
+              %
+              stocks.length
+            ].Code
+          );
+
+        }
+
+
+        assert.equal(
+          selectorCalls,
+          1
+        );
+
+
+        STRATEGY.candidateLimit =
+          9;
+
+
+        assert.equal(
+          candidateIndex.refreshIfNeeded(
+            stocks
+          ),
+          true
+        );
+
+        assert.equal(
+          selectorCalls,
+          2
+        );
+
+        assert.equal(
+          candidateIndex.refreshIfNeeded(
+            stocks
+          ),
+          false
+        );
+
+        assert.equal(
+          selectorCalls,
+          2
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "reloading stock data refreshes the live candidate index",
+  () => {
+
+    withCandidateLimit(
+      10,
+      () => {
+
+        const firstStocks = [
+          ...createLongStocks(),
+          ...createShortStocks()
+        ];
+
+
+        const reloadedStocks = [
+          ...createLongStocks().map(
+            stock => ({
+              ...stock,
+              Code:
+                stock.Code.replace(
+                  "L",
+                  "N"
+                )
+            })
+          ),
+          ...createShortStocks().map(
+            stock => ({
+              ...stock,
+              Code:
+                stock.Code.replace(
+                  "S",
+                  "T"
+                )
+            })
+          )
+        ];
+
+
+        let selectorCalls =
+          0;
+
+
+        const candidateIndex =
+          createLiveCandidateIndex(
+            {
+              selectCandidates(
+                stocks
+              ) {
+
+                selectorCalls +=
+                  1;
+
+
+                return getCandidatesBySide(
+                  stocks
+                );
+
+              }
+            }
+          );
+
+
+        candidateIndex.rebuild(
+          firstStocks
+        );
+
+
+        const firstLongCode =
+          getLongCandidates(
+            firstStocks
+          )[0].Code;
+
+
+        assert.deepEqual(
+          Array.from(
+            candidateIndex.get(
+              firstLongCode
+            )
+          ),
+          [
+            "long"
+          ]
+        );
+
+
+        candidateIndex.rebuild(
+          reloadedStocks
+        );
+
+
+        assert.equal(
+          selectorCalls,
+          2
+        );
+
+        assert.equal(
+          candidateIndex.get(
+            firstLongCode
+          ),
+          null
+        );
+
+        assert.deepEqual(
+          getIndexCodes(
+            candidateIndex,
+            "long"
+          ),
+          getCodes(
+            getLongCandidates(
+              reloadedStocks
+            )
+          ).sort()
+        );
+
+        assert.deepEqual(
+          getIndexCodes(
+            candidateIndex,
+            "short"
+          ),
+          getCodes(
+            getShortCandidates(
+              reloadedStocks
+            )
+          ).sort()
         );
 
       }

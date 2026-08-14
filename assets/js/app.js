@@ -73,12 +73,12 @@ import {
 } from "./panels/tpexPanel.js";
 
 import {
-  getCandidateSidesForCode
-} from "./strategy/candidateSelector.js";
-
-import {
   MockLiveDataProvider
 } from "./live/mockProvider.js";
+
+import {
+  createLiveCandidateIndex
+} from "./live/candidateIndex.js";
 
 import {
   applyLiveQuoteToState
@@ -153,6 +153,10 @@ let liveProvider =
 
 let liveRenderTimer =
   null;
+
+
+const liveCandidateIndex =
+  createLiveCandidateIndex();
 
 
 function updateViewHeader() {
@@ -820,16 +824,19 @@ function handleLiveQuote(
   }
 
 
+  liveCandidateIndex.refreshIfNeeded(
+    state.stocks
+  );
+
+
   const candidateSides =
-    getCandidateSidesForCode(
-      state.stocks,
+    liveCandidateIndex.get(
       stock.Code
     );
 
 
   if (
-    candidateSides.length ===
-    0
+    !candidateSides
   ) {
 
     return;
@@ -1112,6 +1119,11 @@ async function refreshData() {
       result.stocks,
       result.metadata,
       result.pageReadAt
+    );
+
+
+    liveCandidateIndex.rebuild(
+      result.stocks
     );
 
 
