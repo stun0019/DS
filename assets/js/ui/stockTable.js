@@ -8,6 +8,7 @@ import {
 
 import {
   escapeHtml,
+  formatCurrency,
   formatPrice,
   formatPercent
 } from "../utils/format.js";
@@ -38,7 +39,8 @@ import {
 } from "../live/liveState.js";
 
 import {
-  marketBadge
+  marketBadge,
+  eligibilityBadge
 } from "./badges.js";
 
 import {
@@ -404,14 +406,32 @@ function renderRows(
           : "-";
 
 
+      const quote =
+        liveState?.quote
+        ||
+        null;
+
+
+      const riskPlan =
+        liveState?.riskPlan
+        ||
+        null;
+
+
       return `
 
         <tr>
 
           <td>
-            ${marketBadge(
-              stock
-            )}
+            <div class="market-stack">
+              ${marketBadge(
+                stock
+              )}
+
+              ${eligibilityBadge(
+                stock
+              )}
+            </div>
           </td>
 
           <td class="code">
@@ -527,12 +547,59 @@ function renderRows(
             }
           </td>
 
-          <td>
+          <td class="live-decision-cell">
             ${
               side
-                ? escapeHtml(
-                    liveStatus
-                  )
+                ? `
+                    <span
+                      class="
+                        live-status-badge
+                        live-status-${String(
+                          liveState?.status
+                          ||
+                          "waiting_live"
+                        ).toLowerCase()}
+                      "
+                    >
+                      ${escapeHtml(
+                        liveStatus
+                      )}
+                    </span>
+
+                    <span class="live-decision-meta">
+                      現價
+                      ${quote
+                        ? formatPrice(
+                            quote.last
+                          )
+                        : "-"
+                      }
+                    </span>
+
+                    ${riskPlan
+                      ? `
+                          <span class="live-decision-meta risk-ready">
+                            Stop ${formatPrice(riskPlan.stop)}
+                            · 保本 ${formatPrice(riskPlan.breakEvenPrice)}
+                            · TP1 ${formatPrice(riskPlan.tp1)}
+                            ${riskPlan.maxLots !== null
+                              ? `· ${riskPlan.maxLots} 張`
+                              : ""
+                            }
+                          </span>
+
+                          <span class="live-decision-meta cost-ready">
+                            1 張停損淨風險
+                            ${formatCurrency(riskPlan.riskPerLot)}
+                            · 成交先扣
+                            ${formatCurrency(
+                              riskPlan.stopOutcome?.costBeforeRebate
+                            )}
+                          </span>
+                        `
+                      : ""
+                    }
+                  `
                 : "-"
             }
           </td>
@@ -657,7 +724,7 @@ function renderTable(
             </th>
 
             <th>
-              盤中狀態
+              盤中狀態／風控
             </th>
 
           </tr>

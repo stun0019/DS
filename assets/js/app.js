@@ -8,7 +8,8 @@ import {
   resetSort,
   setSort,
   setStocks,
-  setCurrentItems
+  setCurrentItems,
+  setMaxRiskAmount
 } from "./core/state.js";
 
 import {
@@ -31,6 +32,10 @@ import {
 import {
   renderSummary
 } from "./ui/summary.js";
+
+import {
+  renderExecutionBar
+} from "./ui/executionBar.js";
 
 import {
   renderLongPanel
@@ -90,6 +95,12 @@ const summaryRoot =
   );
 
 
+const executionRoot =
+  document.getElementById(
+    "executionRoot"
+  );
+
+
 const viewName =
   document.getElementById(
     "viewName"
@@ -127,6 +138,10 @@ const validViews =
 
 
 let liveProvider =
+  null;
+
+
+let liveRenderTimer =
   null;
 
 
@@ -289,9 +304,61 @@ function renderCurrentPanel() {
 }
 
 
-function renderCurrentView() {
+function handleRiskChange(
+  value
+) {
 
-  updateViewHeader();
+  setMaxRiskAmount(
+    value
+  );
+
+
+  try {
+    localStorage.setItem(
+      "stockDaybyday.maxRiskAmount",
+      state.riskSettings.maxRiskAmount
+      ||
+      ""
+    );
+  }
+  catch (
+    error
+  ) {
+    console.warn(
+      "Risk preference could not be stored",
+      error
+    );
+  }
+
+}
+
+
+function renderCurrentView(
+  {
+    renderShell = true
+  } = {}
+) {
+
+  if (
+    renderShell
+  ) {
+    updateViewHeader();
+
+
+    renderExecutionBar(
+      executionRoot,
+      {
+        stocks:
+          state.stocks,
+        metadata:
+          state.metadata,
+        riskSettings:
+          state.riskSettings,
+        onRiskChange:
+          handleRiskChange
+      }
+    );
+  }
 
 
   const items =
@@ -317,23 +384,27 @@ function renderCurrentView() {
         )} 檔`;
 
 
-  renderSummary(
-    summaryRoot,
-    {
+  if (
+    renderShell
+  ) {
+    renderSummary(
+      summaryRoot,
+      {
 
-      metadata:
-        state.metadata,
+        metadata:
+          state.metadata,
 
-      pageReadAt:
-        state.pageReadAt,
+        pageReadAt:
+          state.pageReadAt,
 
-      stocks:
-        state.stocks,
+        stocks:
+          state.stocks,
 
-      countLabel
+        countLabel
 
-    }
-  );
+      }
+    );
+  }
 
 }
 
@@ -391,12 +462,8 @@ function findStockByCode(
     );
 
 
-  return state.stocks.find(
-    stock =>
-      String(
-        stock.Code || ""
-      ) ===
-      target
+  return state.stockMap.get(
+    target
   );
 
 }
@@ -430,7 +497,11 @@ function handleLiveQuote(
     applyLiveQuoteToState(
       stock,
       "long",
-      quote
+      quote,
+      {
+        maxRiskAmount:
+          state.riskSettings.maxRiskAmount
+      }
     );
 
   }
@@ -445,13 +516,73 @@ function handleLiveQuote(
     applyLiveQuoteToState(
       stock,
       "short",
-      quote
+      quote,
+      {
+        maxRiskAmount:
+          state.riskSettings.maxRiskAmount
+      }
     );
 
   }
 
 
-  renderCurrentView();
+  scheduleLiveRender();
+
+}
+
+
+function scheduleLiveRender() {
+
+  if (
+    liveRenderTimer !==
+    null
+  ) {
+    return;
+  }
+
+
+  liveRenderTimer =
+    setTimeout(
+      () => {
+
+        liveRenderTimer =
+          null;
+
+
+        requestAnimationFrame(
+          () => {
+            renderCurrentView(
+              {
+                renderShell: false
+              }
+            );
+          }
+        );
+
+      },
+      LIVE_CONFIG.renderThrottleMs
+    );
+
+}
+
+
+function initializeRiskSettings() {
+
+  try {
+    setMaxRiskAmount(
+      localStorage.getItem(
+        "stockDaybyday.maxRiskAmount"
+      )
+    );
+  }
+  catch (
+    error
+  ) {
+    console.warn(
+      "Risk preference could not be read",
+      error
+    );
+  }
 
 }
 
@@ -668,6 +799,9 @@ bindHashNavigation(
 
   }
 );
+
+
+initializeRiskSettings();
 
 
 initializeLiveProvider();

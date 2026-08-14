@@ -2,6 +2,9 @@ export const state = {
 
   stocks: [],
 
+  stockMap:
+    new Map(),
+
   metadata: {},
 
   pageReadAt: "",
@@ -9,6 +12,10 @@ export const state = {
   currentView: "long",
 
   currentItems: [],
+
+  riskSettings: {
+    maxRiskAmount: null
+  },
 
   sortState: {
     key: null,
@@ -29,12 +36,51 @@ export function setStocks(
     stocks;
 
 
+  state.stockMap =
+    new Map(
+      stocks.map(
+        stock => [
+          String(
+            stock.Code || ""
+          ),
+          stock
+        ]
+      )
+    );
+
+
   state.metadata =
     metadata;
 
 
   state.pageReadAt =
     pageReadAt;
+
+}
+
+
+export function setMaxRiskAmount(
+  value
+) {
+
+  const amount =
+    Number(
+      value
+    );
+
+
+  state.riskSettings.maxRiskAmount =
+    Number.isFinite(
+      amount
+    )
+    &&
+    amount > 0
+
+      ? Math.round(
+          amount
+        )
+
+      : null;
 
 }
 

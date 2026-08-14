@@ -118,7 +118,22 @@ export function normalizeLiveQuote(
         rawQuote.ask
         ??
         rawQuote.Ask
+      ),
+
+
+    candles:
+      Array.isArray(
+        rawQuote.candles
       )
+
+        ? rawQuote.candles
+
+        : [],
+
+
+    invalidated:
+      rawQuote.invalidated ===
+      true
 
   };
 

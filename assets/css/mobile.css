@@ -99,6 +99,80 @@
   }
 
 
+  .execution-bar {
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+
+    gap:
+      10px
+      8px;
+
+    padding:
+      10px;
+  }
+
+
+  .execution-metric {
+    grid-column:
+      1;
+
+    grid-row: 2;
+
+    flex-wrap: wrap;
+
+    gap: 5px;
+  }
+
+
+  .execution-mode {
+    grid-column:
+      1 / -1;
+
+    flex-wrap: wrap;
+  }
+
+
+  .execution-metric small {
+    flex:
+      0
+      1
+      100%;
+
+    min-width: 0;
+    width: auto;
+
+    margin-left: 0;
+  }
+
+
+  .risk-control {
+    grid-column: 2;
+    grid-row: 2;
+
+    justify-content: flex-end;
+  }
+
+
+  .risk-input-wrap input {
+    width: 70px;
+  }
+
+
+  .market-stack {
+    display: contents;
+  }
+
+
+  .mobile-risk-plan {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+  }
+
+
   .summary-card {
     padding:
       11px

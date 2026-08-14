@@ -285,7 +285,10 @@ export async function loadStockData() {
             json.syncStatus || "",
 
           marketCounts:
-            json.marketCounts || {}
+            json.marketCounts || {},
+
+          dayTradeEligibility:
+            json.dayTradeEligibility || {}
 
         };
 

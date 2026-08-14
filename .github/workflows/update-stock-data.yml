@@ -3,6 +3,8 @@ name: Update Taiwan Stock Data
 on:
   workflow_dispatch:
   schedule:
+    # 台灣時間 08:15，刷新今日當沖／先賣資格
+    - cron: "15 0 * * 1-5"
     # 台灣時間 17:40
     - cron: "40 9 * * 1-5"
     # 台灣時間 18:00 / 18:20 / 18:40
@@ -77,8 +79,10 @@ jobs:
               "21": "化學工業", "22": "生技醫療業", "23": "油電燃氣業",
               "24": "半導體業", "25": "電腦及週邊設備業", "26": "光電業",
               "27": "通信網路業", "28": "電子零組件業", "29": "電子通路業",
-              "30": "資訊服務業", "31": "其他電子業", "35": "綠能環保",
+              "30": "資訊服務業", "31": "其他電子業",
+              "32": "文化創意業", "33": "農業科技業", "35": "綠能環保",
               "36": "數位雲端", "37": "運動休閒", "38": "居家生活",
+              "80": "管理股票",
           }
 
           DATE_KEYS = [
@@ -103,6 +107,7 @@ jobs:
 
           TPEX_INDUSTRY_KEYS = [
               "產業別", "產業類別", "Industry", "IndustryCode", "IndustryCategory",
+              "SecuritiesIndustryCode",
           ]
 
           def fetch_json(url, required=True):
@@ -131,38 +136,10 @@ jobs:
 
                       context = ssl.create_default_context()
 
-                      try:
-                          with urllib.request.urlopen(
-                              request, timeout=45, context=context
-                          ) as response:
-                              raw = response.read()
-
-                      except Exception as first_error:
-                          cert_error = (
-                              isinstance(first_error, ssl.SSLCertVerificationError)
-                              or (
-                                  isinstance(first_error, urllib.error.URLError)
-                                  and isinstance(
-                                      getattr(first_error, "reason", None),
-                                      ssl.SSLCertVerificationError,
-                                  )
-                              )
-                              or "CERTIFICATE_VERIFY_FAILED" in repr(first_error)
-                              or "Missing Subject Key Identifier" in repr(first_error)
-                          )
-
-                          if not is_tpex or not cert_error:
-                              raise
-
-                          print("TPEx SSL fallback:", repr(first_error))
-                          insecure_context = ssl.create_default_context()
-                          insecure_context.check_hostname = False
-                          insecure_context.verify_mode = ssl.CERT_NONE
-
-                          with urllib.request.urlopen(
-                              request, timeout=45, context=insecure_context
-                          ) as response:
-                              raw = response.read()
+                      with urllib.request.urlopen(
+                          request, timeout=45, context=context
+                      ) as response:
+                          raw = response.read()
 
                       return json.loads(raw.decode("utf-8-sig"))
 
@@ -1092,6 +1069,12 @@ jobs:
           print("TPEx formula: Mainboard + After-hours Fixed")
           PY
 
+      - name: Enrich TPEx industry metadata
+        run: python scripts/enrich_tpex_industry.py
+
+      - name: Enrich day-trading eligibility
+        run: python scripts/enrich_day_trade_eligibility.py
+
       - name: Validate stocks.json
         run: |
           python <<'PY'
@@ -1104,6 +1087,37 @@ jobs:
 
           if not stocks:
               raise SystemExit("stocks.json is empty")
+
+          eligibility = payload.get("dayTradeEligibility", {})
+          eligibility_counts = eligibility.get("counts", {})
+
+          if eligibility_counts.get("eligible", 0) < 300:
+              raise SystemExit("Day-trading eligibility coverage is too small")
+
+          tpex_unclassified = sum(
+              1
+              for stock in stocks
+              if stock.get("Market") == "TPEX"
+              and stock.get("Industry") == "未分類"
+          )
+
+          if tpex_unclassified > 10:
+              raise SystemExit(
+                  "Too many unclassified TPEx stocks: "
+                  + str(tpex_unclassified)
+              )
+
+          for stock in stocks:
+              if not isinstance(stock.get("DayTradeEligible"), bool):
+                  raise SystemExit(
+                      "Missing DayTradeEligible for " + str(stock.get("Code"))
+                  )
+
+              if not isinstance(stock.get("SellFirstDayTradeAllowed"), bool):
+                  raise SystemExit(
+                      "Missing SellFirstDayTradeAllowed for "
+                      + str(stock.get("Code"))
+                  )
 
           trade_date = payload.get("tradeDate", "")
 

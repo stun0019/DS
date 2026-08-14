@@ -7,6 +7,11 @@ import {
   roundToTick
 } from "../utils/priceTick.js";
 
+import {
+  calculateCostAdjustedExitPrice,
+  calculateDayTradeCosts
+} from "./tradingCosts.js";
+
 
 export function calculateRiskPlan(
   {
@@ -108,65 +113,145 @@ export function calculateRiskPlan(
       : null;
 
 
-  const riskPerLot =
+  const priceRiskPerLot =
     riskPerShare
     *
     lotSize;
 
 
-  let tp1;
-
-  let tp2;
-
-
-  if (
-    side ===
-    "long"
-  ) {
-
-    tp1 =
-      roundToTick(
-        entryPrice
-        +
-        riskPerShare,
-        "up"
-      );
+  const stopOutcome =
+    calculateDayTradeCosts(
+      {
+        entry:
+          entryPrice,
+        exit:
+          stopPrice,
+        side,
+        shares:
+          lotSize
+      }
+    );
 
 
-    tp2 =
-      roundToTick(
-        entryPrice
-        +
-        riskPerShare
-        *
-        2,
-        "up"
-      );
+  const riskPerLot =
+    stopOutcome
 
-  }
+      ? Math.max(
+          0,
+          -stopOutcome.netPnlAfterRebate
+        )
 
-  else {
-
-    tp1 =
-      roundToTick(
-        entryPrice
-        -
-        riskPerShare,
-        "down"
-      );
+      : priceRiskPerLot;
 
 
-    tp2 =
-      roundToTick(
-        entryPrice
-        -
-        riskPerShare
-        *
-        2,
-        "down"
-      );
+  const cashRiskPerLot =
+    stopOutcome
 
-  }
+      ? Math.max(
+          0,
+          -stopOutcome.pnlBeforeRebate
+        )
+
+      : riskPerLot;
+
+
+  const exitDirection =
+    side === "long"
+      ? "up"
+      : "down";
+
+
+  const breakEvenPrice =
+    roundToTick(
+      calculateCostAdjustedExitPrice(
+        {
+          entry:
+            entryPrice,
+          side,
+          shares:
+            lotSize
+        }
+      ),
+      exitDirection
+    );
+
+
+  const tp1 =
+    roundToTick(
+      calculateCostAdjustedExitPrice(
+        {
+          entry:
+            entryPrice,
+          side,
+          shares:
+            lotSize,
+          desiredNetPnl:
+            riskPerLot
+        }
+      ),
+      exitDirection
+    );
+
+
+  const tp2 =
+    roundToTick(
+      calculateCostAdjustedExitPrice(
+        {
+          entry:
+            entryPrice,
+          side,
+          shares:
+            lotSize,
+          desiredNetPnl:
+            riskPerLot
+            *
+            2
+        }
+      ),
+      exitDirection
+    );
+
+
+  const breakEvenOutcome =
+    calculateDayTradeCosts(
+      {
+        entry:
+          entryPrice,
+        exit:
+          breakEvenPrice,
+        side,
+        shares:
+          lotSize
+      }
+    );
+
+
+  const tp1Outcome =
+    calculateDayTradeCosts(
+      {
+        entry:
+          entryPrice,
+        exit:
+          tp1,
+        side,
+        shares:
+          lotSize
+      }
+    );
+
+
+  const tp2Outcome =
+    calculateDayTradeCosts(
+      {
+        entry:
+          entryPrice,
+        exit:
+          tp2,
+        side,
+        shares:
+          lotSize
+      }
+    );
 
 
   let maxLots =
@@ -211,11 +296,25 @@ export function calculateRiskPlan(
 
     lotSize,
 
+    priceRiskPerLot,
+
     riskPerLot,
+
+    cashRiskPerLot,
+
+    breakEvenPrice,
 
     tp1,
 
     tp2,
+
+    stopOutcome,
+
+    breakEvenOutcome,
+
+    tp1Outcome,
+
+    tp2Outcome,
 
     maxRiskAmount,
 

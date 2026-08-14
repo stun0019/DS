@@ -289,3 +289,94 @@ export function getPreviousPrice(
   );
 
 }
+
+
+export function getTickDistance(
+  fromPrice,
+  toPrice,
+  maxSteps = 10000
+) {
+
+  const from =
+    Number(
+      fromPrice
+      ||
+      0
+    );
+
+
+  const to =
+    Number(
+      toPrice
+      ||
+      0
+    );
+
+
+  if (
+    from <= 0
+    ||
+    to <= 0
+  ) {
+    return null;
+  }
+
+
+  if (
+    Math.abs(
+      from - to
+    ) < 1e-9
+  ) {
+    return 0;
+  }
+
+
+  const direction =
+    to > from
+      ? "up"
+      : "down";
+
+
+  let cursor =
+    from;
+
+
+  for (
+    let steps = 1;
+    steps <= maxSteps;
+    steps += 1
+  ) {
+
+    cursor =
+      direction === "up"
+
+        ? getNextPrice(
+            cursor
+          )
+
+        : getPreviousPrice(
+            cursor
+          );
+
+
+    if (
+      cursor <= 0
+    ) {
+      return null;
+    }
+
+
+    if (
+      direction === "up"
+        ? cursor >= to
+        : cursor <= to
+    ) {
+      return steps;
+    }
+
+  }
+
+
+  return maxSteps + 1;
+
+}

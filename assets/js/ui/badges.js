@@ -6,6 +6,11 @@ import {
   getMarketName
 } from "../data/stockData.js";
 
+import {
+  getTradingEligibility,
+  getEligibilityLabel
+} from "../strategy/tradingEligibility.js";
+
 
 export function marketBadge(
   stock
@@ -88,5 +93,36 @@ export function strategyBadge(
 
 
   return "";
+
+}
+
+
+export function eligibilityBadge(
+  stock
+) {
+
+  const status =
+    getTradingEligibility(
+      stock
+    );
+
+
+  return `
+
+    <span
+      class="
+        eligibility-badge
+        eligibility-${status.toLowerCase()}
+      "
+      title="當沖交易資格"
+    >
+      ${escapeHtml(
+        getEligibilityLabel(
+          stock
+        )
+      )}
+    </span>
+
+  `;
 
 }

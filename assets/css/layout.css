@@ -129,6 +129,11 @@ h1 {
 }
 
 
+.execution-root {
+  margin-bottom: 12px;
+}
+
+
 .panel-root {
   min-height: 280px;
 }

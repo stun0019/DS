@@ -68,6 +68,23 @@ export function createInitialLiveState(
     quote:
       null,
 
+    candles: [],
+
+    triggeredAt:
+      null,
+
+    triggerPrice:
+      null,
+
+    entry:
+      null,
+
+    stop:
+      null,
+
+    riskPlan:
+      null,
+
     updatedAt:
       null
 

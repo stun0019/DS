@@ -1,5 +1,6 @@
 import {
   escapeHtml,
+  formatCurrency,
   formatPrice,
   formatCompactMoney,
   formatNumber,
@@ -33,7 +34,8 @@ import {
 
 import {
   marketBadge,
-  strategyBadge
+  strategyBadge,
+  eligibilityBadge
 } from "./badges.js";
 
 
@@ -104,6 +106,12 @@ function premarketPlanHtml(
       liveState?.status,
       side
     );
+
+
+  const riskPlan =
+    liveState?.riskPlan
+    ||
+    null;
 
 
   return `
@@ -185,6 +193,62 @@ function premarketPlanHtml(
       </div>
 
     </div>
+
+    ${riskPlan
+      ? `
+          <div class="mobile-risk-plan">
+            <div>
+              <span>Entry</span>
+              <strong>${formatPrice(riskPlan.entry)}</strong>
+            </div>
+
+            <div>
+              <span>Stop</span>
+              <strong>${formatPrice(riskPlan.stop)}</strong>
+            </div>
+
+            <div>
+              <span>保本</span>
+              <strong>${formatPrice(riskPlan.breakEvenPrice)}</strong>
+            </div>
+
+            <div>
+              <span>TP1</span>
+              <strong>${formatPrice(riskPlan.tp1)}</strong>
+            </div>
+
+            <div>
+              <span>TP2</span>
+              <strong>${formatPrice(riskPlan.tp2)}</strong>
+            </div>
+
+            ${riskPlan.maxLots !== null
+              ? `
+                  <div>
+                    <span>上限</span>
+                    <strong>${riskPlan.maxLots} 張</strong>
+                  </div>
+                `
+              : ""
+            }
+          </div>
+
+          <div class="mobile-cost-summary">
+            <span>
+              1 張停損淨風險
+              <strong>${formatCurrency(riskPlan.riskPerLot)}</strong>
+            </span>
+
+            <span>
+              交易先扣成本
+              <strong>${formatCurrency(
+                riskPlan.stopOutcome?.costBeforeRebate
+              )}</strong>
+            </span>
+          </div>
+        `
+      : ""
+    }
 
   `;
 
@@ -306,6 +370,9 @@ export function renderStockCards(
                   : ""
               }
             "
+            data-stock-code="${escapeHtml(
+              stock.Code || ""
+            )}"
             tabindex="0"
           >
 
@@ -335,6 +402,10 @@ export function renderStockCards(
                 </span>
 
                 ${marketBadge(
+                  stock
+                )}
+
+                ${eligibilityBadge(
                   stock
                 )}
 

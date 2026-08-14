@@ -68,7 +68,8 @@ body.menu-open {
 
 
 button,
-select {
+select,
+input {
   font: inherit;
 }
 
@@ -80,7 +81,8 @@ button {
 
 
 button:focus-visible,
-select:focus-visible {
+select:focus-visible,
+input:focus-visible {
   outline:
     2px solid
     var(--accent);

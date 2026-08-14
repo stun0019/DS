@@ -7,6 +7,11 @@ import {
   clamp
 } from "../utils/number.js";
 
+import {
+  isDayTradeEligible,
+  isSellFirstAllowed
+} from "./tradingEligibility.js";
+
 
 export function calculatePreviousClose(
   stock
@@ -261,6 +266,12 @@ export function isLongCandidate(
 
   return (
 
+    isDayTradeEligible(
+      stock
+    )
+
+    &&
+
     rank
     <=
     STRATEGY.liquidityPoolSize
@@ -319,6 +330,12 @@ export function isShortCandidate(
 
 
   return (
+
+    isSellFirstAllowed(
+      stock
+    )
+
+    &&
 
     rank
     <=

@@ -46,8 +46,41 @@ export const LIVE_CONFIG = {
   nearTriggerTicks:
     2,
 
+  renderThrottleMs:
+    120,
+
   lotSize:
-    1000
+    1000,
+
+  maxRiskAmount:
+    null
+
+};
+
+
+/*
+交易成本設定
+
+券商於成交時先收原始手續費，
+再以月退方式退回 72%，
+最終等同負擔 28 折。
+
+現股當沖證交稅 0.15% 的優惠
+目前施行至 2027-12-31。
+*/
+export const TRADING_COST_CONFIG = {
+
+  commissionRate:
+    0.001425,
+
+  commissionDiscountMultiplier:
+    0.28,
+
+  dayTradingTaxRate:
+    0.0015,
+
+  dayTradingTaxPreferentialThrough:
+    "2027-12-31"
 
 };
 

@@ -18,6 +18,10 @@ export function renderRulesPanel(
 
           盤前只使用前一交易日官方資料建立候選池與觀察價。
 
+          候選名單會先套用 TWSE / TPEx 官方當沖資格，
+
+          做空池另排除暫停先賣後買標的。
+
           真正的進場、停損與停利，
           必須等今日開盤後取得盤中行情與價格結構再決定。
 
@@ -50,6 +54,16 @@ export function renderRulesPanel(
 
 
         <div class="rules-content">
+
+          先通過交易資格閘門：
+
+          <strong>做多必須可現股當沖</strong>，
+
+          <strong>做空必須同時允許先賣後買</strong>。
+
+          資格未知或官方列為不可當沖者不進入候選池。
+
+          <br><br>
 
           全市場依
           <strong>券商可比成交量</strong>
@@ -581,13 +595,92 @@ export function renderRulesPanel(
 
             <br><br>
 
-            TP1 = 1R
+            1 張停損淨風險 =
+            價格風險 + 月退後交易成本
+
+            <br><br>
+
+            TP1 = 扣除成本後 1R
 
             <br>
 
-            TP2 = 2R
+            TP2 = 扣除成本後 2R
 
           </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="rules-step">
+
+        <div class="rules-step-header">
+
+          <div class="rules-step-number">
+            10
+          </div>
+
+          <div>
+
+            <div class="rules-step-title">
+              交易成本與月退
+            </div>
+
+            <div class="rules-step-description">
+              分開顯示成交當下扣款與月退後淨成本
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="rules-content">
+
+          券商成交時先按原始手續費收取，
+          月退 72% 後，最終等同負擔 28 折。
+
+          <div class="rules-formula">
+
+            原始手續費 =
+            成交金額 × 0.1425%
+
+            <br><br>
+
+            月退後手續費 =
+            原始手續費 × 0.28
+
+            <br><br>
+
+            月退金額 =
+            原始手續費 × 0.72
+
+            <br><br>
+
+            當沖證交稅 =
+            賣出金額 × 0.15%
+
+          </div>
+
+          做多由平倉賣出端課稅；
+          先賣後買則由進場賣出端課稅。
+
+          現股當沖 0.15% 優惠稅率目前施行至
+          2027-12-31，屆期前需重新確認法規。
+
+          <br><br>
+
+          系統的保本價、TP1、TP2 與每張淨風險，
+          都使用月退後淨成本計算；
+          畫面另列「成交先扣成本」，提醒月退前的資金占用。
+
+          <br><br>
+
+          <small>
+            目前依比例連續估算，未套用券商逐筆最低手續費或個別取整規則；
+            實際金額仍以券商對帳單為準。
+          </small>
 
         </div>
 

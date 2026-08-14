@@ -148,6 +148,45 @@ export function formatCompactMoney(
 }
 
 
+export function formatCurrency(
+  value,
+  {
+    maximumFractionDigits = 0
+  } = {}
+) {
+
+  const number =
+    Number(
+      value
+    );
+
+
+  if (
+    !Number.isFinite(
+      number
+    )
+  ) {
+
+    return "-";
+
+  }
+
+
+  return (
+    "NT$"
+    +
+    number.toLocaleString(
+      "zh-TW",
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits
+      }
+    )
+  );
+
+}
+
+
 export function formatTradeDate(
   value
 ) {
