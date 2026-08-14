@@ -14,8 +14,6 @@ export const STRATEGY = {
 
   shortClosePosition: 0.35,
 
-  stopRangeRatio: 0.35,
-
   weights: {
 
     liquidity: 25,
@@ -33,6 +31,27 @@ export const STRATEGY = {
 };
 
 
+/*
+V3.0 盤中行情設定
+
+目前先使用 mock。
+之後接 Shioaji 時，
+只需要更換 Live Data Provider。
+*/
+export const LIVE_CONFIG = {
+
+  mode:
+    "mock",
+
+  nearTriggerTicks:
+    2,
+
+  lotSize:
+    1000
+
+};
+
+
 export const VIEW_CONFIG = {
 
   long: {
@@ -41,7 +60,7 @@ export const VIEW_CONFIG = {
       "做多候選池",
 
     description:
-      "強勢、流動性與收盤位置綜合評分",
+      "盤前強勢候選＋隔日突破觀察價",
 
     chip:
       "LONG",
@@ -58,7 +77,7 @@ export const VIEW_CONFIG = {
       "做空候選池",
 
     description:
-      "弱勢、流動性與收盤位置綜合評分",
+      "盤前弱勢候選＋隔日跌破觀察價",
 
     chip:
       "SHORT",
@@ -92,7 +111,7 @@ export const VIEW_CONFIG = {
       "候選池規則",
 
     description:
-      "多空篩選、評分與隔日價位計算方式",
+      "盤前候選＋盤中交易流程",
 
     chip:
       "RULES",
@@ -153,6 +172,7 @@ export const VIEW_CONFIG = {
 export const SORT_OPTIONS = [
 
   {
+
     value:
       "StrategyScore:desc:number",
 
@@ -161,86 +181,117 @@ export const SORT_OPTIONS = [
 
     strategyOnly:
       true
+
   },
 
+
   {
+
     value:
       "TradeVolume:desc:number",
 
     label:
       "成交量｜大 → 小"
+
   },
 
+
   {
+
     value:
       "TradeVolume:asc:number",
 
     label:
       "成交量｜小 → 大"
+
   },
 
+
   {
+
     value:
       "ChangePercent:desc:number",
 
     label:
       "漲跌幅｜高 → 低"
+
   },
 
+
   {
+
     value:
       "ChangePercent:asc:number",
 
     label:
       "漲跌幅｜低 → 高"
+
   },
 
+
   {
+
     value:
       "Amplitude:desc:number",
 
     label:
       "振幅｜大 → 小"
+
   },
 
+
   {
+
     value:
       "Amplitude:asc:number",
 
     label:
       "振幅｜小 → 大"
+
   },
 
+
   {
+
     value:
       "ClosePosition:desc:number",
 
     label:
       "收盤位置｜高 → 低"
+
   },
 
+
   {
+
     value:
       "ClosePosition:asc:number",
 
     label:
       "收盤位置｜低 → 高"
+
   },
 
+
   {
+
     value:
       "TradeValue:desc:number",
 
     label:
       "成交金額｜大 → 小"
+
   },
 
+
   {
+
     value:
       "Industry:asc:text",
 
     label:
       "產業別"
+
   }
 
 ];
