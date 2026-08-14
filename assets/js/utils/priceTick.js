@@ -2,8 +2,16 @@ export function getPriceTick(
   price
 ) {
 
+  const value =
+    Number(
+      price
+      ||
+      0
+    );
+
+
   if (
-    price < 10
+    value < 10
   ) {
 
     return 0.01;
@@ -12,7 +20,7 @@ export function getPriceTick(
 
 
   if (
-    price < 50
+    value < 50
   ) {
 
     return 0.05;
@@ -21,7 +29,7 @@ export function getPriceTick(
 
 
   if (
-    price < 100
+    value < 100
   ) {
 
     return 0.1;
@@ -30,7 +38,7 @@ export function getPriceTick(
 
 
   if (
-    price < 500
+    value < 500
   ) {
 
     return 0.5;
@@ -39,7 +47,7 @@ export function getPriceTick(
 
 
   if (
-    price < 1000
+    value < 1000
   ) {
 
     return 1;
@@ -57,8 +65,16 @@ export function roundToTick(
   direction = "nearest"
 ) {
 
+  const value =
+    Number(
+      price
+      ||
+      0
+    );
+
+
   if (
-    price <= 0
+    value <= 0
   ) {
 
     return 0;
@@ -68,12 +84,12 @@ export function roundToTick(
 
   const tick =
     getPriceTick(
-      price
+      value
     );
 
 
   const units =
-    price
+    value
     /
     tick;
 
@@ -128,6 +144,148 @@ export function roundToTick(
     .toFixed(
       2
     )
+  );
+
+}
+
+
+/*
+取得目前價格往上的下一個合法 Tick。
+
+例如：
+
+9.99   → 10
+49.95  → 50
+99.9   → 100
+499.5  → 500
+999    → 1000
+*/
+export function getNextPrice(
+  price
+) {
+
+  const value =
+    Number(
+      price
+      ||
+      0
+    );
+
+
+  if (
+    value <= 0
+  ) {
+
+    return 0;
+
+  }
+
+
+  const tick =
+    getPriceTick(
+      value
+    );
+
+
+  const nextPrice =
+    value
+    +
+    tick;
+
+
+  return roundToTick(
+    nextPrice,
+    "up"
+  );
+
+}
+
+
+/*
+取得目前價格往下的上一個合法 Tick。
+
+重要：
+
+不能直接使用
+
+price - getPriceTick(price)
+
+因為在 Tick 級距邊界會錯。
+
+例如：
+
+50 元本身 Tick = 0.1
+
+但 50 往下一檔真正應該是：
+
+49.95
+
+而不是：
+
+49.90
+
+所以計算往下 Tick 時，
+必須取得「目前價格下方級距」的 Tick。
+*/
+export function getPreviousPrice(
+  price
+) {
+
+  const value =
+    Number(
+      price
+      ||
+      0
+    );
+
+
+  if (
+    value <= 0
+  ) {
+
+    return 0;
+
+  }
+
+
+  /*
+  用極小值往價格下方探測，
+  讓 10 / 50 / 100 / 500 / 1000
+  這些級距邊界可以取得正確的前一級 Tick。
+  */
+  const probePrice =
+    Math.max(
+      value
+      -
+      1e-9,
+      0
+    );
+
+
+  const previousTick =
+    getPriceTick(
+      probePrice
+    );
+
+
+  const previousPrice =
+    value
+    -
+    previousTick;
+
+
+  if (
+    previousPrice <= 0
+  ) {
+
+    return 0;
+
+  }
+
+
+  return roundToTick(
+    previousPrice,
+    "down"
   );
 
 }
