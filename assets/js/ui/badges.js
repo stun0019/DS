@@ -8,7 +8,8 @@ import {
 
 import {
   getTradingEligibility,
-  getEligibilityLabel
+  getEligibilityLabel,
+  getEligibilityTitle
 } from "../strategy/tradingEligibility.js";
 
 
@@ -114,7 +115,11 @@ export function eligibilityBadge(
         eligibility-badge
         eligibility-${status.toLowerCase()}
       "
-      title="當沖交易資格"
+      title="${escapeHtml(
+        getEligibilityTitle(
+          stock
+        )
+      )}"
     >
       ${escapeHtml(
         getEligibilityLabel(

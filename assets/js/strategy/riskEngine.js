@@ -265,14 +265,14 @@ export function calculateRiskPlan(
     &&
     maxRiskAmount > 0
     &&
-    riskPerLot > 0
+    cashRiskPerLot > 0
   ) {
 
     maxLots =
       Math.floor(
         maxRiskAmount
         /
-        riskPerLot
+        cashRiskPerLot
       );
 
   }

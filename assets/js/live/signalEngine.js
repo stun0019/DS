@@ -197,7 +197,11 @@ function activeSignalResult(
   const stop =
     getIntradayStructuralStop(
       candles,
-      side
+      side,
+      {
+        afterTimestamp:
+          triggeredAt
+      }
     );
 
 

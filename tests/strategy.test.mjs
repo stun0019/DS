@@ -243,6 +243,17 @@ test(
       ),
       false
     );
+
+    assert.equal(
+      isShortCandidate(
+        {
+          ...shortStock,
+          SellFirstDayTradeAllowed: true,
+          SellFirstSuspended: true
+        }
+      ),
+      false
+    );
   }
 );
 
@@ -310,12 +321,71 @@ test(
 
 
 test(
-  "intraday structure produces an entry-ready risk plan",
+  "only a post-breakout swing can produce an entry-ready risk plan",
   () => {
     resetLiveStates();
 
     const stock =
       createStock();
+
+    const triggered =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 111,
+          timestamp: "2026-08-14T01:05:30.000Z",
+          candles: [
+            {
+              timestamp: "2026-08-14T01:01:00.000Z",
+              open: 102,
+              high: 104,
+              low: 100,
+              close: 103
+            },
+            {
+              timestamp: "2026-08-14T01:02:00.000Z",
+              open: 103,
+              high: 105,
+              low: 99,
+              close: 100
+            },
+            {
+              timestamp: "2026-08-14T01:03:00.000Z",
+              open: 100,
+              high: 106,
+              low: 101,
+              close: 105
+            },
+            {
+              timestamp: "2026-08-14T01:04:00.000Z",
+              open: 105,
+              high: 112,
+              low: 104,
+              close: 111
+            }
+          ]
+        },
+        {
+          maxRiskAmount: 25000
+        }
+      );
+
+    assert.equal(
+      triggered.status,
+      LIVE_STATUS.CONFIRMING
+    );
+
+    assert.equal(
+      triggered.stop,
+      null
+    );
+
+    assert.equal(
+      triggered.riskPlan,
+      null
+    );
 
     const result =
       applyLiveQuoteToState(
@@ -323,12 +393,38 @@ test(
         "long",
         {
           code: stock.Code,
-          last: 111,
+          last: 111.5,
+          timestamp: "2026-08-14T01:10:00.000Z",
           candles: [
-            { open: 102, high: 104, low: 100, close: 103 },
-            { open: 103, high: 105, low: 99, close: 100 },
-            { open: 100, high: 106, low: 101, close: 105 },
-            { open: 105, high: 112, low: 104, close: 111 }
+            ...triggered.candles,
+            {
+              timestamp: "2026-08-14T01:06:00.000Z",
+              open: 110,
+              high: 112,
+              low: 104,
+              close: 108
+            },
+            {
+              timestamp: "2026-08-14T01:07:00.000Z",
+              open: 108,
+              high: 110,
+              low: 102,
+              close: 106
+            },
+            {
+              timestamp: "2026-08-14T01:08:00.000Z",
+              open: 106,
+              high: 111,
+              low: 105,
+              close: 110
+            },
+            {
+              timestamp: "2026-08-14T01:09:00.000Z",
+              open: 110,
+              high: 112,
+              low: 106,
+              close: 111.5
+            }
           ]
         },
         {
@@ -343,7 +439,12 @@ test(
 
     assert.equal(
       result.stop,
-      99
+      102
+    );
+
+    assert.equal(
+      result.triggeredAt,
+      "2026-08-14T01:05:30.000Z"
     );
 
     assert.equal(
@@ -363,7 +464,7 @@ test(
           entry: 50,
           stop: 49.5,
           side: "long",
-          maxRiskAmount: 1200
+          maxRiskAmount: 1300
         }
       );
 
@@ -375,6 +476,20 @@ test(
     assertClose(
       plan.riskPerLot,
       613.9505
+    );
+
+    assertClose(
+      plan.cashRiskPerLot,
+      716.0375
+    );
+
+    assert.equal(
+      Math.floor(
+        plan.maxRiskAmount
+        /
+        plan.riskPerLot
+      ),
+      2
     );
 
     assert.equal(

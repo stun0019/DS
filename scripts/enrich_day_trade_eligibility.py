@@ -7,6 +7,7 @@ import re
 import ssl
 import time
 import urllib.request
+import warnings
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -16,9 +17,19 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 STOCKS_PATH = ROOT / "stocks.json"
 
-SOURCES = {
+ELIGIBILITY_SOURCES = {
     "TWSE": "https://openapi.twse.com.tw/v1/exchangeReport/TWTB4U",
     "TPEX": "https://www.tpex.org.tw/openapi/v1/tpex_securities",
+}
+
+SUSPENSION_SOURCES = {
+    "TWSE": "https://openapi.twse.com.tw/v1/exchangeReport/TWTBAU1",
+    "TPEX": "https://www.tpex.org.tw/openapi/v1/tpex_intraday_trading_pre",
+}
+
+SOURCES = {
+    "eligibility": ELIGIBILITY_SOURCES,
+    "sellFirstSuspensions": SUSPENSION_SOURCES,
 }
 
 CODE_KEYS = (
@@ -71,26 +82,65 @@ def normalize_code(value: Any) -> str:
     return re.sub(r"[^0-9A-Za-z]", "", clean_text(value))
 
 
+def is_certificate_verification_error(error: Exception) -> bool:
+    reason = getattr(error, "reason", None)
+    return isinstance(error, ssl.SSLCertVerificationError) or isinstance(
+        reason,
+        ssl.SSLCertVerificationError,
+    )
+
+
+def create_tpex_fallback_context() -> ssl.SSLContext:
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+    return context
+
+
 def fetch_json(url: str) -> Any:
     last_error: Exception | None = None
-    context = ssl.create_default_context()
+    is_tpex = "tpex.org.tw" in url.lower()
 
     for attempt in range(1, 4):
-        try:
-            request = urllib.request.Request(
-                url,
-                headers={
-                    "User-Agent": "Mozilla/5.0 Taiwan-Stock-Dashboard",
-                    "Accept": "application/json,text/plain,*/*",
-                    "Cache-Control": "no-cache",
-                },
-            )
+        request = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": "Mozilla/5.0 Taiwan-Stock-Dashboard",
+                "Accept": "application/json,text/plain,*/*",
+                "Referer": "https://www.tpex.org.tw/" if is_tpex else "https://www.twse.com.tw/",
+                "Cache-Control": "no-cache",
+            },
+        )
 
-            with urllib.request.urlopen(request, timeout=45, context=context) as response:
+        try:
+            with urllib.request.urlopen(
+                request,
+                timeout=45,
+                context=ssl.create_default_context(),
+            ) as response:
                 return json.loads(response.read().decode("utf-8-sig"))
 
         except Exception as error:  # pragma: no cover - network error details vary
             last_error = error
+
+            if is_tpex and is_certificate_verification_error(error):
+                warnings.warn(
+                    "TPEx certificate verification failed; retrying this TPEx "
+                    "request only with certificate verification disabled.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+
+                try:
+                    with urllib.request.urlopen(
+                        request,
+                        timeout=45,
+                        context=create_tpex_fallback_context(),
+                    ) as response:
+                        return json.loads(response.read().decode("utf-8-sig"))
+                except Exception as fallback_error:  # pragma: no cover
+                    last_error = fallback_error
+
             if attempt < 3:
                 time.sleep(attempt * 2)
 
@@ -133,6 +183,7 @@ def parse_market(payload: Any, market: str) -> tuple[dict[str, dict[str, Any]], 
         result[code] = {
             "DayTradeEligible": True,
             "SellFirstDayTradeAllowed": not suspended,
+            "SellFirstSuspended": suspended,
         }
 
     if len(result) < 300:
@@ -141,7 +192,70 @@ def parse_market(payload: Any, market: str) -> tuple[dict[str, dict[str, Any]], 
     return result, max(dates, default="")
 
 
-def enrich() -> dict[str, Any]:
+def current_roc_date() -> str:
+    now = datetime.now(ZoneInfo("Asia/Taipei"))
+    return f"{now.year - 1911:03d}{now.month:02d}{now.day:02d}"
+
+
+def normalize_date(value: Any) -> str:
+    digits = re.sub(r"\D", "", clean_text(value))
+    return digits if len(digits) == 7 else ""
+
+
+def parse_suspensions(
+    payload: Any,
+    market: str,
+    as_of_date: str,
+) -> tuple[dict[str, dict[str, Any]], str]:
+    result: dict[str, dict[str, Any]] = {}
+    source_dates: list[str] = []
+
+    for row in unwrap_records(payload):
+        code = normalize_code(pick_value(row, CODE_KEYS))
+        if not code:
+            continue
+
+        source_date = normalize_date(pick_value(row, DATE_KEYS))
+        if source_date:
+            source_dates.append(source_date)
+
+        reason = clean_text(row.get("Reason"))
+
+        if market == "TWSE":
+            start_date = normalize_date(row.get("StartDate"))
+            end_date = normalize_date(row.get("EndDate"))
+            active = bool(
+                start_date
+                and end_date
+                and start_date <= as_of_date <= end_date
+            )
+            resume_date = ""
+        else:
+            start_date = normalize_date(row.get("FirstDayToSuspendSellThenBuy"))
+            resume_date = normalize_date(row.get("DayOfReinstatingSellThenBuy"))
+            end_date = ""
+            active = bool(
+                start_date
+                and resume_date
+                and start_date <= as_of_date < resume_date
+            )
+
+        if not active:
+            continue
+
+        result[code] = {
+            "SellFirstDayTradeAllowed": False,
+            "SellFirstSuspended": True,
+            "SellFirstSuspensionReason": reason,
+            "SellFirstSuspensionStartDate": start_date,
+            "SellFirstSuspensionEndDate": end_date,
+            "SellFirstResumeDate": resume_date,
+        }
+
+    return result, max(source_dates, default=as_of_date if market == "TWSE" else "")
+
+
+def enrich(as_of_date: str | None = None) -> dict[str, Any]:
     with STOCKS_PATH.open(encoding="utf-8") as file:
         payload = json.load(file)
 
@@ -151,11 +265,31 @@ def enrich() -> dict[str, Any]:
 
     market_maps: dict[str, dict[str, dict[str, Any]]] = {}
     market_dates: dict[str, str] = {}
+    suspension_dates: dict[str, str] = {}
+    source_suspension_counts: dict[str, int] = {}
+    effective_date = normalize_date(as_of_date) or current_roc_date()
 
-    for market, url in SOURCES.items():
+    for market, url in ELIGIBILITY_SOURCES.items():
         records, reference_date = parse_market(fetch_json(url), market)
+        suspensions, suspension_date = parse_suspensions(
+            fetch_json(SUSPENSION_SOURCES[market]),
+            market,
+            effective_date,
+        )
+
+        active_eligible_suspensions = 0
+        for code, suspension in suspensions.items():
+            eligibility = records.get(code)
+            if eligibility is None:
+                continue
+
+            eligibility.update(suspension)
+            active_eligible_suspensions += 1
+
         market_maps[market] = records
         market_dates[market] = reference_date
+        suspension_dates[market] = suspension_date
+        source_suspension_counts[market] = active_eligible_suspensions
 
     counts = {
         "eligible": 0,
@@ -178,6 +312,16 @@ def enrich() -> dict[str, Any]:
                 changed = True
                 stock.pop(deprecated_key)
 
+        for optional_key in (
+            "SellFirstSuspensionReason",
+            "SellFirstSuspensionStartDate",
+            "SellFirstSuspensionEndDate",
+            "SellFirstResumeDate",
+        ):
+            if optional_key not in values and optional_key in stock:
+                changed = True
+                stock.pop(optional_key)
+
         if any(stock.get(key) != value for key, value in values.items()):
             changed = True
 
@@ -194,6 +338,7 @@ def enrich() -> dict[str, Any]:
                 {
                     "DayTradeEligible": False,
                     "SellFirstDayTradeAllowed": False,
+                    "SellFirstSuspended": False,
                 }
             )
             counts["unknown"] += 1
@@ -206,6 +351,7 @@ def enrich() -> dict[str, Any]:
                 {
                     "DayTradeEligible": False,
                     "SellFirstDayTradeAllowed": False,
+                    "SellFirstSuspended": False,
                 }
             )
             counts["ineligible"] += 1
@@ -221,10 +367,26 @@ def enrich() -> dict[str, Any]:
         else:
             counts["buyFirstOnly"] += 1
 
+    suspension_counts = {
+        market: sum(
+            1
+            for stock in stocks
+            if clean_text(stock.get("Market")) == market
+            and stock.get("SellFirstSuspended") is True
+        )
+        for market in ELIGIBILITY_SOURCES
+    }
+
     previous_metadata = payload.get("dayTradeEligibility", {})
     metadata_without_time = {
         "sources": SOURCES,
         "marketDates": market_dates,
+        "sellFirstSuspensions": {
+            "asOfDate": effective_date,
+            "sourceDates": suspension_dates,
+            "counts": suspension_counts,
+            "sourceEligibleCounts": source_suspension_counts,
+        },
         "counts": counts,
     }
 

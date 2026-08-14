@@ -583,7 +583,7 @@ function renderRows(
                             · 保本 ${formatPrice(riskPlan.breakEvenPrice)}
                             · TP1 ${formatPrice(riskPlan.tp1)}
                             ${riskPlan.maxLots !== null
-                              ? `· ${riskPlan.maxLots} 張`
+                              ? `· 現金上限 ${riskPlan.maxLots} 張`
                               : ""
                             }
                           </span>

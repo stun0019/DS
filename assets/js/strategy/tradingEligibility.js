@@ -18,6 +18,9 @@ export function getTradingEligibility(
     if (
       stock.SellFirstDayTradeAllowed ===
       false
+      ||
+      stock.SellFirstSuspended ===
+      true
     ) {
 
       return TRADING_ELIGIBILITY.BUY_FIRST_ONLY;
@@ -92,7 +95,9 @@ export function getEligibilityLabel(
       return "可先賣";
 
     case TRADING_ELIGIBILITY.BUY_FIRST_ONLY:
-      return "僅先買";
+      return stock?.SellFirstSuspended === true
+        ? "暫停先賣"
+        : "僅先買";
 
     case TRADING_ELIGIBILITY.INELIGIBLE:
       return "不可當沖";
@@ -101,5 +106,44 @@ export function getEligibilityLabel(
       return "資格未知";
 
   }
+
+}
+
+
+export function getEligibilityTitle(
+  stock
+) {
+
+  if (
+    stock?.SellFirstSuspended !==
+    true
+  ) {
+
+    return "當沖交易資格";
+
+  }
+
+
+  const details =
+    [
+      stock.SellFirstSuspensionReason,
+      stock.SellFirstSuspensionStartDate
+        ? `起日 ${stock.SellFirstSuspensionStartDate}`
+        : "",
+      stock.SellFirstResumeDate
+        ? `恢復 ${stock.SellFirstResumeDate}`
+        : stock.SellFirstSuspensionEndDate
+          ? `迄日 ${stock.SellFirstSuspensionEndDate}`
+          : ""
+    ]
+    .filter(
+      Boolean
+    )
+    .join(" · ");
+
+
+  return details
+    ? `暫停先賣後買 · ${details}`
+    : "暫停先賣後買";
 
 }

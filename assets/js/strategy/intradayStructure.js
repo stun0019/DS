@@ -58,6 +58,96 @@ function normalizeCandle(
 }
 
 
+function toTimestamp(
+  value
+) {
+
+  const timestamp =
+    Date.parse(
+      value
+      ??
+      ""
+    );
+
+
+  return Number.isFinite(
+    timestamp
+  )
+
+    ? timestamp
+
+    : null;
+
+}
+
+
+export function getCandlesAfter(
+  candles,
+  afterTimestamp
+) {
+
+  if (
+    !Array.isArray(
+      candles
+    )
+  ) {
+
+    return [];
+
+  }
+
+
+  const boundary =
+    toTimestamp(
+      afterTimestamp
+    );
+
+
+  if (
+    boundary === null
+  ) {
+
+    return [];
+
+  }
+
+
+  return candles
+  .map(
+    normalizeCandle
+  )
+  .map(
+    candle => ({
+      candle,
+      timestamp:
+        toTimestamp(
+          candle?.timestamp
+        )
+    })
+  )
+  .filter(
+    item =>
+      item.timestamp !== null
+      &&
+      item.timestamp > boundary
+  )
+  .sort(
+    (
+      first,
+      second
+    ) =>
+      first.timestamp
+      -
+      second.timestamp
+  )
+  .map(
+    item =>
+      item.candle
+  );
+
+}
+
+
 export function findLatestSwingLow(
   candles
 ) {
@@ -228,8 +318,21 @@ export function findLatestSwingHigh(
 
 export function getIntradayStructuralStop(
   candles,
-  side
+  side,
+  {
+    afterTimestamp = null
+  } = {}
 ) {
+
+  const eligibleCandles =
+    afterTimestamp
+
+      ? getCandlesAfter(
+          candles,
+          afterTimestamp
+        )
+
+      : candles;
 
   if (
     side ===
@@ -238,7 +341,7 @@ export function getIntradayStructuralStop(
 
     const swingLow =
       findLatestSwingLow(
-        candles
+        eligibleCandles
       );
 
 
@@ -256,7 +359,7 @@ export function getIntradayStructuralStop(
 
     const swingHigh =
       findLatestSwingHigh(
-        candles
+        eligibleCandles
       );
 
 

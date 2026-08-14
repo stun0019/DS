@@ -63,6 +63,10 @@ export function renderRulesPanel(
 
           資格未知或官方列為不可當沖者不進入候選池。
 
+          系統另以 TWSE TWTBAU1 與
+          TPEx tpex_intraday_trading_pre
+          覆蓋當日暫停先賣後買名單。
+
           <br><br>
 
           全市場依
@@ -517,27 +521,31 @@ export function renderRulesPanel(
 
           <br><br>
 
-          V3 必須等今日開盤後形成盤中結構，
+          V3 必須先突破觀察價，
 
-          再由今日的
+          再由突破時間之後新形成的
           Swing Low / Swing High
           決定結構停損。
 
           <div class="rules-formula">
 
             做多：
-            今日盤中結構低點
+            突破後新 Swing Low
             →
             Stop
 
             <br><br>
 
             做空：
-            今日盤中結構高點
+            跌破後新 Swing High
             →
             Stop
 
           </div>
+
+          突破前已存在的 Swing 永遠不能作為 Stop。
+          分鐘 K 必須帶可解析 timestamp；無法判定形成時間時，
+          系統會停留在等待結構確認。
 
         </div>
 
@@ -597,6 +605,16 @@ export function renderRulesPanel(
 
             1 張停損淨風險 =
             價格風險 + 月退後交易成本
+
+            <br><br>
+
+            1 張現金風險 =
+            價格風險 + 月退前交易成本
+
+            <br><br>
+
+            maxLots =
+            floor(單筆風險上限 ÷ 1 張現金風險)
 
             <br><br>
 

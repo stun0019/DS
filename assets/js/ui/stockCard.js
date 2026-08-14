@@ -225,7 +225,7 @@ function premarketPlanHtml(
             ${riskPlan.maxLots !== null
               ? `
                   <div>
-                    <span>上限</span>
+                    <span>現金上限</span>
                     <strong>${riskPlan.maxLots} 張</strong>
                   </div>
                 `

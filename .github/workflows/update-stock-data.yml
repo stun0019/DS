@@ -110,6 +110,19 @@ jobs:
               "SecuritiesIndustryCode",
           ]
 
+          def is_certificate_verification_error(error):
+              reason = getattr(error, "reason", None)
+              return (
+                  isinstance(error, ssl.SSLCertVerificationError)
+                  or isinstance(reason, ssl.SSLCertVerificationError)
+              )
+
+          def create_tpex_fallback_context():
+              context = ssl.create_default_context()
+              context.check_hostname = False
+              context.verify_mode = ssl.CERT_NONE
+              return context
+
           def fetch_json(url, required=True):
               print(f"Fetching: {url}")
               last_error = None
@@ -134,12 +147,33 @@ jobs:
                           },
                       )
 
-                      context = ssl.create_default_context()
+                      try:
+                          with urllib.request.urlopen(
+                              request,
+                              timeout=45,
+                              context=ssl.create_default_context(),
+                          ) as response:
+                              raw = response.read()
 
-                      with urllib.request.urlopen(
-                          request, timeout=45, context=context
-                      ) as response:
-                          raw = response.read()
+                      except Exception as verified_error:
+                          if not (
+                              is_tpex
+                              and is_certificate_verification_error(verified_error)
+                          ):
+                              raise
+
+                          print(
+                              "SECURITY WARNING: TPEx certificate verification "
+                              "failed; retrying this TPEx request only without "
+                              "certificate verification."
+                          )
+
+                          with urllib.request.urlopen(
+                              request,
+                              timeout=45,
+                              context=create_tpex_fallback_context(),
+                          ) as response:
+                              raw = response.read()
 
                       return json.loads(raw.decode("utf-8-sig"))
 
@@ -1090,9 +1124,13 @@ jobs:
 
           eligibility = payload.get("dayTradeEligibility", {})
           eligibility_counts = eligibility.get("counts", {})
+          suspension_meta = eligibility.get("sellFirstSuspensions", {})
 
           if eligibility_counts.get("eligible", 0) < 300:
               raise SystemExit("Day-trading eligibility coverage is too small")
+
+          if not suspension_meta.get("asOfDate"):
+              raise SystemExit("Missing sell-first suspension as-of date")
 
           tpex_unclassified = sum(
               1
@@ -1116,6 +1154,12 @@ jobs:
               if not isinstance(stock.get("SellFirstDayTradeAllowed"), bool):
                   raise SystemExit(
                       "Missing SellFirstDayTradeAllowed for "
+                      + str(stock.get("Code"))
+                  )
+
+              if not isinstance(stock.get("SellFirstSuspended"), bool):
+                  raise SystemExit(
+                      "Missing SellFirstSuspended for "
                       + str(stock.get("Code"))
                   )
 

@@ -8,9 +8,9 @@
 
 1. GitHub Actions 抓取上市、上櫃官方日行情並驗證交易日期與成交量公式。
 2. `scripts/enrich_tpex_industry.py` 補齊 TPEx 官方產業分類。
-3. `scripts/enrich_day_trade_eligibility.py` 增補官方現股當沖資格與暫停先賣後買標記。
+3. `scripts/enrich_day_trade_eligibility.py` 增補官方現股當沖資格，並用 TWSE TWTBAU1、TPEx `tpex_intraday_trading_pre` 覆蓋當日暫停先賣後買標記。
 4. 前端載入 `stocks.json`，只讓合格標的進入多空候選池。
-5. 即時 Provider 送入 Quote；突破後由分鐘 K 找 Swing Low／High，建立結構停損與風險計畫。
+5. 即時 Provider 送入 Quote；突破後只使用突破時間之後新形成的 Swing Low／High 建立結構停損，突破前 Swing 一律禁止使用。
 6. 風險計畫納入 28 折月退手續費與賣出端 0.15% 當沖證交稅，產生淨風險、保本價與成本後 1R／2R。
 
 ## 本機執行
@@ -52,12 +52,12 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 }
 ```
 
-`candles` 建議提供已完成及目前形成中的 1 分 K。行情斷線、逾時、訂閱名單與 API 金鑰應由後端服務處理，不要把永豐憑證放進前端或 GitHub 儲存庫。
+`candles` 必須提供帶有可解析 `timestamp` 的 1 分 K。無法證明 K 棒晚於突破時間時，系統不會建立 Stop。行情斷線、逾時、訂閱名單與 API 金鑰應由後端服務處理，不要把永豐憑證放進前端或 GitHub 儲存庫。
 
 ## 重要限制
 
 - 官方「可先賣」資格不等同券商當下保證有券；實際券源仍需由券商 API 確認。
-- 單筆風險上限預設不設定，使用者可在頁面輸入；系統不應自行替使用者決定風險金額。
+- 單筆風險上限預設不設定，使用者可在頁面輸入；`maxLots` 採月退前 `cashRiskPerLot` 保守計算。
 - 交易成本依使用者提供的月退比例連續估算，未套用逐筆最低手續費與券商個別取整方式，實際金額以對帳單為準。
 - 現股當沖 0.15% 優惠稅率目前施行至 2027-12-31，屆期前需重新確認法規並更新設定。
 - 候選分數是規則排序，不代表預期報酬。正式使用前仍需完成含手續費、交易稅與滑價的歷史回測。
