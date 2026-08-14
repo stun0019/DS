@@ -74,6 +74,23 @@ const NAV_GROUPS = [
 
         className:
           "nav-rules"
+      },
+
+      {
+        view:
+          "replay",
+
+        icon:
+          "測",
+
+        name:
+          "Replay 回測",
+
+        description:
+          "5 分 K、LogBox 與績效",
+
+        className:
+          "nav-rules"
       }
 
     ]

@@ -53,6 +53,15 @@ export function normalizeLiveQuote(
       null,
 
 
+    candleTimeframeMinutes:
+
+      toNumber(
+        rawQuote.candleTimeframeMinutes
+        ??
+        rawQuote.timeframeMinutes
+      ),
+
+
     open:
 
       toNumber(

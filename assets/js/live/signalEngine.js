@@ -11,7 +11,9 @@ import {
 } from "../strategy/priceLevels.js";
 
 import {
-  getIntradayStructuralStop
+  getPostBreakoutStructure,
+  isSupportedStructureCandle,
+  normalizeIntradayCandle
 } from "../strategy/intradayStructure.js";
 
 import {
@@ -143,6 +145,121 @@ function getQuoteTime(
 }
 
 
+function mergeStructuralCandles(
+  previousState,
+  quote
+) {
+
+  const quoteTime =
+    getQuoteTime(
+      quote?.timestamp
+    );
+
+
+  if (
+    !quoteTime
+  ) {
+
+    return previousState?.candles
+    ??
+    [];
+
+  }
+
+
+  const fallbackTimeframeMinutes =
+    quote?.candleTimeframeMinutes
+    ??
+    quote?.timeframeMinutes
+    ??
+    null;
+
+  const merged =
+    new Map();
+
+
+  [
+    ...(
+      previousState?.candles
+      ??
+      []
+    ),
+    ...(
+      Array.isArray(
+        quote?.candles
+      )
+
+        ? quote.candles
+
+        : []
+    )
+  ]
+  .forEach(
+    candle => {
+
+      const normalized =
+        normalizeIntradayCandle(
+          candle,
+          fallbackTimeframeMinutes
+        );
+
+      const candleTime =
+        getQuoteTime(
+          normalized?.timestamp
+        );
+
+
+      if (
+        !normalized
+        ||
+        !candleTime
+        ||
+        candleTime.milliseconds >
+          quoteTime.milliseconds
+        ||
+        !isSupportedStructureCandle(
+          normalized
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      merged.set(
+        candleTime.timestamp,
+        {
+          ...normalized,
+          timestamp:
+            candleTime.timestamp
+        }
+      );
+
+    }
+  );
+
+
+  return [
+    ...merged.values()
+  ]
+  .sort(
+    (
+      first,
+      second
+    ) =>
+      Date.parse(
+        first.timestamp
+      )
+      -
+      Date.parse(
+        second.timestamp
+      )
+  );
+
+}
+
+
 function hasTriggered(
   side,
   last,
@@ -208,17 +325,10 @@ function invalidatedResult(
 
 
   const candles =
-    Array.isArray(
-      quote?.candles
-    )
-    &&
-    quote.candles.length > 0
-
-      ? quote.candles
-
-      : previousState?.candles
-        ||
-        [];
+    mergeStructuralCandles(
+      previousState,
+      quote
+    );
 
 
   return {
@@ -247,6 +357,26 @@ function invalidatedResult(
       previousState?.triggerPrice
       ??
       null,
+    pullbackAt:
+      previousState?.pullbackAt
+      ??
+      null,
+    swing:
+      previousState?.swing
+      ??
+      null,
+    directionConfirmedAt:
+      null,
+    directionConfirmation:
+      null,
+    entryReadyAt:
+      null,
+    riskBlockedAt:
+      previousState?.riskBlockedAt
+      ??
+      null,
+    blockReason:
+      "今日劇本失效",
     entry:
       null,
     stop:
@@ -289,17 +419,10 @@ function activeSignalResult(
 
 
   const candles =
-    Array.isArray(
-      quote.candles
-    )
-    &&
-    quote.candles.length > 0
-
-      ? quote.candles
-
-      : previousState?.candles
-        ||
-        [];
+    mergeStructuralCandles(
+      previousState,
+      quote
+    );
 
 
   const baseResult = {
@@ -309,7 +432,35 @@ function activeSignalResult(
     distanceTicks: 0,
     triggeredAt,
     triggerPrice,
-    candles
+    candles,
+    pullbackAt:
+      previousState?.pullbackAt
+      ??
+      null,
+    swing:
+      previousState?.swing
+      ??
+      null,
+    directionConfirmedAt:
+      previousState?.directionConfirmedAt
+      ??
+      null,
+    directionConfirmation:
+      previousState?.directionConfirmation
+      ??
+      null,
+    entryReadyAt:
+      previousState?.entryReadyAt
+      ??
+      null,
+    riskBlockedAt:
+      previousState?.riskBlockedAt
+      ??
+      null,
+    blockReason:
+      previousState?.blockReason
+      ??
+      null
   };
 
 
@@ -332,11 +483,15 @@ function activeSignalResult(
       ||
       previousState.riskPlan;
 
+    const isBlocked =
+      refreshedRiskPlan?.maxLots ===
+      0;
+
+
     return {
       ...baseResult,
       status:
-        refreshedRiskPlan?.maxLots ===
-        0
+        isBlocked
 
           ? LIVE_STATUS.RISK_BLOCKED
 
@@ -346,42 +501,185 @@ function activeSignalResult(
       stop:
         previousState.stop,
       riskPlan:
-        refreshedRiskPlan
+        refreshedRiskPlan,
+      entryReadyAt:
+        isBlocked
+
+          ? null
+
+          : previousState.entryReadyAt
+            ??
+            quote.timestamp,
+      riskBlockedAt:
+        isBlocked
+
+          ? quote.timestamp
+
+          : null,
+      blockReason:
+        isBlocked
+
+          ? "單筆現金風險超過上限"
+
+          : null
     };
 
   }
 
 
+  const confirmationAfterTimestamp =
+    previousState?.riskBlockedAt
+    ??
+    null;
+
+  const structure =
+    getPostBreakoutStructure(
+      candles,
+      side,
+      {
+        afterTimestamp:
+          triggeredAt,
+        confirmationAfterTimestamp
+      }
+    );
+
+
   if (
-    candles.length < 3
+    !structure.pullback
   ) {
 
     return {
       ...baseResult,
       status:
-        previousState
-        &&
-        TRIGGERED_STATUSES.has(
-          previousState.status
-        )
+        previousState?.riskBlockedAt
 
           ? LIVE_STATUS.CONFIRMING
 
-          : LIVE_STATUS.TRIGGERED
+          : LIVE_STATUS.TRIGGERED,
+      pullbackAt: null,
+      swing: null,
+      directionConfirmedAt: null,
+      directionConfirmation: null,
+      entryReadyAt: null,
+      entry: null,
+      stop: null,
+      riskPlan: null,
+      blockReason:
+        previousState?.riskBlockedAt
+
+          ? "等待新的 Pullback 與方向確認"
+
+          : null
+    };
+
+  }
+
+
+  const structureResult = {
+    pullbackAt:
+      structure.pullback.timestamp,
+    swing:
+      structure.swing,
+    directionConfirmedAt:
+      structure.directionConfirmation?.timestamp
+      ??
+      null,
+    directionConfirmation:
+      structure.directionConfirmation
+  };
+
+
+  if (
+    !structure.swing
+  ) {
+
+    return {
+      ...baseResult,
+      ...structureResult,
+      status:
+        LIVE_STATUS.CONFIRMING,
+      entryReadyAt: null,
+      entry: null,
+      stop: null,
+      riskPlan: null,
+      blockReason:
+        "等待突破後 Swing"
     };
 
   }
 
 
   const stop =
-    getIntradayStructuralStop(
-      candles,
-      side,
-      {
-        afterTimestamp:
-          triggeredAt
-      }
-    );
+    structure.swing.price;
+
+
+  if (
+    !structure.directionConfirmation
+  ) {
+
+    if (
+      previousState?.riskBlockedAt
+    ) {
+
+      const refreshedRiskPlan =
+        calculateRiskPlan(
+          {
+            entry:
+              last,
+            stop,
+            side,
+            maxRiskAmount
+          }
+        );
+
+
+      return {
+        ...baseResult,
+        ...structureResult,
+        status:
+          refreshedRiskPlan?.maxLots ===
+          0
+
+            ? LIVE_STATUS.RISK_BLOCKED
+
+            : LIVE_STATUS.CONFIRMING,
+        entryReadyAt: null,
+        riskBlockedAt:
+          previousState.riskBlockedAt,
+        entry:
+          refreshedRiskPlan?.entry
+          ??
+          null,
+        stop,
+        riskPlan:
+          refreshedRiskPlan,
+        blockReason:
+          refreshedRiskPlan?.maxLots ===
+          0
+
+            ? "單筆現金風險超過上限"
+
+            : "風險已可接受，等待方向再次確認"
+      };
+
+    }
+
+
+    return {
+      ...baseResult,
+      ...structureResult,
+      status:
+        LIVE_STATUS.CONFIRMING,
+      entryReadyAt: null,
+      riskBlockedAt: null,
+      entry: null,
+      stop,
+      riskPlan: null,
+      blockReason:
+        "等待 Direction Confirmation"
+    };
+
+  }
 
 
   const riskPlan =
@@ -402,11 +700,17 @@ function activeSignalResult(
 
     return {
       ...baseResult,
+      ...structureResult,
       status:
         LIVE_STATUS.CONFIRMING,
+      entryReadyAt: null,
+      riskBlockedAt: null,
+      entry: null,
       stop:
         stop || null,
-      riskPlan: null
+      riskPlan: null,
+      blockReason:
+        "Entry 與 Stop 無法形成有效風險"
     };
 
   }
@@ -414,6 +718,7 @@ function activeSignalResult(
 
   return {
     ...baseResult,
+    ...structureResult,
     status:
       riskPlan.maxLots ===
       0
@@ -425,7 +730,28 @@ function activeSignalResult(
       riskPlan.entry,
     stop:
       riskPlan.stop,
-    riskPlan
+    riskPlan,
+    entryReadyAt:
+      riskPlan.maxLots ===
+      0
+
+        ? null
+
+        : quote.timestamp,
+    riskBlockedAt:
+      riskPlan.maxLots ===
+      0
+
+        ? quote.timestamp
+
+        : null,
+    blockReason:
+      riskPlan.maxLots ===
+      0
+
+        ? "單筆現金風險超過上限"
+
+        : null
   };
 
 }

@@ -15,6 +15,15 @@ import {
 } from "../assets/js/strategy/tradingCosts.js";
 
 import {
+  getCandlesAfter
+} from "../assets/js/strategy/intradayStructure.js";
+
+import {
+  replayCandidate,
+  runBacktest
+} from "../assets/js/replay/replayEngine.js";
+
+import {
   getNextPrice,
   getPreviousPrice,
   getTickDistance
@@ -29,6 +38,7 @@ import {
 } from "../assets/js/live/liveDataProvider.js";
 
 import {
+  getLiveState,
   getLiveStatusLabel,
   LIVE_STATUS,
   resetLiveStates
@@ -50,6 +60,200 @@ function createStock(
     SellFirstDayTradeAllowed: true,
     ...overrides
   };
+}
+
+
+function createShortStock(
+  overrides = {}
+) {
+  return createStock(
+    {
+      Code: "SHORT",
+      Name: "空方測試",
+      OpeningPrice: 120,
+      HighestPrice: 122,
+      LowestPrice: 100,
+      ClosingPrice: 101,
+      Change: -5,
+      ...overrides
+    }
+  );
+}
+
+
+function fiveMinuteBar(
+  timestamp,
+  overrides = {}
+) {
+  return {
+    timestamp,
+    timeframeMinutes: 5,
+    isComplete: true,
+    open: 110,
+    high: 111,
+    low: 109,
+    close: 110,
+    volume: 1000,
+    ...overrides
+  };
+}
+
+
+function applyFiveMinuteBar(
+  stock,
+  side,
+  bar,
+  maxRiskAmount = null
+) {
+  return applyLiveQuoteToState(
+    stock,
+    side,
+    {
+      code: stock.Code,
+      timestamp: bar.timestamp,
+      candleTimeframeMinutes: 5,
+      open: bar.open,
+      high: bar.high,
+      low: bar.low,
+      last: bar.close,
+      volume: bar.volume,
+      candles: [
+        bar
+      ],
+      invalidated:
+        bar.invalidated ===
+        true
+    },
+    {
+      maxRiskAmount
+    }
+  );
+}
+
+
+function longDirectionBars(
+  date = "2026-08-18"
+) {
+  return [
+    fiveMinuteBar(
+      `${date}T09:00:00+08:00`,
+      {
+        open: 110,
+        high: 112,
+        low: 110,
+        close: 111.5
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:05:00+08:00`,
+      {
+        open: 111.5,
+        high: 112,
+        low: 109,
+        close: 110.5
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:10:00+08:00`,
+      {
+        open: 110.5,
+        high: 110.5,
+        low: 104,
+        close: 106
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:15:00+08:00`,
+      {
+        open: 106,
+        high: 109,
+        low: 105,
+        close: 108
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:20:00+08:00`,
+      {
+        open: 108,
+        high: 112,
+        low: 107,
+        close: 111.5
+      }
+    )
+  ];
+}
+
+
+function shortDirectionBars(
+  date = "2026-08-18"
+) {
+  return [
+    fiveMinuteBar(
+      `${date}T09:00:00+08:00`,
+      {
+        open: 100,
+        high: 100,
+        low: 98,
+        close: 98.5
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:05:00+08:00`,
+      {
+        open: 98.5,
+        high: 101,
+        low: 98,
+        close: 99.5
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:10:00+08:00`,
+      {
+        open: 99.5,
+        high: 106,
+        low: 99,
+        close: 104
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:15:00+08:00`,
+      {
+        open: 104,
+        high: 105,
+        low: 100,
+        close: 102
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:20:00+08:00`,
+      {
+        open: 102,
+        high: 103,
+        low: 98,
+        close: 98.5
+      }
+    )
+  ];
+}
+
+
+function feedBars(
+  stock,
+  side,
+  bars,
+  maxRiskAmount = null
+) {
+  resetLiveStates();
+
+  return bars.map(
+    bar =>
+      applyFiveMinuteBar(
+        stock,
+        side,
+        bar,
+        maxRiskAmount
+      )
+  );
 }
 
 
@@ -264,7 +468,7 @@ test(
 
 
 test(
-  "triggered signals do not regress when price pulls back",
+  "raw price pullback cannot replace completed five-minute structure",
   () => {
     resetLiveStates();
 
@@ -316,7 +520,7 @@ test(
 
     assert.equal(
       pullback.status,
-      LIVE_STATUS.CONFIRMING
+      LIVE_STATUS.TRIGGERED
     );
 
     assert.equal(
@@ -511,56 +715,20 @@ function createEntryReadyLiveState(
   stock
 ) {
 
-  resetLiveStates();
+  const states =
+    feedBars(
+      stock,
+      "long",
+      longDirectionBars(
+        "2026-08-17"
+      ),
+      25000
+    );
 
-  applyLiveQuoteToState(
-    stock,
-    "long",
-    {
-      code: stock.Code,
-      last: 111,
-      timestamp: "2026-08-17T09:15:00+08:00"
-    }
-  );
 
-  return applyLiveQuoteToState(
-    stock,
-    "long",
-    {
-      code: stock.Code,
-      last: 111.5,
-      timestamp: "2026-08-17T09:15:05+08:00",
-      candles: [
-        {
-          timestamp: "2026-08-17T09:15:01+08:00",
-          open: 110,
-          high: 112,
-          low: 104,
-          close: 108,
-          isComplete: true
-        },
-        {
-          timestamp: "2026-08-17T09:15:02+08:00",
-          open: 108,
-          high: 110,
-          low: 102,
-          close: 106,
-          isComplete: true
-        },
-        {
-          timestamp: "2026-08-17T09:15:03+08:00",
-          open: 106,
-          high: 112,
-          low: 105,
-          close: 111.5,
-          isComplete: true
-        }
-      ]
-    },
-    {
-      maxRiskAmount: 25000
-    }
-  );
+  return states[
+    states.length - 1
+  ];
 
 }
 
@@ -621,7 +789,7 @@ test(
 
     assert.equal(
       afterStaleQuote.lastQuoteTimestamp,
-      "2026-08-17T01:15:05.000Z"
+      "2026-08-17T01:20:00.000Z"
     );
   }
 );
@@ -645,7 +813,7 @@ test(
         {
           code: stock.Code,
           last: 112,
-          timestamp: "2026-08-17T09:15:06+08:00"
+          timestamp: "2026-08-17T09:25:00+08:00"
         }
       );
 
@@ -666,7 +834,7 @@ test(
 
     assert.equal(
       nextState.lastQuoteTimestamp,
-      "2026-08-17T01:15:06.000Z"
+      "2026-08-17T01:25:00.000Z"
     );
   }
 );
@@ -677,59 +845,18 @@ function createRiskEvaluatedLiveState(
   maxRiskAmount
 ) {
 
-  resetLiveStates();
-
-  applyLiveQuoteToState(
-    stock,
-    "long",
-    {
-      code: stock.Code,
-      last: 111,
-      timestamp: "2026-08-18T09:15:00+08:00"
-    },
-    {
+  const states =
+    feedBars(
+      stock,
+      "long",
+      longDirectionBars(),
       maxRiskAmount
-    }
-  );
+    );
 
-  return applyLiveQuoteToState(
-    stock,
-    "long",
-    {
-      code: stock.Code,
-      last: 111.5,
-      timestamp: "2026-08-18T09:15:05+08:00",
-      candles: [
-        {
-          timestamp: "2026-08-18T09:15:01+08:00",
-          open: 110,
-          high: 112,
-          low: 106,
-          close: 108,
-          isComplete: true
-        },
-        {
-          timestamp: "2026-08-18T09:15:02+08:00",
-          open: 108,
-          high: 110,
-          low: 104,
-          close: 106,
-          isComplete: true
-        },
-        {
-          timestamp: "2026-08-18T09:15:03+08:00",
-          open: 106,
-          high: 112,
-          low: 107,
-          close: 111.5,
-          isComplete: true
-        }
-      ]
-    },
-    {
-      maxRiskAmount
-    }
-  );
+
+  return states[
+    states.length - 1
+  ];
 
 }
 
@@ -784,7 +911,7 @@ test(
 
 
 test(
-  "risk-blocked returns to entry-ready after per-lot risk falls",
+  "risk-blocked requires a new direction confirmation after risk falls",
   () => {
     const stock =
       createStock();
@@ -795,18 +922,20 @@ test(
         5000
       );
 
-    const readyState =
-      applyLiveQuoteToState(
+    const lowerRiskState =
+      applyFiveMinuteBar(
         stock,
         "long",
-        {
-          code: stock.Code,
-          last: 108,
-          timestamp: "2026-08-18T09:15:06+08:00"
-        },
-        {
-          maxRiskAmount: 5000
-        }
+        fiveMinuteBar(
+          "2026-08-18T09:25:00+08:00",
+          {
+            open: 108.3,
+            high: 108.4,
+            low: 107.5,
+            close: 108
+          }
+        ),
+        5000
       );
 
     assert.equal(
@@ -815,18 +944,44 @@ test(
     );
 
     assert.ok(
-      readyState.riskPlan.cashRiskPerLot <
+      lowerRiskState.riskPlan.cashRiskPerLot <
       5000
     );
 
     assert.equal(
-      readyState.riskPlan.maxLots,
+      lowerRiskState.riskPlan.maxLots,
       1
     );
 
     assert.equal(
-      readyState.entry,
+      lowerRiskState.entry,
       108
+    );
+
+    assert.equal(
+      lowerRiskState.status,
+      LIVE_STATUS.CONFIRMING
+    );
+
+    const readyState =
+      applyFiveMinuteBar(
+        stock,
+        "long",
+        fiveMinuteBar(
+          "2026-08-18T09:30:00+08:00",
+          {
+            open: 108,
+            high: 109,
+            low: 107.8,
+            close: 108.5
+          }
+        ),
+        5000
+      );
+
+    assert.equal(
+      readyState.riskPlan.maxLots,
+      1
     );
 
     assert.equal(
@@ -916,7 +1071,7 @@ test(
 
     assert.equal(
       triggered.status,
-      LIVE_STATUS.CONFIRMING
+      LIVE_STATUS.TRIGGERED
     );
 
     assert.equal(
@@ -936,11 +1091,12 @@ test(
         {
           code: stock.Code,
           last: 111.5,
-          timestamp: "2026-08-14T01:10:00.000Z",
+          timestamp: "2026-08-14T01:20:00.000Z",
+          candleTimeframeMinutes: 5,
           candles: [
             ...triggered.candles,
             {
-              timestamp: "2026-08-14T01:06:00.000Z",
+              timestamp: "2026-08-14T01:10:00.000Z",
               open: 110,
               high: 112,
               low: 104,
@@ -948,7 +1104,7 @@ test(
               isComplete: true
             },
             {
-              timestamp: "2026-08-14T01:07:00.000Z",
+              timestamp: "2026-08-14T01:15:00.000Z",
               open: 108,
               high: 110,
               low: 102,
@@ -956,7 +1112,7 @@ test(
               isComplete: true
             },
             {
-              timestamp: "2026-08-14T01:08:00.000Z",
+              timestamp: "2026-08-14T01:20:00.000Z",
               open: 106,
               high: 111,
               low: 105,
@@ -987,12 +1143,13 @@ test(
         {
           code: stock.Code,
           last: 111.5,
-          timestamp: "2026-08-14T01:11:00.000Z",
+          timestamp: "2026-08-14T01:25:00.000Z",
+          candleTimeframeMinutes: 5,
           candles: [
             ...forming.candles.map(
               candle =>
                 candle.timestamp ===
-                "2026-08-14T01:08:00.000Z"
+                "2026-08-14T01:20:00.000Z"
 
                   ? {
                       ...candle,
@@ -1002,12 +1159,12 @@ test(
                   : candle
             ),
             {
-              timestamp: "2026-08-14T01:09:00.000Z",
+              timestamp: "2026-08-14T01:25:00.000Z",
               open: 110,
               high: 112,
               low: 106,
               close: 111.5,
-              isComplete: false
+              isComplete: true
             }
           ]
         },
@@ -1034,6 +1191,460 @@ test(
     assert.equal(
       result.riskPlan.maxLots,
       2
+    );
+  }
+);
+
+
+test(
+  "forming and sub-five-minute candles cannot confirm structure",
+  () => {
+    const boundary =
+      "2026-08-18T09:00:00+08:00";
+
+    const eligible =
+      getCandlesAfter(
+        [
+          fiveMinuteBar(
+            "2026-08-18T09:05:00+08:00",
+            {
+              timeframeMinutes: 1
+            }
+          ),
+          fiveMinuteBar(
+            "2026-08-18T09:10:00+08:00",
+            {
+              isComplete: false
+            }
+          ),
+          fiveMinuteBar(
+            "2026-08-18T09:15:00+08:00"
+          )
+        ],
+        boundary
+      );
+
+    assert.equal(
+      eligible.length,
+      1
+    );
+
+    assert.equal(
+      eligible[0].timestamp,
+      "2026-08-18T09:15:00+08:00"
+    );
+  }
+);
+
+
+test(
+  "future candles are excluded from the current live decision",
+  () => {
+    resetLiveStates();
+
+    const stock =
+      createStock();
+
+    const bars =
+      longDirectionBars();
+
+    const firstBar =
+      bars[0];
+
+    const state =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          timestamp: firstBar.timestamp,
+          candleTimeframeMinutes: 5,
+          last: firstBar.close,
+          candles:
+            bars
+        }
+      );
+
+    assert.equal(
+      state.status,
+      LIVE_STATUS.TRIGGERED
+    );
+
+    assert.equal(
+      state.candles.length,
+      1
+    );
+
+    assert.equal(
+      state.directionConfirmedAt,
+      null
+    );
+  }
+);
+
+
+test(
+  "short risk-blocked direction confirmation is symmetric",
+  () => {
+    const stock =
+      createShortStock();
+
+    const states =
+      feedBars(
+        stock,
+        "short",
+        shortDirectionBars(),
+        5000
+      );
+
+    const blockedState =
+      states[
+        states.length - 1
+      ];
+
+    assert.equal(
+      blockedState.status,
+      LIVE_STATUS.RISK_BLOCKED
+    );
+
+    assert.equal(
+      blockedState.stop,
+      106
+    );
+
+    assert.equal(
+      blockedState.riskPlan.maxLots,
+      0
+    );
+
+    const lowerRiskState =
+      applyFiveMinuteBar(
+        stock,
+        "short",
+        fiveMinuteBar(
+          "2026-08-18T09:25:00+08:00",
+          {
+            open: 102,
+            high: 102.5,
+            low: 101.7,
+            close: 102
+          }
+        ),
+        5000
+      );
+
+    assert.equal(
+      lowerRiskState.riskPlan.maxLots,
+      1
+    );
+
+    assert.equal(
+      lowerRiskState.status,
+      LIVE_STATUS.CONFIRMING
+    );
+
+    const readyState =
+      applyFiveMinuteBar(
+        stock,
+        "short",
+        fiveMinuteBar(
+          "2026-08-18T09:30:00+08:00",
+          {
+            open: 102,
+            high: 102.1,
+            low: 101.4,
+            close: 101.6
+          }
+        ),
+        5000
+      );
+
+    assert.equal(
+      readyState.riskPlan.maxLots,
+      1
+    );
+
+    assert.equal(
+      readyState.status,
+      LIVE_STATUS.ENTRY_READY
+    );
+  }
+);
+
+
+function replayBarsForDate(
+  date
+) {
+  return [
+    ...longDirectionBars(
+      date
+    ),
+    fiveMinuteBar(
+      `${date}T09:25:00+08:00`,
+      {
+        open: 111.5,
+        high: 125,
+        low: 110,
+        close: 122
+      }
+    )
+  ];
+}
+
+
+test(
+  "replay feeds completed five-minute bars one at a time deterministically",
+  () => {
+    resetLiveStates();
+
+    const input = {
+      stock:
+        createStock(
+          {
+            Name: "多方測試"
+          }
+        ),
+      side:
+        "long",
+      sessionDate:
+        "2026-08-18",
+      bars:
+        replayBarsForDate(
+          "2026-08-18"
+        ),
+      maxRiskAmount:
+        null
+    };
+
+    const first =
+      replayCandidate(
+        input
+      );
+
+    const second =
+      replayCandidate(
+        input
+      );
+
+    assert.deepEqual(
+      second,
+      first
+    );
+
+    assert.equal(
+      getLiveState(
+        input.stock.Code,
+        input.side
+      ).status,
+      LIVE_STATUS.WAITING_LIVE
+    );
+
+    assert.equal(
+      first.processedBars,
+      input.bars.length
+    );
+
+    assert.equal(
+      first.logs.filter(
+        log =>
+          log.eventType ===
+          "ENTRY"
+      ).length,
+      1
+    );
+
+    assert.equal(
+      first.trades.length,
+      1
+    );
+
+    assert.ok(
+      first.logs.every(
+        log =>
+          log.candle.timeframeMinutes ===
+          5
+      )
+    );
+  }
+);
+
+
+test(
+  "replay rejects sub-five-minute bars",
+  () => {
+    assert.throws(
+      () =>
+        replayCandidate(
+          {
+            stock:
+              createStock(),
+            side:
+              "long",
+            sessionDate:
+              "2026-08-18",
+            bars: [
+              fiveMinuteBar(
+                "2026-08-18T09:00:00+08:00",
+                {
+                  timeframeMinutes: 1
+                }
+              )
+            ]
+          }
+        ),
+      /至少 5 分 K/
+    );
+  }
+);
+
+
+test(
+  "daily and weekly performance reconcile with trade and entry logs",
+  () => {
+    const longStock =
+      createStock(
+        {
+          Name: "多方測試",
+          TradeVolume: 2_000_000
+        }
+      );
+
+    const shortStock =
+      createShortStock(
+        {
+          TradeVolume: 1_000_000
+        }
+      );
+
+    const dataset = {
+      dailySnapshots: [
+        {
+          date: "2026-08-17",
+          stocks: [
+            longStock,
+            shortStock
+          ]
+        },
+        {
+          date: "2026-08-18",
+          stocks: [
+            longStock,
+            shortStock
+          ]
+        }
+      ],
+      sessions: [
+        {
+          date: "2026-08-18",
+          previousTradingDate: "2026-08-17",
+          barsByCode: {
+            TEST:
+              replayBarsForDate(
+                "2026-08-18"
+              ),
+            SHORT: []
+          }
+        },
+        {
+          date: "2026-08-19",
+          previousTradingDate: "2026-08-18",
+          barsByCode: {
+            TEST:
+              replayBarsForDate(
+                "2026-08-19"
+              ),
+            SHORT: []
+          }
+        }
+      ]
+    };
+
+    const report =
+      runBacktest(
+        dataset
+      );
+
+    const entryLogs =
+      report.logs.filter(
+        log =>
+          log.eventType ===
+          "ENTRY"
+      );
+
+    const netPnlSum =
+      report.trades.reduce(
+        (
+          total,
+          trade
+        ) =>
+          total
+          +
+          trade.netPnl,
+        0
+      );
+
+    assert.equal(
+      report.summary.tradingDays,
+      2
+    );
+
+    assert.equal(
+      report.daily.length,
+      2
+    );
+
+    assert.equal(
+      report.summary.actualTrades,
+      report.trades.length
+    );
+
+    assert.equal(
+      report.summary.actualTrades,
+      entryLogs.length
+    );
+
+    assert.equal(
+      report.summary.actualTrades,
+      report.daily.reduce(
+        (
+          total,
+          day
+        ) =>
+          total
+          +
+          day.actualTrades,
+        0
+      )
+    );
+
+    assertClose(
+      report.summary.totalPnl,
+      netPnlSum
+    );
+
+    report.trades.forEach(
+      trade => {
+        assertClose(
+          trade.netPnl,
+          trade.grossPnl
+          -
+          trade.tradingCost
+          +
+          trade.monthlyRebate
+          -
+          trade.transactionTax
+        );
+      }
+    );
+
+    assert.equal(
+      report.sessions[0].previousTradingDate,
+      "2026-08-17"
+    );
+
+    assert.equal(
+      report.sessions[1].previousTradingDate,
+      "2026-08-18"
     );
   }
 );

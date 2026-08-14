@@ -85,6 +85,27 @@ export function createInitialLiveState(
     triggerPrice:
       null,
 
+    pullbackAt:
+      null,
+
+    swing:
+      null,
+
+    directionConfirmedAt:
+      null,
+
+    directionConfirmation:
+      null,
+
+    entryReadyAt:
+      null,
+
+    riskBlockedAt:
+      null,
+
+    blockReason:
+      null,
+
     entry:
       null,
 

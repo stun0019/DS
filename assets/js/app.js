@@ -9,7 +9,10 @@ import {
   setSort,
   setStocks,
   setCurrentItems,
-  setMaxRiskAmount
+  setMaxRiskAmount,
+  setReplayDataset,
+  setReplayRange,
+  setReplayReport
 } from "./core/state.js";
 
 import {
@@ -54,6 +57,10 @@ import {
 } from "./panels/rulesPanel.js";
 
 import {
+  renderReplayPanel
+} from "./panels/replayPanel.js";
+
+import {
   renderAllStocksPanel
 } from "./panels/allStocksPanel.js";
 
@@ -81,6 +88,10 @@ import {
 import {
   resetLiveStates
 } from "./live/liveState.js";
+
+import {
+  runBacktest
+} from "./replay/replayEngine.js";
 
 
 const panelRoot =
@@ -199,6 +210,305 @@ function updateViewHeader() {
     state.currentView
   );
 
+
+  reloadBtn.classList.toggle(
+    "hidden",
+    state.currentView ===
+    "replay"
+  );
+
+
+  summaryRoot.classList.toggle(
+    "hidden",
+    state.currentView ===
+    "replay"
+  );
+
+}
+
+
+function getReplaySessionDates() {
+
+  return (
+    Array.isArray(
+      state.replay.dataset?.sessions
+    )
+
+      ? state.replay.dataset.sessions
+
+      : []
+  )
+  .map(
+    session =>
+      session.date
+  )
+  .filter(
+    Boolean
+  )
+  .sort();
+
+}
+
+
+function getWeekStart(
+  dateValue
+) {
+
+  const date =
+    new Date(
+      `${dateValue}T00:00:00Z`
+    );
+
+  const offset =
+    (
+      date.getUTCDay()
+      +
+      6
+    )
+    %
+    7;
+
+
+  date.setUTCDate(
+    date.getUTCDate()
+    -
+    offset
+  );
+
+
+  return date
+  .toISOString()
+  .slice(
+    0,
+    10
+  );
+
+}
+
+
+function resolveReplayRange(
+  mode,
+  from,
+  to
+) {
+
+  const dates =
+    getReplaySessionDates();
+
+  const latest =
+    dates[
+      dates.length - 1
+    ]
+    ??
+    "";
+
+
+  if (
+    mode ===
+    "today"
+  ) {
+
+    return {
+      from:
+        latest,
+      to:
+        latest
+    };
+
+  }
+
+
+  if (
+    mode ===
+    "week"
+  ) {
+
+    return {
+      from:
+        latest
+
+          ? getWeekStart(
+              latest
+            )
+
+          : "",
+      to:
+        latest
+    };
+
+  }
+
+
+  return {
+    from:
+      from
+      ||
+      dates[0]
+      ||
+      "",
+    to:
+      to
+      ||
+      latest
+  };
+
+}
+
+
+function rerunReplay(
+  {
+    mode =
+      state.replay.mode,
+    from =
+      state.replay.from,
+    to =
+      state.replay.to,
+    exitTarget =
+      state.replay.exitTarget
+  } = {}
+) {
+
+  if (
+    !state.replay.dataset
+  ) {
+
+    setReplayReport(
+      null,
+      null
+    );
+
+    return null;
+
+  }
+
+
+  const range =
+    resolveReplayRange(
+      mode,
+      from,
+      to
+    );
+
+
+  setReplayRange(
+    {
+      mode,
+      from:
+        range.from,
+      to:
+        range.to,
+      exitTarget
+    }
+  );
+
+
+  try {
+    const report =
+      runBacktest(
+        state.replay.dataset,
+        {
+          from:
+            range.from
+            ||
+            null,
+          to:
+            range.to
+            ||
+            null,
+          maxRiskAmount:
+            state.riskSettings.maxRiskAmount,
+          exitTarget
+        }
+      );
+
+
+    setReplayReport(
+      report,
+      null
+    );
+
+
+    return report;
+  }
+  catch (
+    error
+  ) {
+
+    setReplayReport(
+      null,
+      error.message
+      ||
+      String(
+        error
+      )
+    );
+
+
+    return null;
+  }
+
+}
+
+
+function handleReplayDataset(
+  dataset,
+  fileName,
+  inputError =
+    null
+) {
+
+  if (
+    inputError
+    ||
+    !dataset
+  ) {
+
+    setReplayDataset(
+      null,
+      fileName
+    );
+
+    setReplayReport(
+      null,
+      inputError?.message
+      ||
+      "Replay JSON 格式錯誤"
+    );
+
+    renderCurrentView();
+
+    return;
+
+  }
+
+
+  setReplayDataset(
+    dataset,
+    fileName
+  );
+
+  rerunReplay(
+    {
+      mode:
+        "week"
+    }
+  );
+
+  renderCurrentView();
+
+}
+
+
+function handleReplayRangeChange(
+  options
+) {
+
+  rerunReplay(
+    options
+  );
+
+  renderCurrentView();
+
 }
 
 
@@ -268,6 +578,20 @@ function renderCurrentPanel() {
 
       return renderRulesPanel(
         panelRoot
+      );
+
+
+    case "replay":
+
+      return renderReplayPanel(
+        panelRoot,
+        state.replay,
+        {
+          onLoadDataset:
+            handleReplayDataset,
+          onRangeChange:
+            handleReplayRangeChange
+        }
       );
 
 
@@ -378,6 +702,15 @@ function renderCurrentView(
     "rules"
 
       ? "規則說明"
+
+      : state.currentView ===
+        "replay"
+
+        ? state.replay.report
+
+          ? `${state.replay.report.summary.actualTrades} 筆交易`
+
+          : "等待 Replay 資料"
 
       : `${items.length.toLocaleString(
           "zh-TW"
@@ -583,6 +916,80 @@ function initializeRiskSettings() {
       error
     );
   }
+
+}
+
+
+function initializeReplayApi() {
+
+  window.stockDaybydayReplay = {
+    run(
+      dataset,
+      options = {}
+    ) {
+
+      if (
+        options.maxRiskAmount !==
+        undefined
+      ) {
+
+        setMaxRiskAmount(
+          options.maxRiskAmount
+        );
+
+      }
+
+
+      setReplayDataset(
+        dataset,
+        options.name
+        ||
+        "程式載入"
+      );
+
+      const report =
+        rerunReplay(
+          options
+        );
+
+
+      navigateTo(
+        "replay"
+      );
+
+
+      return report;
+
+    },
+
+
+    getReport() {
+      return state.replay.report;
+    },
+
+
+    clear() {
+      setReplayDataset(
+        null,
+        ""
+      );
+
+      setReplayReport(
+        null,
+        null
+      );
+
+
+      if (
+        state.currentView ===
+        "replay"
+      ) {
+
+        renderCurrentView();
+
+      }
+    }
+  };
 
 }
 
@@ -803,6 +1210,9 @@ bindHashNavigation(
 
 
 initializeRiskSettings();
+
+
+initializeReplayApi();
 
 
 initializeLiveProvider();

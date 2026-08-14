@@ -1,0 +1,98 @@
+{
+  "dailySnapshots": [
+    {
+      "date": "2026-08-13",
+      "stocks": [
+        {
+          "Code": "2330",
+          "Name": "模擬台積電",
+          "Market": "TWSE",
+          "OpeningPrice": 104,
+          "HighestPrice": 110,
+          "LowestPrice": 100,
+          "ClosingPrice": 109,
+          "Change": 5,
+          "TradeVolume": 2000000,
+          "DayTradeEligible": true,
+          "SellFirstDayTradeAllowed": true
+        }
+      ]
+    }
+  ],
+  "sessions": [
+    {
+      "date": "2026-08-14",
+      "previousTradingDate": "2026-08-13",
+      "barsByCode": {
+        "2330": [
+          {
+            "code": "2330",
+            "timestamp": "2026-08-14T09:00:00+08:00",
+            "timeframeMinutes": 5,
+            "isComplete": true,
+            "open": 110,
+            "high": 112,
+            "low": 110,
+            "close": 111.5,
+            "volume": 1800
+          },
+          {
+            "code": "2330",
+            "timestamp": "2026-08-14T09:05:00+08:00",
+            "timeframeMinutes": 5,
+            "isComplete": true,
+            "open": 111.5,
+            "high": 112,
+            "low": 109,
+            "close": 110.5,
+            "volume": 1400
+          },
+          {
+            "code": "2330",
+            "timestamp": "2026-08-14T09:10:00+08:00",
+            "timeframeMinutes": 5,
+            "isComplete": true,
+            "open": 110.5,
+            "high": 110.5,
+            "low": 104,
+            "close": 106,
+            "volume": 2200
+          },
+          {
+            "code": "2330",
+            "timestamp": "2026-08-14T09:15:00+08:00",
+            "timeframeMinutes": 5,
+            "isComplete": true,
+            "open": 106,
+            "high": 109,
+            "low": 105,
+            "close": 108,
+            "volume": 1700
+          },
+          {
+            "code": "2330",
+            "timestamp": "2026-08-14T09:20:00+08:00",
+            "timeframeMinutes": 5,
+            "isComplete": true,
+            "open": 108,
+            "high": 112,
+            "low": 107,
+            "close": 111.5,
+            "volume": 2600
+          },
+          {
+            "code": "2330",
+            "timestamp": "2026-08-14T09:25:00+08:00",
+            "timeframeMinutes": 5,
+            "isComplete": true,
+            "open": 111.5,
+            "high": 125,
+            "low": 110,
+            "close": 122,
+            "volume": 3100
+          }
+        ]
+      }
+    }
+  ]
+}

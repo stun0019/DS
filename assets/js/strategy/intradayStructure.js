@@ -1,64 +1,83 @@
-function normalizeCandle(
+export const MIN_INTRADAY_TIMEFRAME_MINUTES = 5;
+
+
+function toTimestamp(
+  value
+) {
+
+  const timestamp =
+    Date.parse(
+      value
+      ??
+      ""
+    );
+
+
+  return Number.isFinite(
+    timestamp
+  )
+
+    ? timestamp
+
+    : null;
+
+}
+
+
+export function getCandleTimeframeMinutes(
   candle
 ) {
 
+  const explicit =
+    Number(
+      candle?.timeframeMinutes
+      ??
+      candle?.intervalMinutes
+      ??
+      candle?.durationMinutes
+      ??
+      0
+    );
+
+
   if (
-    !candle
+    Number.isFinite(
+      explicit
+    )
+    &&
+    explicit > 0
   ) {
 
-    return null;
+    return explicit;
 
   }
 
 
-  return {
-
-    timestamp:
-      candle.timestamp
+  const label =
+    String(
+      candle?.timeframe
       ??
-      null,
+      candle?.interval
+      ??
+      ""
+    )
+    .trim()
+    .toLowerCase();
 
-    isComplete:
-      isCompletedCandle(
-        candle
-      ),
 
-    open:
-      Number(
-        candle.open
-        ||
-        0
-      ),
+  const match =
+    label.match(
+      /^(\d+(?:\.\d+)?)\s*(?:m|min|mins|minute|minutes)$/
+    );
 
-    high:
-      Number(
-        candle.high
-        ||
-        0
-      ),
 
-    low:
-      Number(
-        candle.low
-        ||
-        0
-      ),
+  return match
 
-    close:
-      Number(
-        candle.close
-        ||
-        0
-      ),
-
-    volume:
-      Number(
-        candle.volume
-        ||
-        0
+    ? Number(
+        match[1]
       )
 
-  };
+    : null;
 
 }
 
@@ -123,32 +142,110 @@ export function isCompletedCandle(
 }
 
 
-function toTimestamp(
-  value
+export function isSupportedStructureCandle(
+  candle
 ) {
 
-  const timestamp =
-    Date.parse(
-      value
-      ??
-      ""
+  const timeframeMinutes =
+    getCandleTimeframeMinutes(
+      candle
     );
 
 
-  return Number.isFinite(
-    timestamp
-  )
-
-    ? timestamp
-
-    : null;
+  return (
+    timeframeMinutes !==
+      null
+    &&
+    timeframeMinutes >=
+      MIN_INTRADAY_TIMEFRAME_MINUTES
+  );
 
 }
 
 
-export function getCandlesAfter(
-  candles,
-  afterTimestamp
+export function normalizeIntradayCandle(
+  candle,
+  fallbackTimeframeMinutes =
+    null
+) {
+
+  if (
+    !candle
+  ) {
+
+    return null;
+
+  }
+
+
+  const fallback =
+    Number(
+      fallbackTimeframeMinutes
+      ||
+      0
+    );
+
+  const timeframeMinutes =
+    getCandleTimeframeMinutes(
+      candle
+    )
+    ??
+    (
+      fallback > 0
+
+        ? fallback
+
+        : null
+    );
+
+
+  return {
+    timestamp:
+      candle.timestamp
+      ??
+      null,
+    timeframeMinutes,
+    isComplete:
+      isCompletedCandle(
+        candle
+      ),
+    open:
+      Number(
+        candle.open
+        ??
+        0
+      ),
+    high:
+      Number(
+        candle.high
+        ??
+        0
+      ),
+    low:
+      Number(
+        candle.low
+        ??
+        0
+      ),
+    close:
+      Number(
+        candle.close
+        ??
+        0
+      ),
+    volume:
+      Number(
+        candle.volume
+        ??
+        0
+      )
+  };
+
+}
+
+
+function normalizeCompletedCandles(
+  candles
 ) {
 
   if (
@@ -162,28 +259,13 @@ export function getCandlesAfter(
   }
 
 
-  const boundary =
-    toTimestamp(
-      afterTimestamp
-    );
-
-
-  if (
-    boundary === null
-  ) {
-
-    return [];
-
-  }
-
-
   return candles
   .map(
-    normalizeCandle
-  )
-  .map(
     candle => ({
-      candle,
+      candle:
+        normalizeIntradayCandle(
+          candle
+        ),
       timestamp:
         toTimestamp(
           candle?.timestamp
@@ -193,11 +275,14 @@ export function getCandlesAfter(
   .filter(
     item =>
       item.candle?.isComplete ===
-      true
+        true
       &&
-      item.timestamp !== null
+      isSupportedStructureCandle(
+        item.candle
+      )
       &&
-      item.timestamp > boundary
+      item.timestamp !==
+        null
   )
   .sort(
     (
@@ -216,41 +301,128 @@ export function getCandlesAfter(
 }
 
 
-export function findLatestSwingLow(
-  candles
+export function getCandlesAfter(
+  candles,
+  afterTimestamp
 ) {
 
+  const boundary =
+    toTimestamp(
+      afterTimestamp
+    );
+
+
   if (
-    !Array.isArray(
-      candles
-    )
-    ||
-    candles.length < 3
+    boundary ===
+    null
   ) {
 
-    return null;
+    return [];
 
   }
 
 
-  const normalized =
+  return normalizeCompletedCandles(
     candles
-    .map(
-      normalizeCandle
-    )
-    .filter(
-      candle =>
-        candle?.isComplete ===
-        true
+  )
+  .filter(
+    candle =>
+      toTimestamp(
+        candle.timestamp
+      ) >
+      boundary
+  );
+
+}
+
+
+export function findPostBreakoutPullback(
+  candles,
+  side
+) {
+
+  const normalized =
+    normalizeCompletedCandles(
+      candles
+    );
+
+
+  for (
+    let index = 1;
+    index < normalized.length;
+    index += 1
+  ) {
+
+    const previous =
+      normalized[
+        index - 1
+      ];
+
+    const current =
+      normalized[
+        index
+      ];
+
+
+    const isPullback =
+      side ===
+      "long"
+
+        ? current.low <
+          previous.low
+
+        : side ===
+          "short"
+
+          ? current.high >
+            previous.high
+
+          : false;
+
+
+    if (
+      isPullback
+    ) {
+
+      return {
+        index,
+        timestamp:
+          current.timestamp,
+        price:
+          side ===
+          "long"
+
+            ? current.low
+
+            : current.high,
+        candle:
+          current
+      };
+
+    }
+
+  }
+
+
+  return null;
+
+}
+
+
+export function findLatestSwingLow(
+  candles
+) {
+
+  const normalized =
+    normalizeCompletedCandles(
+      candles
     );
 
 
   for (
     let index =
       normalized.length - 2;
-
     index >= 1;
-
     index -= 1
   ) {
 
@@ -259,12 +431,10 @@ export function findLatestSwingLow(
         index - 1
       ];
 
-
     const current =
       normalized[
         index
       ];
-
 
     const next =
       normalized[
@@ -274,22 +444,26 @@ export function findLatestSwingLow(
 
     if (
       current.low <
-      previous.low
+        previous.low
       &&
       current.low <=
-      next.low
+        next.low
     ) {
 
       return {
-
         index,
-
+        type:
+          "SWING_LOW",
         price:
           current.low,
-
+        timestamp:
+          current.timestamp,
+        formedAt:
+          next.timestamp,
         candle:
-          current
-
+          current,
+        confirmationCandle:
+          next
       };
 
     }
@@ -306,37 +480,16 @@ export function findLatestSwingHigh(
   candles
 ) {
 
-  if (
-    !Array.isArray(
-      candles
-    )
-    ||
-    candles.length < 3
-  ) {
-
-    return null;
-
-  }
-
-
   const normalized =
-    candles
-    .map(
-      normalizeCandle
-    )
-    .filter(
-      candle =>
-        candle?.isComplete ===
-        true
+    normalizeCompletedCandles(
+      candles
     );
 
 
   for (
     let index =
       normalized.length - 2;
-
     index >= 1;
-
     index -= 1
   ) {
 
@@ -345,12 +498,10 @@ export function findLatestSwingHigh(
         index - 1
       ];
 
-
     const current =
       normalized[
         index
       ];
-
 
     const next =
       normalized[
@@ -360,22 +511,26 @@ export function findLatestSwingHigh(
 
     if (
       current.high >
-      previous.high
+        previous.high
       &&
       current.high >=
-      next.high
+        next.high
     ) {
 
       return {
-
         index,
-
+        type:
+          "SWING_HIGH",
         price:
           current.high,
-
+        timestamp:
+          current.timestamp,
+        formedAt:
+          next.timestamp,
         candle:
-          current
-
+          current,
+        confirmationCandle:
+          next
       };
 
     }
@@ -388,60 +543,215 @@ export function findLatestSwingHigh(
 }
 
 
-export function getIntradayStructuralStop(
+export function findDirectionConfirmation(
   candles,
   side,
   {
-    afterTimestamp = null
+    afterTimestamp =
+      null
   } = {}
 ) {
 
-  const eligibleCandles =
-    afterTimestamp
+  const boundary =
+    toTimestamp(
+      afterTimestamp
+    );
 
-      ? getCandlesAfter(
-          candles,
-          afterTimestamp
-        )
+  const normalized =
+    normalizeCompletedCandles(
+      candles
+    );
 
-      : candles;
 
   if (
-    side ===
-    "long"
+    boundary ===
+    null
   ) {
 
-    const swingLow =
-      findLatestSwingLow(
-        eligibleCandles
-      );
-
-
-    return swingLow
-      ? swingLow.price
-      : null;
+    return null;
 
   }
 
 
-  if (
-    side ===
-    "short"
+  for (
+    let index = 1;
+    index < normalized.length;
+    index += 1
   ) {
 
-    const swingHigh =
-      findLatestSwingHigh(
-        eligibleCandles
+    const previous =
+      normalized[
+        index - 1
+      ];
+
+    const current =
+      normalized[
+        index
+      ];
+
+    const previousTimestamp =
+      toTimestamp(
+        previous.timestamp
+      );
+
+    const currentTimestamp =
+      toTimestamp(
+        current.timestamp
       );
 
 
-    return swingHigh
-      ? swingHigh.price
-      : null;
+    if (
+      previousTimestamp <
+        boundary
+      ||
+      currentTimestamp <=
+        boundary
+    ) {
+
+      continue;
+
+    }
+
+
+    const isConfirmed =
+      side ===
+      "long"
+
+        ? current.close >
+          previous.high
+
+        : side ===
+          "short"
+
+          ? current.close <
+            previous.low
+
+          : false;
+
+
+    if (
+      isConfirmed
+    ) {
+
+      return {
+        side,
+        timestamp:
+          current.timestamp,
+        price:
+          current.close,
+        threshold:
+          side ===
+          "long"
+
+            ? previous.high
+
+            : previous.low,
+        candle:
+          current,
+        previousCandle:
+          previous
+      };
+
+    }
 
   }
 
 
   return null;
+
+}
+
+
+export function getPostBreakoutStructure(
+  candles,
+  side,
+  {
+    afterTimestamp =
+      null,
+    confirmationAfterTimestamp =
+      null
+  } = {}
+) {
+
+  const eligibleCandles =
+    getCandlesAfter(
+      candles,
+      afterTimestamp
+    );
+
+  const pullback =
+    findPostBreakoutPullback(
+      eligibleCandles,
+      side
+    );
+
+  const swing =
+    side ===
+    "long"
+
+      ? findLatestSwingLow(
+          eligibleCandles
+        )
+
+      : side ===
+        "short"
+
+        ? findLatestSwingHigh(
+            eligibleCandles
+          )
+
+        : null;
+
+  const directionConfirmation =
+    swing
+
+      ? findDirectionConfirmation(
+          eligibleCandles,
+          side,
+          {
+            afterTimestamp:
+              confirmationAfterTimestamp
+              ??
+              swing.formedAt
+          }
+        )
+
+      : null;
+
+
+  return {
+    eligibleCandles,
+    pullback,
+    swing,
+    directionConfirmation
+  };
+
+}
+
+
+export function getIntradayStructuralStop(
+  candles,
+  side,
+  {
+    afterTimestamp =
+      null
+  } = {}
+) {
+
+  const structure =
+    getPostBreakoutStructure(
+      candles,
+      side,
+      {
+        afterTimestamp
+      }
+    );
+
+
+  return structure.swing
+
+    ? structure.swing.price
+
+    : null;
 
 }

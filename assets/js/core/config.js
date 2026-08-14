@@ -155,6 +155,23 @@ export const VIEW_CONFIG = {
   },
 
 
+  replay: {
+
+    name:
+      "Replay 回測",
+
+    description:
+      "逐根 5 分 K 驗證狀態、交易與績效",
+
+    chip:
+      "BACKTEST",
+
+    chipClass:
+      "rules"
+
+  },
+
+
   all: {
 
     name:

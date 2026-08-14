@@ -463,6 +463,20 @@ export function renderRulesPanel(
 
             <br>
 
+            Direction Confirmation
+
+            <br>
+            ↓
+
+            <br>
+
+            Risk Check
+
+            <br>
+            ↓
+
+            <br>
+
             Entry Ready
 
           </div>
@@ -471,8 +485,11 @@ export function renderRulesPanel(
           <code>maxLots = 0</code>，狀態改為
           <strong>風險超標</strong>，不得進入 Entry Ready。
           這不是 terminal state；後續行情會重新計算
-          Entry、Stop 與 Risk Plan，直到
-          <code>maxLots ≥ 1</code> 才能轉為 Entry Ready。
+          Entry、Stop 與 Risk Plan。即使
+          <code>maxLots ≥ 1</code>，也必須在 blocked 後
+          重新完成 Direction Confirmation 才能轉為 Entry Ready；
+          單純因價格靠近 Stop 而使風險下降，不能視為進場訊號。
+          風險已恢復但方向尚未確認時，狀態回到等待結構確認。
 
           <br><br>
 
@@ -575,9 +592,17 @@ export function renderRulesPanel(
 
           <br><br>
 
-          分鐘 K 必須帶可解析 timestamp 與
+          盤中結構最短週期統一為<strong>5 分 K</strong>；
+          1 分 K 不得用於 Pullback、Swing、Direction Confirmation、
+          Entry 或 Stop。5 分 K 必須帶可解析 timestamp 與
           <code>isComplete: true</code>；無法判定形成時間或完成狀態時，
           系統會停留在等待結構確認。
+
+          <br><br>
+
+          Direction Confirmation 採完全對稱規則：
+          Long 必須由 Swing 形成後的新完成 5 分 K
+          收盤突破前一根高點；Short 必須收盤跌破前一根低點。
 
         </div>
 
@@ -661,7 +686,8 @@ export function renderRulesPanel(
           有設定單筆風險上限時，
           <code>maxLots = 0</code> 代表一張也超過風險預算，
           UI 顯示<strong>風險超標</strong>且禁止 Entry Ready。
-          未設定上限時，maxLots 保持空值，不阻擋正常訊號。
+          未設定上限時，maxLots 保持空值，不阻擋正常訊號；
+          但所有情況仍須先通過 Direction Confirmation。
 
         </div>
 
@@ -736,6 +762,55 @@ export function renderRulesPanel(
             目前依比例連續估算，未套用券商逐筆最低手續費或個別取整規則；
             實際金額仍以券商對帳單為準。
           </small>
+
+        </div>
+
+      </div>
+
+
+      <div class="rules-step">
+
+        <div class="rules-step-header">
+
+          <div class="rules-step-number">
+            11
+          </div>
+
+          <div>
+
+            <div class="rules-step-title">
+              Replay / Backtest
+            </div>
+
+            <div class="rules-step-description">
+              逐根 5 分 K，共用正式策略核心
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="rules-content">
+
+          Replay 嚴格按 09:00、09:05、09:10…逐根餵入；
+          每一步只保留當下與過去 K 棒，禁止讀取未來資料。
+          同一份資料重播多次必須得到完全一致的狀態、交易與績效。
+
+          <div class="rules-formula">
+
+            前一交易日盤後資料
+            → 今日 Candidate / Observation
+            → 逐根 5 分 K
+            → 共用 Strategy Engine
+            → Entry / Exit
+            → LogBox / Performance
+
+          </div>
+
+          每日回測只能使用明確早於該日、且資料集指定為
+          previousTradingDate 的盤後快照。Replay 頁提供今日、本週、
+          自訂區間、逐筆交易、標的統計與狀態 LogBox。
 
         </div>
 
