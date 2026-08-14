@@ -136,6 +136,9 @@ function renderSourceBadge(
         )
       )}
     </span>
+    <small class="replay-source-disclaimer">
+      來源宣告，非系統行情真實性驗證
+    </small>
   `;
 
 }
@@ -407,6 +410,16 @@ function renderLogBox(
               <span>TP1 / TP2 <strong>${formatPrice(log.tp1)} / ${formatPrice(log.tp2)}</strong></span>
               <span>maxLots <strong>${log.maxLots ?? "-"}</strong></span>
               <span>現金 / 淨風險 <strong>${formatOptionalCurrency(log.cashRiskPerLot)} / ${formatOptionalCurrency(log.riskPerLot)}</strong></span>
+              ${log.eventType === "ENTRY" || log.eventType === "ENTRY_REJECTED_RISK"
+                ? `
+                    <span>Raw / Filled Entry <strong>${formatPrice(log.rawEntry)} / ${formatPrice(log.filledEntry)}</strong></span>
+                    <span>Structural / Expected Stop <strong>${formatPrice(log.structuralStop)} / ${formatPrice(log.expectedFilledStop)}</strong></span>
+                    <span>Raw / Filled 現金風險 <strong>${formatOptionalCurrency(log.rawCashRiskPerLot)} / ${formatOptionalCurrency(log.filledCashRiskPerLot)}</strong></span>
+                    <span>Raw / Filled Lots <strong>${log.rawMaxLots ?? "-"} / ${log.filledMaxLots ?? "-"}</strong></span>
+                    <span>風險上限 / 滑價 <strong>${formatOptionalCurrency(log.maxRiskAmount)} / ${log.slippageTicks ?? 0} Tick</strong></span>
+                  `
+                : ""
+              }
             </div>
 
             <div class="replay-log-reason">

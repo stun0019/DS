@@ -14,7 +14,7 @@
 6. Direction Confirmation 通過後才執行 Risk Check；有設定風險上限且 `maxLots = 0` 時進入可恢復的 `RISK_BLOCKED`，風險降低後仍須重新確認方向，禁止把「靠近 Stop」當成進場訊號。
 7. Replay／Backtest 共用正式 Signal、Structure、Risk 與交易成本邏輯，逐根計算 Entry、Exit、P&L、R、每日／區間與標的績效。
 
-Live 啟動前會以 `stocks.json` 的 `tradeDateISO`、`syncStatus` 與 `validForTradingDate` 驗證候選資料。盤前同步流程會查詢 TWSE 官方開休市日曆，只有官方確認的交易日才會寫入 `validForTradingDate`，不得用日曆日減一或僅憑更新時間推算；缺少可驗證資訊時會進入 `DATA_STALE`，禁止形成正式交易訊號。
+Live 啟動前會以 `stocks.json` 的官方 Trading Calendar 算出 `expectedPreviousTradingDate`；只有 `tradeDateISO` 完全等於最近一個實際交易日，且 `syncStatus`、`validForTradingDate` 與上市／上櫃日期同步時才會通過。週末、官方休市與特殊交易日都由日曆 contract 處理，不得用日曆日減一、`updatedAt` 或僅比較日期大小推算；年份缺漏、格式異常或無法確認時一律進入 `DATA_STALE`。
 
 ## 本機執行
 
@@ -96,9 +96,9 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 }
 ```
 
-Replay 會驗證 K 棒時間嚴格遞增且間隔不少於 5 分鐘，每一步只送入當前 K 棒；`previousTradingDate` 對應的快照必須早於回測日。出場目標可選 TP1 或 TP2；若同一根 K 同時碰到 Stop 與目標，採保守原則先判定 Stop。滑價可選 0、1、2 Tick，買賣成交價一律透過台股 Tick Engine 往不利方向調整，P&L、R 與績效都使用 Filled Price。
+Replay 會驗證 K 棒時間嚴格遞增且間隔不少於 5 分鐘，每一步只送入當前 K 棒；`previousTradingDate` 對應的快照必須早於回測日。出場目標可選 TP1 或 TP2；若同一根 K 同時碰到 Stop 與目標，採保守原則先判定 Stop。滑價可選 0、1、2 Tick，買賣成交價一律透過台股 Tick Engine 往不利方向調整。Structural Stop 不變，但 Position Sizing 會以 Filled Entry、Expected Filled Stop 與交易成本重新計算；若滑價後可交易張數為 0，只記錄 `ENTRY_REJECTED_RISK`，不建立交易。P&L、R 與所有績效都使用 Filled Price 與 Actual Shares。
 
-JSON 可在 `metadata.sourceType` 明確填入 `REAL_HISTORICAL_DATA`；未標記資料一律顯示 `SAMPLE / MOCK`。CSV 每列代表一根 5 分 K，需提供 `sessionDate`、`previousTradingDate`、股票盤後 OHLC／成交量／當沖資格、`timestamp`、`timeframeMinutes`、`isComplete` 與盤中 OHLCV。只有 CSV 的 `sourceType` 明確且一致為 `REAL_HISTORICAL_DATA` 時，UI 才會顯示 `REAL HISTORICAL DATA`。
+JSON 只有在 `metadata.sourceType` 明確填入 `REAL_HISTORICAL_DATA` 時才顯示 REAL；未標記資料一律顯示 `SAMPLE / MOCK`。CSV 每列代表一根 5 分 K，需提供 `sessionDate`、`previousTradingDate`、股票盤後 OHLC／成交量／當沖資格、`timestamp`、`timeframeMinutes`、`isComplete` 與盤中 OHLCV；每一列都必須明確且一致宣告 `REAL_HISTORICAL_DATA` 才能顯示 REAL，空白與 REAL 混合會拒絕匯入。`sourceType` 只是匯入資料的來源宣告，不代表系統已向行情供應商驗證真實性。
 
 ## 重要限制
 

@@ -305,6 +305,12 @@ export async function loadStockData() {
           nextTradingDate:
             json.nextTradingDate || "",
 
+          expectedPreviousTradingDate:
+            json.expectedPreviousTradingDate || "",
+
+          tradingCalendar:
+            json.tradingCalendar || null,
+
           marketCounts:
             json.marketCounts || {},
 

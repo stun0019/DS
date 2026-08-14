@@ -523,3 +523,10 @@
   background: rgba(59, 211, 154, 0.09);
   color: #80dfbc;
 }
+
+
+.replay-source-disclaimer {
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.35;
+}

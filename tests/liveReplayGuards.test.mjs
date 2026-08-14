@@ -16,12 +16,17 @@ import {
 } from "../assets/js/live/liveState.js";
 
 import {
+  replayCandidate,
   runBacktest
 } from "../assets/js/replay/replayEngine.js";
 
 import {
   applyReplaySlippage
 } from "../assets/js/replay/slippage.js";
+
+import {
+  buildPerformanceReport
+} from "../assets/js/replay/performance.js";
 
 import {
   HISTORICAL_SOURCE_TYPE,
@@ -37,6 +42,12 @@ import {
 import {
   getTickDistance
 } from "../assets/js/utils/priceTick.js";
+
+import {
+  TRADING_CALENDAR_SOURCE,
+  getPreviousTradingDate,
+  isTradingDate
+} from "../assets/js/utils/tradingCalendar.js";
 
 
 function assertClose(
@@ -71,6 +82,61 @@ function createStock() {
     TradeVolume: 2_000_000,
     DayTradeEligible: true,
     SellFirstDayTradeAllowed: true
+  };
+
+}
+
+
+function tradingCalendar(
+  {
+    coveredYears = [
+      "2026"
+    ],
+    closedDates = [],
+    specialTradingDates = []
+  } = {}
+) {
+
+  return {
+    source:
+      TRADING_CALENDAR_SOURCE,
+    syncStatus:
+      "SYNCED",
+    coveredYears,
+    closedDates,
+    specialTradingDates
+  };
+
+}
+
+
+function candidateMetadata(
+  tradeDate,
+  liveSessionDate,
+  calendar,
+  expectedPreviousTradingDate =
+    getPreviousTradingDate(
+      liveSessionDate,
+      calendar
+    )
+) {
+
+  return {
+    tradeDateISO:
+      tradeDate,
+    syncStatus:
+      "SYNCED",
+    validForTradingDate:
+      liveSessionDate,
+    expectedPreviousTradingDate,
+    tradingCalendar:
+      calendar,
+    marketTradeDates: {
+      TWSE:
+        tradeDate,
+      TPEX:
+        tradeDate
+    }
   };
 
 }
@@ -147,6 +213,112 @@ function longDirectionBars(
       }
     )
   ];
+
+}
+
+
+function createShortStock() {
+
+  return {
+    ...createStock(),
+    Code: "SHORT_GUARD",
+    Name: "Short Guard 測試",
+    OpeningPrice: 120,
+    HighestPrice: 122,
+    LowestPrice: 100,
+    ClosingPrice: 101,
+    Change: -5
+  };
+
+}
+
+
+function shortDirectionBars(
+  date
+) {
+
+  return [
+    fiveMinuteBar(
+      `${date}T09:00:00+08:00`,
+      {
+        open: 100,
+        high: 100,
+        low: 98,
+        close: 98.5
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:05:00+08:00`,
+      {
+        open: 98.5,
+        high: 101,
+        low: 98,
+        close: 99.5
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:10:00+08:00`,
+      {
+        open: 99.5,
+        high: 106,
+        low: 99,
+        close: 104
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:15:00+08:00`,
+      {
+        open: 104,
+        high: 105,
+        low: 100,
+        close: 102
+      }
+    ),
+    fiveMinuteBar(
+      `${date}T09:20:00+08:00`,
+      {
+        open: 102,
+        high: 103,
+        low: 98,
+        close: 98.5
+      }
+    )
+  ];
+
+}
+
+
+function replaySide(
+  side,
+  {
+    slippageTicks = 0,
+    maxRiskAmount = null
+  } = {}
+) {
+
+  const stock =
+    side === "long"
+
+      ? createStock()
+
+      : createShortStock();
+
+
+  return replayCandidate(
+    {
+      stock,
+      side,
+      sessionDate: "2026-08-18",
+      bars:
+        side === "long"
+
+          ? longDirectionBars("2026-08-18")
+
+          : shortDirectionBars("2026-08-18"),
+      slippageTicks,
+      maxRiskAmount
+    }
+  );
 
 }
 
@@ -272,13 +444,16 @@ test(
   "stale candidate data cannot reach live entry ready",
   () => {
 
+    const calendar =
+      tradingCalendar();
+
     const freshness =
       evaluateCandidateDataFreshness(
-        {
-          tradeDateISO: "2026-08-13",
-          updatedAt: "2026-08-14 08:15:22",
-          syncStatus: "SYNCED"
-        },
+        candidateMetadata(
+          "2026-08-13",
+          "2026-08-17",
+          calendar
+        ),
         "2026-08-17"
       );
 
@@ -362,18 +537,20 @@ test(
 
 
 test(
-  "explicit latest trading-day confirmation allows live signals across calendar gaps",
+  "the actual previous trading date allows live signals",
   () => {
+
+    const calendar =
+      tradingCalendar();
 
     const freshness =
       evaluateCandidateDataFreshness(
-        {
-          tradeDateISO: "2026-08-13",
-          updatedAt: "2026-08-14 08:15:22",
-          syncStatus: "SYNCED",
-          validForTradingDate: "2026-08-17"
-        },
-        "2026-08-17"
+        candidateMetadata(
+          "2026-08-17",
+          "2026-08-18",
+          calendar
+        ),
+        "2026-08-18"
       );
 
 
@@ -384,14 +561,246 @@ test(
 
 
     const states =
-      applyBarsWithFreshness(
-        freshness
-      );
+      (() => {
+        resetLiveStates();
+
+        const stock =
+          createStock();
+
+        return longDirectionBars(
+          "2026-08-18"
+        ).map(
+          bar =>
+            applyLiveQuoteToState(
+              stock,
+              "long",
+              {
+                code: stock.Code,
+                timestamp: bar.timestamp,
+                candleTimeframeMinutes: 5,
+                open: bar.open,
+                high: bar.high,
+                low: bar.low,
+                last: bar.close,
+                volume: bar.volume,
+                candles: [bar]
+              },
+              {
+                candidateDataFreshness:
+                  freshness
+              }
+            )
+        );
+      })();
 
 
     assert.equal(
       states.at(-1).status,
       LIVE_STATUS.ENTRY_READY
+    );
+
+  }
+);
+
+
+test(
+  "Monday requires Friday candidate data and rejects Thursday",
+  () => {
+
+    const calendar =
+      tradingCalendar();
+
+
+    assert.equal(
+      getPreviousTradingDate(
+        "2026-08-17",
+        calendar
+      ),
+      "2026-08-14"
+    );
+
+
+    const friday =
+      evaluateCandidateDataFreshness(
+        candidateMetadata(
+          "2026-08-14",
+          "2026-08-17",
+          calendar
+        ),
+        "2026-08-17"
+      );
+
+
+    const thursday =
+      evaluateCandidateDataFreshness(
+        candidateMetadata(
+          "2026-08-13",
+          "2026-08-17",
+          calendar
+        ),
+        "2026-08-17"
+      );
+
+
+    assert.equal(
+      friday.status,
+      CANDIDATE_DATA_STATUS.FRESH
+    );
+
+
+    assert.equal(
+      thursday.status,
+      CANDIDATE_DATA_STATUS.DATA_STALE
+    );
+
+  }
+);
+
+
+test(
+  "holiday and consecutive closures resolve the last actual trading date",
+  () => {
+
+    const lunarNewYearCalendar =
+      tradingCalendar(
+        {
+          closedDates: [
+            "2026-02-12",
+            "2026-02-13",
+            "2026-02-16",
+            "2026-02-17",
+            "2026-02-18",
+            "2026-02-19",
+            "2026-02-20"
+          ],
+          specialTradingDates: [
+            "2026-02-11",
+            "2026-02-23"
+          ]
+        }
+      );
+
+
+    assert.equal(
+      getPreviousTradingDate(
+        "2026-02-23",
+        lunarNewYearCalendar
+      ),
+      "2026-02-11"
+    );
+
+
+    assert.equal(
+      evaluateCandidateDataFreshness(
+        candidateMetadata(
+          "2026-02-11",
+          "2026-02-23",
+          lunarNewYearCalendar
+        ),
+        "2026-02-23"
+      ).status,
+      CANDIDATE_DATA_STATUS.FRESH
+    );
+
+
+    const consecutiveClosureCalendar =
+      tradingCalendar(
+        {
+          closedDates: [
+            "2026-09-28",
+            "2026-09-29"
+          ]
+        }
+      );
+
+
+    assert.equal(
+      getPreviousTradingDate(
+        "2026-09-30",
+        consecutiveClosureCalendar
+      ),
+      "2026-09-25"
+    );
+
+  }
+);
+
+
+test(
+  "official special weekend trading dates override the weekend rule",
+  () => {
+
+    const calendar =
+      tradingCalendar(
+        {
+          specialTradingDates: [
+            "2026-08-15"
+          ]
+        }
+      );
+
+
+    assert.equal(
+      isTradingDate(
+        "2026-08-15",
+        calendar
+      ),
+      true
+    );
+
+
+    assert.equal(
+      getPreviousTradingDate(
+        "2026-08-17",
+        calendar
+      ),
+      "2026-08-15"
+    );
+
+  }
+);
+
+
+test(
+  "an incomplete holiday calendar fails closed",
+  () => {
+
+    const incompleteCalendar =
+      tradingCalendar(
+        {
+          coveredYears: [
+            "2026"
+          ],
+          closedDates: [
+            "2026-01-01"
+          ],
+          specialTradingDates: [
+            "2026-01-02"
+          ]
+        }
+      );
+
+
+    assert.equal(
+      getPreviousTradingDate(
+        "2026-01-02",
+        incompleteCalendar
+      ),
+      null
+    );
+
+
+    assert.equal(
+      evaluateCandidateDataFreshness(
+        candidateMetadata(
+          "2025-12-31",
+          "2026-01-02",
+          incompleteCalendar,
+          null
+        ),
+        "2026-01-02"
+      ).status,
+      CANDIDATE_DATA_STATUS.DATA_STALE
     );
 
   }
@@ -587,6 +996,359 @@ test(
       2
     );
 
+
+    [
+      [49.95, 50.1],
+      [99.9, 100.5],
+      [499.5, 501],
+      [999, 1005]
+    ].forEach(
+      ([rawPrice, expectedPrice]) => {
+
+        const filledPrice =
+          applyReplaySlippage(
+            {
+              price: rawPrice,
+              side: "long",
+              leg: "entry",
+              slippageTicks: 2
+            }
+          );
+
+
+        assert.equal(
+          filledPrice,
+          expectedPrice
+        );
+
+
+        assert.equal(
+          getTickDistance(
+            rawPrice,
+            filledPrice
+          ),
+          2
+        );
+
+      }
+    );
+
+
+    [
+      [50, 49.9],
+      [100, 99.8],
+      [500, 499],
+      [1000, 998]
+    ].forEach(
+      ([rawPrice, expectedPrice]) => {
+
+        const filledPrice =
+          applyReplaySlippage(
+            {
+              price: rawPrice,
+              side: "long",
+              leg: "exit",
+              slippageTicks: 2
+            }
+          );
+
+
+        assert.equal(
+          filledPrice,
+          expectedPrice
+        );
+
+
+        assert.equal(
+          getTickDistance(
+            rawPrice,
+            filledPrice
+          ),
+          2
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "filled slippage risk can reject a raw one-lot entry",
+  () => {
+
+    const baseline =
+      replaySide(
+        "long",
+        {
+          slippageTicks: 2
+        }
+      ).trades[0];
+
+
+    assert.ok(
+      baseline.filledCashRiskPerLot >
+        baseline.rawCashRiskPerLot
+    );
+
+
+    const maxRiskAmount =
+      (
+        baseline.rawCashRiskPerLot
+        +
+        baseline.filledCashRiskPerLot
+      )
+      /
+      2;
+
+
+    const result =
+      replaySide(
+        "long",
+        {
+          slippageTicks: 2,
+          maxRiskAmount
+        }
+      );
+
+
+    const rejected =
+      result.logs.find(
+        log =>
+          log.eventType ===
+            "ENTRY_REJECTED_RISK"
+      );
+
+
+    assert.equal(
+      result.trades.length,
+      0
+    );
+
+
+    assert.ok(rejected);
+
+
+    assert.equal(
+      rejected.rawMaxLots,
+      1
+    );
+
+
+    assert.equal(
+      rejected.filledMaxLots,
+      0
+    );
+
+
+    assert.equal(
+      rejected.newStatus,
+      "RISK_BLOCKED_SLIPPAGE"
+    );
+
+
+    assert.equal(
+      rejected.structuralStop,
+      rejected.stop
+    );
+
+
+    assert.ok(
+      rejected.expectedFilledStop !==
+        rejected.structuralStop
+    );
+
+
+    const performance =
+      buildPerformanceReport(
+        {
+          sessionResults: [
+            {
+              date: "2026-08-18",
+              candidateCount: 1
+            }
+          ],
+          trades:
+            result.trades,
+          logs:
+            result.logs
+        }
+      );
+
+
+    assert.equal(
+      performance.summary.actualTrades,
+      0
+    );
+
+
+    assert.equal(
+      performance.summary.wins,
+      0
+    );
+
+
+    assert.equal(
+      performance.summary.losses,
+      0
+    );
+
+
+    assert.equal(
+      performance.summary.riskBlockedCount,
+      1
+    );
+
+  }
+);
+
+
+test(
+  "filled position sizing reduces three raw lots to two actual lots",
+  () => {
+
+    [
+      "long",
+      "short"
+    ].forEach(
+      side => {
+
+        const baseline =
+          replaySide(
+            side,
+            {
+              slippageTicks: 2
+            }
+          ).trades[0];
+
+
+        const maxRiskAmount =
+          baseline.rawCashRiskPerLot
+          *
+          3
+          +
+          0.01;
+
+
+        const trade =
+          replaySide(
+            side,
+            {
+              slippageTicks: 2,
+              maxRiskAmount
+            }
+          ).trades[0];
+
+
+        assert.equal(
+          trade.rawMaxLots,
+          3
+        );
+
+
+        assert.equal(
+          trade.filledMaxLots,
+          2
+        );
+
+
+        assert.equal(
+          trade.actualLots,
+          2
+        );
+
+
+        assert.equal(
+          trade.shares,
+          2000
+        );
+
+
+        const expectedCosts =
+          calculateDayTradeCosts(
+            {
+              entry:
+                trade.filledEntry,
+              exit:
+                trade.filledExit,
+              side,
+              shares:
+                trade.shares
+            }
+          );
+
+
+        assertClose(
+          trade.netPnl,
+          expectedCosts.netPnlAfterRebate
+        );
+
+
+        assertClose(
+          trade.initialRisk,
+          trade.filledRiskPerLot
+          *
+          trade.actualLots
+        );
+
+      }
+    );
+
+  }
+);
+
+
+test(
+  "zero-tick raw and filled position sizes are identical",
+  () => {
+
+    [
+      "long",
+      "short"
+    ].forEach(
+      side => {
+
+        const baseline =
+          replaySide(side).trades[0];
+
+        const maxRiskAmount =
+          baseline.rawCashRiskPerLot
+          *
+          3
+          +
+          0.01;
+
+        const trade =
+          replaySide(
+            side,
+            {
+              slippageTicks: 0,
+              maxRiskAmount
+            }
+          ).trades[0];
+
+
+        assert.equal(
+          trade.rawMaxLots,
+          trade.filledMaxLots
+        );
+
+
+        assert.equal(
+          trade.rawCashRiskPerLot,
+          trade.filledCashRiskPerLot
+        );
+
+
+        assert.equal(
+          trade.actualLots,
+          3
+        );
+
+      }
+    );
+
   }
 );
 
@@ -646,6 +1408,30 @@ test(
         assertClose(
           trade.grossPnl,
           expectedCosts.grossPnl
+        );
+
+
+        assertClose(
+          trade.originalCommission,
+          expectedCosts.originalCommission
+        );
+
+
+        assertClose(
+          trade.monthlyRebate,
+          expectedCosts.monthlyRebate
+        );
+
+
+        assertClose(
+          trade.transactionTax,
+          expectedCosts.transactionTax
+        );
+
+
+        assertClose(
+          trade.netCostAfterRebate,
+          expectedCosts.netCostAfterRebate
         );
 
 
@@ -763,6 +1549,36 @@ test(
       expectedProfitFactor
     );
 
+
+    assertClose(
+      report.daily.reduce(
+        (
+          total,
+          day
+        ) =>
+          total
+          +
+          day.totalPnl,
+        0
+      ),
+      report.summary.totalPnl
+    );
+
+
+    assertClose(
+      report.instruments.reduce(
+        (
+          total,
+          instrument
+        ) =>
+          total
+          +
+          instrument.totalPnl,
+        0
+      ),
+      report.summary.totalPnl
+    );
+
   }
 );
 
@@ -813,6 +1629,16 @@ test(
       );
 
 
+    const topLevelRealOnly =
+      jsonProvider.toReplayDataset(
+        {
+          ...baseDataset,
+          sourceType:
+            HISTORICAL_SOURCE_TYPE.REAL_HISTORICAL_DATA
+        }
+      );
+
+
     assert.equal(
       implicitMock.metadata.sourceLabel,
       "SAMPLE / MOCK"
@@ -826,6 +1652,12 @@ test(
     assert.equal(
       explicitReal.metadata.sourceLabel,
       "REAL HISTORICAL DATA"
+    );
+
+
+    assert.equal(
+      topLevelRealOnly.metadata.sourceType,
+      HISTORICAL_SOURCE_TYPE.SAMPLE_MOCK
     );
 
     assert.equal(
@@ -892,6 +1724,67 @@ test(
     assert.equal(
       report.sessions[0].previousTradingDate,
       "2026-08-17"
+    );
+
+  }
+);
+
+
+test(
+  "CSV requires every row to declare REAL historical data",
+  () => {
+
+    const header =
+      "sourceType,sessionDate,previousTradingDate,code,name,market,openingPrice,highestPrice,lowestPrice,closingPrice,change,tradeVolume,dayTradeEligible,sellFirstDayTradeAllowed,timestamp,timeframeMinutes,isComplete,open,high,low,close,volume";
+
+    const realRow =
+      "REAL_HISTORICAL_DATA,2026-08-18,2026-08-17,2330,台積電,TWSE,104,110,100,109,5,2000000,true,true,2026-08-18T09:00:00+08:00,5,true,110,112,109,111.5,1800";
+
+    const blankRow =
+      ",2026-08-18,2026-08-17,2330,台積電,TWSE,104,110,100,109,5,2000000,true,true,2026-08-18T09:05:00+08:00,5,true,111.5,113,111,112,1600";
+
+    const sampleRow =
+      "SAMPLE_MOCK,2026-08-18,2026-08-17,2330,台積電,TWSE,104,110,100,109,5,2000000,true,true,2026-08-18T09:05:00+08:00,5,true,111.5,113,111,112,1600";
+
+
+    assert.throws(
+      () =>
+        parseHistorical5mCsv(
+          [
+            header,
+            realRow,
+            blankRow
+          ].join("\n")
+        ),
+      /來源標記不一致/
+    );
+
+
+    assert.throws(
+      () =>
+        parseHistorical5mCsv(
+          [
+            header,
+            realRow,
+            sampleRow
+          ].join("\n")
+        ),
+      /來源標記不一致/
+    );
+
+
+    const implicitSample =
+      parseHistorical5mCsv(
+        [
+          header,
+          blankRow
+        ].join("\n")
+      );
+
+
+    assert.equal(
+      implicitSample.metadata.sourceType,
+      HISTORICAL_SOURCE_TYPE.SAMPLE_MOCK
     );
 
   }

@@ -85,9 +85,7 @@ export function normalizeReplayDataset(
 
   const sourceType =
     normalizeSourceType(
-      dataset.metadata?.sourceType
-      ??
-      dataset.sourceType,
+      dataset.metadata?.sourceType,
       fallbackSourceType
     );
 
@@ -414,9 +412,8 @@ export function parseHistorical5mCsv(
             row,
             "sourceType"
           )
-      )
-      .filter(
-        Boolean
+          ||
+          HISTORICAL_SOURCE_TYPE.SAMPLE_MOCK
       )
     );
 

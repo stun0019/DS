@@ -1,122 +1,16 @@
+import {
+  getPreviousTradingDate,
+  isTradingDate,
+  normalizeTradingDate
+} from "../utils/tradingCalendar.js";
+
+
 export const CANDIDATE_DATA_STATUS = {
   FRESH:
     "FRESH",
   DATA_STALE:
     "DATA_STALE"
 };
-
-
-function buildValidDate(
-  year,
-  month,
-  day
-) {
-
-  const date =
-    new Date(
-      Date.UTC(
-        Number(
-          year
-        ),
-        Number(
-          month
-        ) - 1,
-        Number(
-          day
-        )
-      )
-    );
-
-
-  if (
-    date.getUTCFullYear() !==
-      Number(
-        year
-      )
-    ||
-    date.getUTCMonth() !==
-      Number(
-        month
-      ) - 1
-    ||
-    date.getUTCDate() !==
-      Number(
-        day
-      )
-  ) {
-
-    return null;
-
-  }
-
-
-  return (
-    `${String(year).padStart(4, "0")}-`
-    +
-    `${String(month).padStart(2, "0")}-`
-    +
-    String(day).padStart(2, "0")
-  );
-
-}
-
-
-function normalizeDate(
-  value
-) {
-
-  const text =
-    String(
-      value
-      ??
-      ""
-    )
-    .trim();
-
-
-  const isoMatch =
-    text.match(
-      /^(\d{4})-(\d{2})-(\d{2})/
-    );
-
-
-  if (
-    isoMatch
-  ) {
-
-    return buildValidDate(
-      isoMatch[1],
-      isoMatch[2],
-      isoMatch[3]
-    );
-
-  }
-
-
-  const rocMatch =
-    text.match(
-      /^(\d{3})(\d{2})(\d{2})$/
-    );
-
-
-  if (
-    rocMatch
-  ) {
-
-    return buildValidDate(
-      Number(
-        rocMatch[1]
-      ) + 1911,
-      rocMatch[2],
-      rocMatch[3]
-    );
-
-  }
-
-
-  return null;
-
-}
 
 
 function staleResult(
@@ -144,13 +38,13 @@ export function evaluateCandidateDataFreshness(
 ) {
 
   const sessionDate =
-    normalizeDate(
+    normalizeTradingDate(
       liveSessionDate
     );
 
 
   const candidateDataDate =
-    normalizeDate(
+    normalizeTradingDate(
       metadata?.tradeDateISO
       ??
       metadata?.tradeDate
@@ -170,21 +64,15 @@ export function evaluateCandidateDataFreshness(
   }
 
 
-  const sessionWeekday =
-    new Date(
-      `${sessionDate}T00:00:00Z`
-    )
-    .getUTCDay();
-
-
   if (
-    sessionWeekday === 0
-    ||
-    sessionWeekday === 6
+    isTradingDate(
+      sessionDate,
+      metadata?.tradingCalendar
+    ) !== true
   ) {
 
     return staleResult(
-      "目前日期不是 Live 交易日",
+      "官方交易日曆無法確認目前 Live 交易日",
       candidateDataDate,
       sessionDate
     );
@@ -244,7 +132,7 @@ export function evaluateCandidateDataFreshness(
   const marketDates =
     rawMarketDates
     .map(
-      normalizeDate
+      normalizeTradingDate
     )
     .filter(
       Boolean
@@ -283,7 +171,7 @@ export function evaluateCandidateDataFreshness(
 
 
   const declaredSessionDate =
-    normalizeDate(
+    normalizeTradingDate(
       metadata?.validForTradingDate
       ??
       metadata?.candidateForTradingDate
@@ -319,6 +207,62 @@ export function evaluateCandidateDataFreshness(
   }
 
 
+  const expectedPreviousTradingDate =
+    getPreviousTradingDate(
+      sessionDate,
+      metadata?.tradingCalendar
+    );
+
+
+  if (
+    !expectedPreviousTradingDate
+  ) {
+
+    return staleResult(
+      "無法確認最近一個已完成交易日",
+      candidateDataDate,
+      sessionDate
+    );
+
+  }
+
+
+  const declaredPreviousTradingDate =
+    normalizeTradingDate(
+      metadata?.expectedPreviousTradingDate
+    );
+
+
+  if (
+    metadata?.expectedPreviousTradingDate
+    &&
+    declaredPreviousTradingDate !==
+      expectedPreviousTradingDate
+  ) {
+
+    return staleResult(
+      "候選資料的前一交易日宣告不一致",
+      candidateDataDate,
+      sessionDate
+    );
+
+  }
+
+
+  if (
+    candidateDataDate !==
+      expectedPreviousTradingDate
+  ) {
+
+    return staleResult(
+      "候選資料不是最近一個已完成交易日",
+      candidateDataDate,
+      sessionDate
+    );
+
+  }
+
+
   return {
     status:
       CANDIDATE_DATA_STATUS.FRESH,
@@ -327,6 +271,7 @@ export function evaluateCandidateDataFreshness(
     reason:
       "候選資料交易日已確認",
     candidateDataDate,
+    expectedPreviousTradingDate,
     liveSessionDate:
       sessionDate,
     confirmation:

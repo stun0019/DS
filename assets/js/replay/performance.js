@@ -378,11 +378,16 @@ export function buildPerformanceReport(
     riskBlockedCount:
       logs.filter(
         log =>
-          log.newStatus ===
-            "RISK_BLOCKED"
-          &&
-          log.previousStatus !==
-            "RISK_BLOCKED"
+          (
+            log.newStatus ===
+              "RISK_BLOCKED"
+            &&
+            log.previousStatus !==
+              "RISK_BLOCKED"
+          )
+          ||
+          log.eventType ===
+            "ENTRY_REJECTED_RISK"
       ).length,
     invalidatedCount:
       logs.filter(

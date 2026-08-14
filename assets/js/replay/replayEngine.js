@@ -18,6 +18,10 @@ import {
 } from "../strategy/tradingCosts.js";
 
 import {
+  calculateRiskPlan
+} from "../strategy/riskEngine.js";
+
+import {
   getCandleTimeframeMinutes,
   MIN_INTRADAY_TIMEFRAME_MINUTES
 } from "../strategy/intradayStructure.js";
@@ -409,14 +413,6 @@ function createOpenTrade(
   const riskPlan =
     state.riskPlan;
 
-  const lots =
-    riskPlan.maxLots ===
-    null
-
-      ? 1
-
-      : riskPlan.maxLots;
-
 
   const rawEntry =
     state.entry;
@@ -435,7 +431,7 @@ function createOpenTrade(
     );
 
 
-  const filledStop =
+  const expectedFilledStop =
     applyReplaySlippage(
       {
         price:
@@ -448,29 +444,50 @@ function createOpenTrade(
     );
 
 
-  const filledStopOutcome =
-    calculateDayTradeCosts(
+  const filledRiskPlan =
+    calculateRiskPlan(
       {
         entry:
           filledEntry,
-        exit:
-          filledStop,
+        stop:
+          expectedFilledStop,
         side,
-        shares:
-          riskPlan.lotSize
+        lotSize:
+          riskPlan.lotSize,
+        maxRiskAmount:
+          riskPlan.maxRiskAmount
       }
     );
 
 
   const filledRiskPerLot =
-    filledStopOutcome
+    filledRiskPlan?.riskPerLot
+    ??
+    null;
 
-      ? Math.max(
-          0,
-          -filledStopOutcome.netPnlAfterRebate
-        )
 
-      : riskPlan.riskPerLot;
+  const filledCashRiskPerLot =
+    filledRiskPlan?.cashRiskPerLot
+    ??
+    null;
+
+
+  const filledMaxLots =
+    filledRiskPlan?.maxLots
+    ??
+    null;
+
+
+  const lots =
+    filledMaxLots === null
+
+      ? filledRiskPlan
+
+        ? 1
+
+        : 0
+
+      : filledMaxLots;
 
 
   return {
@@ -504,6 +521,9 @@ function createOpenTrade(
     slippageTicks,
     rawEntry,
     filledEntry,
+    structuralStop:
+      state.stop,
+    expectedFilledStop,
     stop:
       state.stop,
     tp1:
@@ -512,6 +532,21 @@ function createOpenTrade(
       riskPlan.tp2,
     maxLots:
       lots,
+    actualLots:
+      lots,
+    rawMaxLots:
+      riskPlan.maxLots,
+    filledMaxLots,
+    maxRiskAmount:
+      riskPlan.maxRiskAmount,
+    entryRejectedRisk:
+      lots <= 0,
+    blockReason:
+      lots <= 0
+
+        ? "滑價後每張現金風險超過上限"
+
+        : null,
     shares:
       lots
       *
@@ -521,9 +556,13 @@ function createOpenTrade(
       *
       lots,
     cashRiskPerLot:
+      filledCashRiskPerLot,
+    rawCashRiskPerLot:
       riskPlan.cashRiskPerLot,
+    filledCashRiskPerLot,
     riskPerLot:
       filledRiskPerLot,
+    filledRiskPerLot,
     rawRiskPerLot:
       riskPlan.riskPerLot
   };
@@ -1028,7 +1067,7 @@ export function replayCandidate(
           LIVE_STATUS.ENTRY_READY
       ) {
 
-        openTrade =
+        const entryAttempt =
           createOpenTrade(
             stock,
             side,
@@ -1040,23 +1079,47 @@ export function replayCandidate(
         hasEntered =
           true;
 
-        logs.push(
-          {
-            ...stateLog,
-            eventType:
-              "ENTRY",
-            slippageTicks:
-              openTrade.slippageTicks,
-            rawEntry:
-              openTrade.rawEntry,
-            filledEntry:
-              openTrade.filledEntry,
-            entry:
-              openTrade.filledEntry,
-            triggerReason:
-              "Direction Confirmation + Risk Pass，建立模擬部位"
-          }
-        );
+
+        if (
+          entryAttempt.entryRejectedRisk
+        ) {
+
+          logs.push(
+            {
+              ...stateLog,
+              ...entryAttempt,
+              eventType:
+                "ENTRY_REJECTED_RISK",
+              newStatus:
+                "RISK_BLOCKED_SLIPPAGE",
+              entry:
+                entryAttempt.filledEntry,
+              triggerReason:
+                "滑價後風險檢查拒絕進場"
+            }
+          );
+
+        }
+
+        else {
+
+          openTrade =
+            entryAttempt;
+
+          logs.push(
+            {
+              ...stateLog,
+              ...openTrade,
+              eventType:
+                "ENTRY",
+              entry:
+                openTrade.filledEntry,
+              triggerReason:
+                "Direction Confirmation + Filled Risk Pass，建立模擬部位"
+            }
+          );
+
+        }
 
       }
 
