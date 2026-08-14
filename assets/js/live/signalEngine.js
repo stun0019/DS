@@ -21,6 +21,7 @@ import {
 import {
   LIVE_STATUS,
   getLiveState,
+  resetLiveState,
   setLiveState
 } from "./liveState.js";
 
@@ -33,6 +34,76 @@ const TRIGGERED_STATUSES =
       LIVE_STATUS.ENTRY_READY
     ]
   );
+
+
+const SESSION_DATE_FORMATTER =
+  new Intl.DateTimeFormat(
+    "en-US",
+    {
+      timeZone:
+        "Asia/Taipei",
+      year:
+        "numeric",
+      month:
+        "2-digit",
+      day:
+        "2-digit"
+    }
+  );
+
+
+export function getTradingSessionDate(
+  timestamp
+) {
+
+  const date =
+    new Date(
+      timestamp
+      ??
+      ""
+    );
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return null;
+
+  }
+
+
+  const parts =
+    Object.fromEntries(
+      SESSION_DATE_FORMATTER
+      .formatToParts(
+        date
+      )
+      .filter(
+        part =>
+          part.type !==
+          "literal"
+      )
+      .map(
+        part => [
+          part.type,
+          part.value
+        ]
+      )
+    );
+
+
+  return (
+    `${parts.year}-`
+    +
+    `${parts.month}-`
+    +
+    `${parts.day}`
+  );
+
+}
 
 
 function hasTriggered(
@@ -79,6 +150,72 @@ function watchingResult(
       plan.observationPrice,
 
     distanceTicks
+  };
+
+}
+
+
+function invalidatedResult(
+  plan,
+  last,
+  quote,
+  previousState
+) {
+
+  const observationPrice =
+    plan?.observationPrice
+    ??
+    previousState?.observationPrice
+    ??
+    null;
+
+
+  const candles =
+    Array.isArray(
+      quote?.candles
+    )
+    &&
+    quote.candles.length > 0
+
+      ? quote.candles
+
+      : previousState?.candles
+        ||
+        [];
+
+
+  return {
+    status:
+      LIVE_STATUS.INVALIDATED,
+    observationPrice,
+    distanceTicks:
+      last > 0
+      &&
+      observationPrice
+
+        ? getTickDistance(
+            last,
+            observationPrice
+          )
+
+        : previousState?.distanceTicks
+          ??
+          null,
+    candles,
+    triggeredAt:
+      previousState?.triggeredAt
+      ??
+      null,
+    triggerPrice:
+      previousState?.triggerPrice
+      ??
+      null,
+    entry:
+      null,
+    stop:
+      null,
+    riskPlan:
+      null
   };
 
 }
@@ -265,6 +402,44 @@ export function evaluateLiveSignal(
     );
 
 
+  const last =
+    Number(
+      quote?.last
+      ||
+      0
+    );
+
+
+  if (
+    previousState?.status ===
+    LIVE_STATUS.INVALIDATED
+  ) {
+
+    return invalidatedResult(
+      plan,
+      last,
+      quote,
+      previousState
+    );
+
+  }
+
+
+  if (
+    quote?.invalidated ===
+    true
+  ) {
+
+    return invalidatedResult(
+      plan,
+      last,
+      quote,
+      previousState
+    );
+
+  }
+
+
   if (
     !plan
   ) {
@@ -279,14 +454,6 @@ export function evaluateLiveSignal(
   }
 
 
-  const last =
-    Number(
-      quote?.last
-      ||
-      0
-    );
-
-
   if (
     last <= 0
   ) {
@@ -297,26 +464,6 @@ export function evaluateLiveSignal(
       observationPrice:
         plan.observationPrice,
       distanceTicks: null
-    };
-
-  }
-
-
-  if (
-    quote?.invalidated ===
-    true
-  ) {
-
-    return {
-      status:
-        LIVE_STATUS.INVALIDATED,
-      observationPrice:
-        plan.observationPrice,
-      distanceTicks:
-        getTickDistance(
-          last,
-          plan.observationPrice
-        )
     };
 
   }
@@ -367,11 +514,41 @@ export function applyLiveQuoteToState(
   options = {}
 ) {
 
-  const previousState =
+  let previousState =
     getLiveState(
       stock.Code,
       side
     );
+
+
+  const sessionDate =
+    getTradingSessionDate(
+      quote?.timestamp
+    );
+
+
+  if (
+    sessionDate
+    &&
+    previousState.sessionDate
+    &&
+    sessionDate >
+    previousState.sessionDate
+  ) {
+
+    resetLiveState(
+      stock.Code,
+      side
+    );
+
+
+    previousState =
+      getLiveState(
+        stock.Code,
+        side
+      );
+
+  }
 
 
   const result =
@@ -391,7 +568,11 @@ export function applyLiveQuoteToState(
     side,
     {
       ...result,
-      quote
+      quote,
+      sessionDate:
+        sessionDate
+        ||
+        previousState.sessionDate
     }
   );
 

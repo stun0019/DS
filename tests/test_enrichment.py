@@ -80,6 +80,16 @@ class SuspensionParsingTests(unittest.TestCase):
 
         self.assertTrue(is_certificate_verification_error(certificate_error))
         self.assertTrue(is_certificate_verification_error(wrapped_error))
+        self.assertTrue(
+            is_certificate_verification_error(
+                RuntimeError("[SSL: CERTIFICATE_VERIFY_FAILED] verify failed")
+            )
+        )
+        self.assertTrue(
+            is_certificate_verification_error(
+                RuntimeError("Missing Subject Key Identifier")
+            )
+        )
         self.assertFalse(is_certificate_verification_error(RuntimeError("timeout")))
 
     def test_tpex_certificate_error_uses_unverified_fallback_once(self) -> None:

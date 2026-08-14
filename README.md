@@ -47,16 +47,20 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
   bid: 668,
   ask: 669,
   candles: [
-    { timestamp, open, high, low, close, volume }
-  ]
+    { timestamp, open, high, low, close, volume, isComplete: true }
+  ],
+  invalidated: false
 }
 ```
 
-`candles` 必須提供帶有可解析 `timestamp` 的 1 分 K。無法證明 K 棒晚於突破時間時，系統不會建立 Stop。行情斷線、逾時、訂閱名單與 API 金鑰應由後端服務處理，不要把永豐憑證放進前端或 GitHub 儲存庫。
+`candles` 必須提供帶有可解析 `timestamp` 的 1 分 K，且已收線 K 要明確標記 `isComplete: true`。形成中 K、完成狀態未知或無法證明晚於突破時間的 K，都不能建立 Swing Stop。
+
+`invalidated: true` 代表今日劇本失效，會成為同交易日 terminal state 並清除可執行風控計畫；只有手動 reset 或下一交易日的行情能解除。行情斷線、逾時、訂閱名單與 API 金鑰應由後端服務處理，不要把永豐憑證放進前端或 GitHub 儲存庫。
 
 ## 重要限制
 
 - 官方「可先賣」資格不等同券商當下保證有券；實際券源仍需由券商 API 確認。
+- TPEx SSL fallback 僅限憑證驗證失敗，並辨識 `CERTIFICATE_VERIFY_FAILED` 與 `Missing Subject Key Identifier`；啟用時會輸出安全警告。
 - 單筆風險上限預設不設定，使用者可在頁面輸入；`maxLots` 採月退前 `cashRiskPerLot` 保守計算。
 - 交易成本依使用者提供的月退比例連續估算，未套用逐筆最低手續費與券商個別取整方式，實際金額以對帳單為準。
 - 現股當沖 0.15% 優惠稅率目前施行至 2027-12-31，屆期前需重新確認法規並更新設定。

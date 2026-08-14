@@ -18,6 +18,11 @@ function normalizeCandle(
       ??
       null,
 
+    isComplete:
+      isCompletedCandle(
+        candle
+      ),
+
     open:
       Number(
         candle.open
@@ -54,6 +59,66 @@ function normalizeCandle(
       )
 
   };
+
+}
+
+
+export function isCompletedCandle(
+  candle
+) {
+
+  if (
+    !candle
+  ) {
+
+    return false;
+
+  }
+
+
+  const explicit =
+    candle.isComplete
+    ??
+    candle.complete
+    ??
+    candle.completed
+    ??
+    candle.isClosed
+    ??
+    candle.closed
+    ??
+    candle.final;
+
+
+  if (
+    typeof explicit ===
+    "boolean"
+  ) {
+
+    return explicit;
+
+  }
+
+
+  const status =
+    String(
+      candle.status
+      ??
+      ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+  return [
+    "closed",
+    "complete",
+    "completed",
+    "final"
+  ]
+  .includes(
+    status
+  );
 
 }
 
@@ -127,6 +192,9 @@ export function getCandlesAfter(
   )
   .filter(
     item =>
+      item.candle?.isComplete ===
+      true
+      &&
       item.timestamp !== null
       &&
       item.timestamp > boundary
@@ -171,7 +239,9 @@ export function findLatestSwingLow(
       normalizeCandle
     )
     .filter(
-      Boolean
+      candle =>
+        candle?.isComplete ===
+        true
     );
 
 
@@ -255,7 +325,9 @@ export function findLatestSwingHigh(
       normalizeCandle
     )
     .filter(
-      Boolean
+      candle =>
+        candle?.isComplete ===
+        true
     );
 
 

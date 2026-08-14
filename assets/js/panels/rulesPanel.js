@@ -467,6 +467,14 @@ export function renderRulesPanel(
 
           </div>
 
+          任一狀態若進入
+          <strong>今日劇本失效</strong>，
+          即成為該交易日的 terminal state。
+          後續行情不得重新觸發，直到手動 reset
+          或收到下一交易日行情才重新開始。
+
+          <br><br>
+
           現階段尚未接 Shioaji，
 
           因此正式行情會先顯示：
@@ -544,7 +552,14 @@ export function renderRulesPanel(
           </div>
 
           突破前已存在的 Swing 永遠不能作為 Stop。
-          分鐘 K 必須帶可解析 timestamp；無法判定形成時間時，
+          Swing 的左側、中心與右側三根 K
+          都必須晚於突破時間，且明確標記為已完成。
+          形成中 K 不得確認 Swing，也不得讓狀態進入 Entry Ready。
+
+          <br><br>
+
+          分鐘 K 必須帶可解析 timestamp 與
+          <code>isComplete: true</code>；無法判定形成時間或完成狀態時，
           系統會停留在等待結構確認。
 
         </div>

@@ -321,7 +321,97 @@ test(
 
 
 test(
-  "only a post-breakout swing can produce an entry-ready risk plan",
+  "invalidated is terminal until reset or a later trading session",
+  () => {
+    resetLiveStates();
+
+    const stock =
+      createStock();
+
+    const invalidated =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 109,
+          timestamp: "2026-08-14T01:00:00.000Z",
+          invalidated: true
+        }
+      );
+
+    const sameSession =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 111,
+          timestamp: "2026-08-14T05:00:00.000Z",
+          invalidated: false
+        }
+      );
+
+    assert.equal(
+      invalidated.status,
+      LIVE_STATUS.INVALIDATED
+    );
+
+    assert.equal(
+      sameSession.status,
+      LIVE_STATUS.INVALIDATED
+    );
+
+    assert.equal(
+      sameSession.entry,
+      null
+    );
+
+    const nextSession =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 111,
+          timestamp: "2026-08-17T01:00:00.000Z",
+          invalidated: false
+        }
+      );
+
+    assert.equal(
+      nextSession.status,
+      LIVE_STATUS.TRIGGERED
+    );
+
+    assert.equal(
+      nextSession.sessionDate,
+      "2026-08-17"
+    );
+
+    resetLiveStates();
+
+    const afterManualReset =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 111,
+          timestamp: "2026-08-14T05:01:00.000Z"
+        }
+      );
+
+    assert.equal(
+      afterManualReset.status,
+      LIVE_STATUS.TRIGGERED
+    );
+  }
+);
+
+
+test(
+  "only a completed post-breakout swing can produce an entry-ready risk plan",
   () => {
     resetLiveStates();
 
@@ -387,7 +477,7 @@ test(
       null
     );
 
-    const result =
+    const forming =
       applyLiveQuoteToState(
         stock,
         "long",
@@ -402,28 +492,70 @@ test(
               open: 110,
               high: 112,
               low: 104,
-              close: 108
+              close: 108,
+              isComplete: true
             },
             {
               timestamp: "2026-08-14T01:07:00.000Z",
               open: 108,
               high: 110,
               low: 102,
-              close: 106
+              close: 106,
+              isComplete: true
             },
             {
               timestamp: "2026-08-14T01:08:00.000Z",
               open: 106,
               high: 111,
               low: 105,
-              close: 110
-            },
+              close: 110,
+              isComplete: false
+            }
+          ]
+        },
+        {
+          maxRiskAmount: 25000
+        }
+      );
+
+    assert.equal(
+      forming.status,
+      LIVE_STATUS.CONFIRMING
+    );
+
+    assert.equal(
+      forming.riskPlan,
+      null
+    );
+
+    const result =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 111.5,
+          timestamp: "2026-08-14T01:11:00.000Z",
+          candles: [
+            ...forming.candles.map(
+              candle =>
+                candle.timestamp ===
+                "2026-08-14T01:08:00.000Z"
+
+                  ? {
+                      ...candle,
+                      isComplete: true
+                    }
+
+                  : candle
+            ),
             {
               timestamp: "2026-08-14T01:09:00.000Z",
               open: 110,
               high: 112,
               low: 106,
-              close: 111.5
+              close: 111.5,
+              isComplete: false
             }
           ]
         },

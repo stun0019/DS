@@ -83,11 +83,35 @@ def normalize_code(value: Any) -> str:
 
 
 def is_certificate_verification_error(error: Exception) -> bool:
-    reason = getattr(error, "reason", None)
-    return isinstance(error, ssl.SSLCertVerificationError) or isinstance(
-        reason,
-        ssl.SSLCertVerificationError,
-    )
+    pending: list[BaseException] = [error]
+    visited: set[int] = set()
+
+    while pending:
+        current = pending.pop()
+        if id(current) in visited:
+            continue
+
+        visited.add(id(current))
+
+        if isinstance(current, ssl.SSLCertVerificationError):
+            return True
+
+        message = str(current).upper()
+        if (
+            "CERTIFICATE_VERIFY_FAILED" in message
+            or "MISSING SUBJECT KEY IDENTIFIER" in message
+        ):
+            return True
+
+        for nested in (
+            getattr(current, "reason", None),
+            current.__cause__,
+            current.__context__,
+        ):
+            if isinstance(nested, BaseException):
+                pending.append(nested)
+
+    return False
 
 
 def create_tpex_fallback_context() -> ssl.SSLContext:

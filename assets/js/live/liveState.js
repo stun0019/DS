@@ -56,6 +56,9 @@ export function createInitialLiveState(
 
     side,
 
+    sessionDate:
+      null,
+
     status:
       LIVE_STATUS.WAITING_LIVE,
 
