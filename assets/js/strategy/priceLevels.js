@@ -1,8 +1,4 @@
 import {
-  STRATEGY
-} from "../core/config.js";
-
-import {
   toNumber
 } from "../utils/number.js";
 
@@ -12,16 +8,10 @@ import {
 } from "../utils/priceTick.js";
 
 
-export function calculateStrategyPrices(
+export function calculateObservationPrice(
   stock,
   side
 ) {
-
-  const open =
-    toNumber(
-      stock.OpeningPrice
-    );
-
 
   const high =
     toNumber(
@@ -35,29 +25,13 @@ export function calculateStrategyPrices(
     );
 
 
-  const close =
-    toNumber(
-      stock.ClosingPrice
-    );
-
-
-  const range =
-    high
-    -
-    low;
-
-
   if (
     high <= 0
     ||
     low <= 0
-    ||
-    close <= 0
-    ||
-    range <= 0
   ) {
 
-    return null;
+    return 0;
 
   }
 
@@ -73,81 +47,12 @@ export function calculateStrategyPrices(
       );
 
 
-    const entry =
-      roundToTick(
-        high
-        +
-        tick,
-        "up"
-      );
-
-
-    const rawStop =
-
-      Math.max(
-
-        low,
-
-        Math.min(
-
-          open,
-
-          close
-          -
-          range
-          *
-          STRATEGY.stopRangeRatio
-
-        )
-
-      );
-
-
-    const stop =
-      roundToTick(
-        rawStop,
-        "down"
-      );
-
-
-    const risk =
-      entry
-      -
-      stop;
-
-
-    if (
-      risk <= 0
-    ) {
-
-      return null;
-
-    }
-
-
-    return {
-
-      entry,
-
-      stop,
-
-      tp1:
-        roundToTick(
-          entry
-          +
-          risk
-        ),
-
-      tp2:
-        roundToTick(
-          entry
-          +
-          risk
-          *
-          2
-        )
-
-    };
+    return roundToTick(
+      high
+      +
+      tick,
+      "up"
+    );
 
   }
 
@@ -163,85 +68,76 @@ export function calculateStrategyPrices(
       );
 
 
-    const entry =
-      roundToTick(
-        low
-        -
-        tick,
-        "down"
-      );
-
-
-    const rawStop =
-
-      Math.min(
-
-        high,
-
-        Math.max(
-
-          open,
-
-          close
-          +
-          range
-          *
-          STRATEGY.stopRangeRatio
-
-        )
-
-      );
-
-
-    const stop =
-      roundToTick(
-        rawStop,
-        "up"
-      );
-
-
-    const risk =
-      stop
+    return roundToTick(
+      low
       -
-      entry;
-
-
-    if (
-      risk <= 0
-    ) {
-
-      return null;
-
-    }
-
-
-    return {
-
-      entry,
-
-      stop,
-
-      tp1:
-        roundToTick(
-          entry
-          -
-          risk
-        ),
-
-      tp2:
-        roundToTick(
-          entry
-          -
-          risk
-          *
-          2
-        )
-
-    };
+      tick,
+      "down"
+    );
 
   }
 
 
-  return null;
+  return 0;
+
+}
+
+
+export function calculatePremarketPlan(
+  stock,
+  side
+) {
+
+  const previousHigh =
+    toNumber(
+      stock.HighestPrice
+    );
+
+
+  const previousLow =
+    toNumber(
+      stock.LowestPrice
+    );
+
+
+  const previousClose =
+    toNumber(
+      stock.ClosingPrice
+    );
+
+
+  const observationPrice =
+    calculateObservationPrice(
+      stock,
+      side
+    );
+
+
+  if (
+    previousHigh <= 0
+    ||
+    previousLow <= 0
+    ||
+    observationPrice <= 0
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    side,
+
+    observationPrice,
+
+    previousHigh,
+
+    previousLow,
+
+    previousClose
+
+  };
 
 }
