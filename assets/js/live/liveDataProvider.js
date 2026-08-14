@@ -50,8 +50,7 @@ export function normalizeLiveQuote(
 
       ??
 
-      new Date()
-      .toISOString(),
+      null,
 
 
     open:

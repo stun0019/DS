@@ -475,6 +475,14 @@ export function renderRulesPanel(
 
           <br><br>
 
+          即時行情採嚴格時間順序：
+          較舊交易日的 Quote 直接忽略；
+          同一交易日若 timestamp 早於上一筆 Quote，
+          也不更新狀態、K 棒、Entry、Stop 或 Risk Plan。
+          只有交易日確實晚於目前狀態時，才會重設為新交易日。
+
+          <br><br>
+
           現階段尚未接 Shioaji，
 
           因此正式行情會先顯示：

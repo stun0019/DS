@@ -25,6 +25,10 @@ import {
 } from "../assets/js/live/signalEngine.js";
 
 import {
+  normalizeLiveQuote
+} from "../assets/js/live/liveDataProvider.js";
+
+import {
   LIVE_STATUS,
   resetLiveStates
 } from "../assets/js/live/liveState.js";
@@ -272,7 +276,8 @@ test(
         "long",
         {
           code: stock.Code,
-          last: 110
+          last: 110,
+          timestamp: "2026-08-14T00:59:58.000Z"
         }
       );
 
@@ -293,7 +298,8 @@ test(
         "long",
         {
           code: stock.Code,
-          last: 110
+          last: 110,
+          timestamp: "2026-08-14T01:00:01.000Z"
         }
       );
 
@@ -405,6 +411,261 @@ test(
     assert.equal(
       afterManualReset.status,
       LIVE_STATUS.TRIGGERED
+    );
+  }
+);
+
+
+test(
+  "an older-session quote cannot roll the live state backward",
+  () => {
+    resetLiveStates();
+
+    const stock =
+      createStock();
+
+    const currentState =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 111,
+          timestamp: "2026-08-17T09:15:05+08:00"
+        }
+      );
+
+    const afterOldQuote =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 90,
+          timestamp: "2026-08-14T09:15:06+08:00",
+          invalidated: true
+        }
+      );
+
+    assert.strictEqual(
+      afterOldQuote,
+      currentState
+    );
+
+    assert.equal(
+      afterOldQuote.sessionDate,
+      "2026-08-17"
+    );
+
+    assert.equal(
+      afterOldQuote.lastQuoteTimestamp,
+      "2026-08-17T01:15:05.000Z"
+    );
+  }
+);
+
+
+test(
+  "a quote without a sortable timestamp fails closed",
+  () => {
+    resetLiveStates();
+
+    const stock =
+      createStock();
+
+    const quote =
+      normalizeLiveQuote(
+        {
+          code: stock.Code,
+          last: 111
+        }
+      );
+
+    assert.equal(
+      quote.timestamp,
+      null
+    );
+
+    const state =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        quote
+      );
+
+    assert.equal(
+      state.status,
+      LIVE_STATUS.WAITING_LIVE
+    );
+
+    assert.equal(
+      state.updatedAt,
+      null
+    );
+  }
+);
+
+
+function createEntryReadyLiveState(
+  stock
+) {
+
+  resetLiveStates();
+
+  applyLiveQuoteToState(
+    stock,
+    "long",
+    {
+      code: stock.Code,
+      last: 111,
+      timestamp: "2026-08-17T09:15:00+08:00"
+    }
+  );
+
+  return applyLiveQuoteToState(
+    stock,
+    "long",
+    {
+      code: stock.Code,
+      last: 111.5,
+      timestamp: "2026-08-17T09:15:05+08:00",
+      candles: [
+        {
+          timestamp: "2026-08-17T09:15:01+08:00",
+          open: 110,
+          high: 112,
+          low: 104,
+          close: 108,
+          isComplete: true
+        },
+        {
+          timestamp: "2026-08-17T09:15:02+08:00",
+          open: 108,
+          high: 110,
+          low: 102,
+          close: 106,
+          isComplete: true
+        },
+        {
+          timestamp: "2026-08-17T09:15:03+08:00",
+          open: 106,
+          high: 112,
+          low: 105,
+          close: 111.5,
+          isComplete: true
+        }
+      ]
+    },
+    {
+      maxRiskAmount: 25000
+    }
+  );
+
+}
+
+
+test(
+  "a stale same-session quote cannot alter entry stop or signal",
+  () => {
+    const stock =
+      createStock();
+
+    const readyState =
+      createEntryReadyLiveState(
+        stock
+      );
+
+    assert.equal(
+      readyState.status,
+      LIVE_STATUS.ENTRY_READY
+    );
+
+    const afterStaleQuote =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 90,
+          timestamp: "2026-08-17T09:14:58+08:00",
+          candles: [],
+          invalidated: true
+        }
+      );
+
+    assert.strictEqual(
+      afterStaleQuote,
+      readyState
+    );
+
+    assert.equal(
+      afterStaleQuote.status,
+      LIVE_STATUS.ENTRY_READY
+    );
+
+    assert.equal(
+      afterStaleQuote.entry,
+      readyState.entry
+    );
+
+    assert.equal(
+      afterStaleQuote.stop,
+      readyState.stop
+    );
+
+    assert.strictEqual(
+      afterStaleQuote.riskPlan,
+      readyState.riskPlan
+    );
+
+    assert.equal(
+      afterStaleQuote.lastQuoteTimestamp,
+      "2026-08-17T01:15:05.000Z"
+    );
+  }
+);
+
+
+test(
+  "a newer same-session quote continues processing normally",
+  () => {
+    const stock =
+      createStock();
+
+    const readyState =
+      createEntryReadyLiveState(
+        stock
+      );
+
+    const nextState =
+      applyLiveQuoteToState(
+        stock,
+        "long",
+        {
+          code: stock.Code,
+          last: 112,
+          timestamp: "2026-08-17T09:15:06+08:00"
+        }
+      );
+
+    assert.notStrictEqual(
+      nextState,
+      readyState
+    );
+
+    assert.equal(
+      nextState.status,
+      LIVE_STATUS.ENTRY_READY
+    );
+
+    assert.equal(
+      nextState.quote.last,
+      112
+    );
+
+    assert.equal(
+      nextState.lastQuoteTimestamp,
+      "2026-08-17T01:15:06.000Z"
     );
   }
 );

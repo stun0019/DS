@@ -55,6 +55,8 @@ Shioaji Adapter 日後只需繼承 `LiveDataProvider`，並送入下列格式：
 
 `candles` 必須提供帶有可解析 `timestamp` 的 1 分 K，且已收線 K 要明確標記 `isComplete: true`。形成中 K、完成狀態未知或無法證明晚於突破時間的 K，都不能建立 Swing Stop。
 
+每筆 Quote 必須提供可解析的 `timestamp`，缺少或無效時會直接忽略且不以本機現在時間代填。系統會保存同交易日最後處理時間；較舊交易日或同交易日內較舊的 Quote 會完整忽略，不更新行情、狀態、K 棒、Entry、Stop、Risk Plan 或交易日。只有 Quote 的交易日嚴格晚於目前狀態時，才會重設並開始新交易日。
+
 `invalidated: true` 代表今日劇本失效，會成為同交易日 terminal state 並清除可執行風控計畫；只有手動 reset 或下一交易日的行情能解除。行情斷線、逾時、訂閱名單與 API 金鑰應由後端服務處理，不要把永豐憑證放進前端或 GitHub 儲存庫。
 
 ## 重要限制

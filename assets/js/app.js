@@ -618,6 +618,7 @@ function initializeLiveProvider() {
 
   stockDaybydayMock.push({
     code: "2327",
+    timestamp: "2026-08-14T09:15:05+08:00",
     open: 650,
     high: 664,
     low: 648,

@@ -59,6 +59,9 @@ export function createInitialLiveState(
     sessionDate:
       null,
 
+    lastQuoteTimestamp:
+      null,
+
     status:
       LIVE_STATUS.WAITING_LIVE,
 

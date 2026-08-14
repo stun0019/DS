@@ -106,6 +106,42 @@ export function getTradingSessionDate(
 }
 
 
+function getQuoteTime(
+  timestamp
+) {
+
+  const milliseconds =
+    new Date(
+      timestamp
+      ??
+      ""
+    )
+    .getTime();
+
+
+  if (
+    Number.isNaN(
+      milliseconds
+    )
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+    milliseconds,
+    timestamp:
+      new Date(
+        milliseconds
+      )
+      .toISOString()
+  };
+
+}
+
+
 function hasTriggered(
   side,
   last,
@@ -521,19 +557,71 @@ export function applyLiveQuoteToState(
     );
 
 
-  const sessionDate =
-    getTradingSessionDate(
+  const incomingQuoteTime =
+    getQuoteTime(
       quote?.timestamp
     );
 
 
   if (
-    sessionDate
+    !incomingQuoteTime
+  ) {
+
+    return previousState;
+
+  }
+
+
+  const sessionDate =
+    getTradingSessionDate(
+      incomingQuoteTime.timestamp
+    );
+
+
+  if (
+    previousState.sessionDate
     &&
+    sessionDate <
+    previousState.sessionDate
+  ) {
+
+    return previousState;
+
+  }
+
+
+  if (
+    sessionDate ===
+      previousState.sessionDate
+    &&
+    previousState.lastQuoteTimestamp
+  ) {
+
+    const previousQuoteTime =
+      getQuoteTime(
+        previousState.lastQuoteTimestamp
+      );
+
+
+    if (
+      previousQuoteTime
+      &&
+      incomingQuoteTime.milliseconds <
+        previousQuoteTime.milliseconds
+    ) {
+
+      return previousState;
+
+    }
+
+  }
+
+
+  if (
     previousState.sessionDate
     &&
     sessionDate >
-    previousState.sessionDate
+      previousState.sessionDate
   ) {
 
     resetLiveState(
@@ -569,10 +657,9 @@ export function applyLiveQuoteToState(
     {
       ...result,
       quote,
-      sessionDate:
-        sessionDate
-        ||
-        previousState.sessionDate
+      sessionDate,
+      lastQuoteTimestamp:
+        incomingQuoteTime.timestamp
     }
   );
 
