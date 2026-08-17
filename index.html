@@ -223,34 +223,24 @@ h1 {
 }
 
 
-.market-status-grid {
+/* ==================================================
+   SYSTEM LOG
+   ================================================== */
 
-  display:
-    grid;
-
-  grid-template-columns:
-    1fr 1fr 1fr;
-
-  gap:
-    12px;
+.logbox {
 
   margin-bottom:
     22px;
-
-}
-
-
-.status-card {
-
-  padding:
-    16px 18px;
 
   border:
     1px solid
     var(--border);
 
   border-radius:
-    var(--radius);
+    16px;
+
+  overflow:
+    hidden;
 
   background:
     var(--surface);
@@ -258,10 +248,113 @@ h1 {
 }
 
 
-.status-title {
+.logbox-header {
 
-  margin-bottom:
-    7px;
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    16px;
+
+  padding:
+    14px 18px;
+
+  border-bottom:
+    1px solid
+    var(--border);
+
+  background:
+    var(--surface-2);
+
+}
+
+
+.logbox-title {
+
+  color:
+    var(--accent);
+
+  font-size:
+    11px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .16em;
+
+}
+
+
+.logbox-hint {
+
+  color:
+    var(--muted);
+
+  font-size:
+    10px;
+
+}
+
+
+.logbox-body {
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+}
+
+
+.log-row {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    110px 150px minmax(0, 1fr);
+
+  align-items:
+    center;
+
+  gap:
+    12px;
+
+  min-height:
+    54px;
+
+  padding:
+    13px 18px;
+
+  border-bottom:
+    1px solid
+    rgba(
+      41,
+      49,
+      61,
+      .7
+    );
+
+}
+
+
+.log-row:last-child {
+
+  border-bottom:
+    0;
+
+}
+
+
+.log-tag {
 
   color:
     var(--muted);
@@ -270,35 +363,49 @@ h1 {
     11px;
 
   font-weight:
-    700;
+    800;
 
   letter-spacing:
-    .08em;
+    .1em;
 
 }
 
 
-.status-value {
+.log-status {
 
   font-size:
-    17px;
+    14px;
 
   font-weight:
-    700;
+    800;
+
+  white-space:
+    nowrap;
 
 }
 
 
-.status-meta {
+.log-meta {
 
-  margin-top:
-    6px;
+  min-width: 0;
+
+  overflow:
+    hidden;
 
   color:
     var(--secondary);
 
   font-size:
     12px;
+
+  line-height:
+    1.5;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
 
 }
 
@@ -318,6 +425,26 @@ h1 {
 
 }
 
+
+.status-waiting {
+
+  color:
+    var(--warning);
+
+}
+
+
+.status-checking {
+
+  color:
+    var(--secondary);
+
+}
+
+
+/* ==================================================
+   SYNC WARNING
+   ================================================== */
 
 .sync-warning {
 
@@ -356,6 +483,9 @@ h1 {
   font-size:
     13px;
 
+  line-height:
+    1.6;
+
 }
 
 
@@ -366,6 +496,10 @@ h1 {
 
 }
 
+
+/* ==================================================
+   SUMMARY
+   ================================================== */
 
 .summary {
 
@@ -429,6 +563,10 @@ h1 {
 
 }
 
+
+/* ==================================================
+   CANDIDATE
+   ================================================== */
 
 .candidate-grid {
 
@@ -768,6 +906,9 @@ h1 {
   font-size:
     13px;
 
+  line-height:
+    1.7;
+
 }
 
 
@@ -784,6 +925,10 @@ h1 {
 
 }
 
+
+/* ==================================================
+   TRADE PLAN DIALOG
+   ================================================== */
 
 dialog {
 
@@ -1238,17 +1383,13 @@ dialog::backdrop {
 }
 
 
+/* ==================================================
+   RESPONSIVE
+   ================================================== */
+
 @media (
   max-width: 850px
 ) {
-
-  .market-status-grid {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
 
   .summary {
 
@@ -1262,6 +1403,43 @@ dialog::backdrop {
 
     grid-template-columns:
       1fr;
+
+  }
+
+}
+
+
+@media (
+  max-width: 620px
+) {
+
+  .log-row {
+
+    grid-template-columns:
+      90px minmax(0, 1fr);
+
+    gap:
+      5px 10px;
+
+  }
+
+
+  .log-meta {
+
+    grid-column:
+      1 / -1;
+
+    overflow:
+      visible;
+
+    padding-left:
+      100px;
+
+    text-overflow:
+      initial;
+
+    white-space:
+      normal;
 
   }
 
@@ -1301,6 +1479,41 @@ dialog::backdrop {
   }
 
 
+  .logbox-header {
+
+    padding:
+      13px 14px;
+
+  }
+
+
+  .logbox-hint {
+
+    display:
+      none;
+
+  }
+
+
+  .log-row {
+
+    grid-template-columns:
+      86px minmax(0, 1fr);
+
+    padding:
+      13px 14px;
+
+  }
+
+
+  .log-meta {
+
+    padding-left:
+      96px;
+
+  }
+
+
   .trade-summary,
   .price-grid {
 
@@ -1326,6 +1539,61 @@ dialog::backdrop {
 
     font-size:
       24px;
+
+  }
+
+}
+
+
+@media (
+  max-width: 400px
+) {
+
+  .header {
+
+    gap:
+      12px;
+
+  }
+
+
+  .reload-btn {
+
+    padding:
+      8px 10px;
+
+    font-size:
+      12px;
+
+  }
+
+
+  .summary {
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+
+  .candidate-card {
+
+    grid-template-columns:
+      26px minmax(0, 1fr) auto;
+
+    gap:
+      8px;
+
+    padding:
+      12px 8px;
+
+  }
+
+
+  .stock-meta {
+
+    line-height:
+      1.5;
 
   }
 
@@ -1371,74 +1639,93 @@ dialog::backdrop {
   </header>
 
 
-  <section
-    class="market-status-grid"
-  >
+  <!-- ==================================================
+       SYSTEM LOG
+       ================================================== -->
 
-    <div class="status-card">
+  <section class="logbox">
 
-      <div class="status-title">
-        TWSE
+    <header class="logbox-header">
+
+      <div class="logbox-title">
+        SYSTEM LOG
       </div>
 
-      <div
-        id="twseStatus"
-        class="status-value"
-      >
-        LOADING
+      <div class="logbox-hint">
+        MARKET DATA STATUS
       </div>
 
-      <div
-        id="twseMeta"
-        class="status-meta"
-      >
-        -
+    </header>
+
+
+    <div class="logbox-body">
+
+      <div class="log-row">
+
+        <div class="log-tag">
+          TWSE
+        </div>
+
+        <div
+          id="twseStatus"
+          class="log-status status-checking"
+        >
+          LOADING
+        </div>
+
+        <div
+          id="twseMeta"
+          class="log-meta"
+        >
+          讀取中...
+        </div>
+
       </div>
 
-    </div>
 
+      <div class="log-row">
 
-    <div class="status-card">
+        <div class="log-tag">
+          TPEx
+        </div>
 
-      <div class="status-title">
-        TPEX
+        <div
+          id="tpexStatus"
+          class="log-status status-checking"
+        >
+          LOADING
+        </div>
+
+        <div
+          id="tpexMeta"
+          class="log-meta"
+        >
+          讀取中...
+        </div>
+
       </div>
 
-      <div
-        id="tpexStatus"
-        class="status-value"
-      >
-        LOADING
-      </div>
 
-      <div
-        id="tpexMeta"
-        class="status-meta"
-      >
-        -
-      </div>
+      <div class="log-row">
 
-    </div>
+        <div class="log-tag">
+          UNIFIED
+        </div>
 
+        <div
+          id="syncStatus"
+          class="log-status status-checking"
+        >
+          CHECKING
+        </div>
 
-    <div class="status-card">
+        <div
+          id="syncMeta"
+          class="log-meta"
+        >
+          檢查同步狀態...
+        </div>
 
-      <div class="status-title">
-        UNIFIED CANDIDATE DATA
-      </div>
-
-      <div
-        id="syncStatus"
-        class="status-value"
-      >
-        CHECKING
-      </div>
-
-      <div
-        id="syncMeta"
-        class="status-meta"
-      >
-        -
       </div>
 
     </div>
@@ -1542,6 +1829,10 @@ const state = {
 };
 
 
+/* ==================================================
+   NUMBER
+   ================================================== */
+
 function num(
   value
 ) {
@@ -1551,7 +1842,9 @@ function num(
     ||
     value === undefined
   ) {
+
     return 0;
+
   }
 
   let text =
@@ -1575,7 +1868,9 @@ function num(
     ||
     text === "--"
   ) {
+
     return 0;
+
   }
 
   const direct =
@@ -1588,7 +1883,9 @@ function num(
       direct
     )
   ) {
+
     return direct;
+
   }
 
   text =
@@ -1661,6 +1958,10 @@ function escapeHtml(
 }
 
 
+/* ==================================================
+   PRICE TICK
+   ================================================== */
+
 function getTickSize(
   price
 ) {
@@ -1673,31 +1974,41 @@ function getTickSize(
   if (
     value < 10
   ) {
+
     return 0.01;
+
   }
 
   if (
     value < 50
   ) {
+
     return 0.05;
+
   }
 
   if (
     value < 100
   ) {
+
     return 0.1;
+
   }
 
   if (
     value < 500
   ) {
+
     return 0.5;
+
   }
 
   if (
     value < 1000
   ) {
+
     return 1;
+
   }
 
   return 5;
@@ -1733,7 +2044,9 @@ function nextTick(
   if (
     value <= 0
   ) {
+
     return 0;
+
   }
 
   return roundPrice(
@@ -1759,7 +2072,9 @@ function previousTick(
   if (
     value <= 0
   ) {
+
     return 0;
+
   }
 
   const lookupPrice =
@@ -1820,6 +2135,10 @@ function moveTicks(
 }
 
 
+/* ==================================================
+   FORMAT
+   ================================================== */
+
 function formatPrice(
   value
 ) {
@@ -1832,7 +2151,9 @@ function formatPrice(
   if (
     price <= 0
   ) {
+
     return "-";
+
   }
 
   const tick =
@@ -1897,6 +2218,10 @@ function formatLots(
 
 }
 
+
+/* ==================================================
+   STOCK DATA
+   ================================================== */
 
 function getTradeVolume(
   stock
@@ -1980,7 +2305,9 @@ function changePercent(
   if (
     previous <= 0
   ) {
+
     return 0;
+
   }
 
   return (
@@ -2022,7 +2349,9 @@ function amplitude(
     ||
     open <= 0
   ) {
+
     return 0;
+
   }
 
   return (
@@ -2067,7 +2396,9 @@ function closePosition(
   if (
     range <= 0
   ) {
+
     return 0.5;
+
   }
 
   return clamp(
@@ -2117,7 +2448,9 @@ function bodyRatio(
   if (
     range <= 0
   ) {
+
     return 0;
+
   }
 
   return (
@@ -2136,29 +2469,45 @@ function validStock(
 ) {
 
   return Boolean(
+
     stock
+
     &&
+
     stock.Code
+
     &&
+
     num(
       stock.OpeningPrice
     ) > 0
+
     &&
+
     num(
       stock.HighestPrice
     ) > 0
+
     &&
+
     num(
       stock.LowestPrice
     ) > 0
+
     &&
+
     num(
       stock.ClosingPrice
     ) > 0
+
   );
 
 }
 
+
+/* ==================================================
+   LIQUIDITY
+   ================================================== */
 
 function assignLiquidityRanks(
   stocks
@@ -2186,7 +2535,9 @@ function assignLiquidityRanks(
         if (
           volumeDiff !== 0
         ) {
+
           return volumeDiff;
+
         }
 
         return String(
@@ -2222,6 +2573,10 @@ function assignLiquidityRanks(
 }
 
 
+/* ==================================================
+   SCORE
+   ================================================== */
+
 function liquidityScore(
   stock
 ) {
@@ -2235,7 +2590,9 @@ function liquidityScore(
     rank >
     CONFIG.liquidityPoolSize
   ) {
+
     return 0;
+
   }
 
   const maxIndex =
@@ -2248,7 +2605,9 @@ function liquidityScore(
 
   return (
     CONFIG.weights.liquidity
+
     *
+
     (
       1
       -
@@ -2429,6 +2788,10 @@ function scoreShort(
 }
 
 
+/* ==================================================
+   CANDIDATE RULE
+   ================================================== */
+
 function isLongCandidate(
   stock
 ) {
@@ -2566,12 +2929,14 @@ function selectCandidates(
 
     .map(
       stock => ({
+
         ...stock,
 
         __score:
           scoreFn(
             stock
           )
+
       })
     )
 
@@ -2617,6 +2982,10 @@ function selectCandidates(
 }
 
 
+/* ==================================================
+   TRADE PLAN
+   ================================================== */
+
 function observationPrice(
   stock,
   side
@@ -2653,7 +3022,9 @@ function entryWatchZone(
   if (
     observation <= 0
   ) {
+
     return null;
+
   }
 
   if (
@@ -2661,6 +3032,7 @@ function entryWatchZone(
   ) {
 
     return {
+
       from:
         observation,
 
@@ -2669,11 +3041,13 @@ function entryWatchZone(
           observation,
           CONFIG.entryWatchTicks
         )
+
     };
 
   }
 
   return {
+
     from:
       moveTicks(
         observation,
@@ -2682,6 +3056,7 @@ function entryWatchZone(
 
     to:
       observation
+
   };
 
 }
@@ -2695,26 +3070,37 @@ function eligibilityLabel(
     stock.DayTradeEligible !==
     true
   ) {
+
     return "不可當沖";
+
   }
 
   if (
     stock.SellFirstSuspended ===
     true
   ) {
+
     return "暫停先賣";
+
   }
 
   if (
     stock.SellFirstDayTradeAllowed ===
     true
   ) {
+
     return "可先賣";
+
   }
 
   return "僅先買";
+
 }
 
+
+/* ==================================================
+   FETCH
+   ================================================== */
 
 async function fetchMarket(
   url
@@ -2728,8 +3114,10 @@ async function fetchMarket(
       +
       Date.now(),
       {
+
         cache:
           "no-store"
+
       }
     );
 
@@ -2747,6 +3135,10 @@ async function fetchMarket(
 
 }
 
+
+/* ==================================================
+   LOG STATUS
+   ================================================== */
 
 function setMarketStatus(
   market,
@@ -2773,6 +3165,7 @@ function setMarketStatus(
       "Meta"
     );
 
+
   if (
     error
   ) {
@@ -2781,28 +3174,88 @@ function setMarketStatus(
       "ERROR";
 
     status.className =
-      "status-value status-error";
+      "log-status status-error";
 
     meta.textContent =
-      error.message;
+      error.message
+      ||
+      "資料讀取失敗";
 
     return;
 
   }
 
+
+  if (
+    !payload
+  ) {
+
+    status.textContent =
+      "NOT READY";
+
+    status.className =
+      "log-status status-error";
+
+    meta.textContent =
+      "尚未讀取到市場資料";
+
+    return;
+
+  }
+
+
+  const count =
+    Number(
+      payload.count
+      ||
+      0
+    );
+
+  const tradeDate =
+    String(
+      payload.tradeDateISO
+      ||
+      ""
+    );
+
+
+  if (
+    !tradeDate
+    ||
+    count <= 0
+  ) {
+
+    status.textContent =
+      "WAITING DATA";
+
+    status.className =
+      "log-status status-waiting";
+
+    meta.textContent =
+      "尚未產生正式市場資料";
+
+    return;
+
+  }
+
+
   status.textContent =
     "READY";
 
   status.className =
-    "status-value status-ready";
+    "log-status status-ready";
 
   meta.textContent =
-    `${payload.tradeDateISO || "-"} · `
+    `${tradeDate} · `
     +
-    `${payload.count || 0} 檔`;
+    `${count.toLocaleString("zh-TW")} 檔`;
 
 }
 
+
+/* ==================================================
+   SUMMARY
+   ================================================== */
 
 function renderSummary() {
 
@@ -2812,19 +3265,24 @@ function renderSummary() {
     );
 
   const twseCount =
-    state.twse?.count
-    ??
-    0;
+    Number(
+      state.twse?.count
+      ??
+      0
+    );
 
   const tpexCount =
-    state.tpex?.count
-    ??
-    0;
+    Number(
+      state.tpex?.count
+      ??
+      0
+    );
 
   root.innerHTML =
     `
 
       <div class="summary-item">
+
         <span>
           TWSE
         </span>
@@ -2832,10 +3290,12 @@ function renderSummary() {
         <strong>
           ${twseCount.toLocaleString("zh-TW")}
         </strong>
+
       </div>
 
 
       <div class="summary-item">
+
         <span>
           TPEx
         </span>
@@ -2843,10 +3303,12 @@ function renderSummary() {
         <strong>
           ${tpexCount.toLocaleString("zh-TW")}
         </strong>
+
       </div>
 
 
       <div class="summary-item">
+
         <span>
           LONG
         </span>
@@ -2854,10 +3316,12 @@ function renderSummary() {
         <strong class="long-text">
           ${state.long.length}
         </strong>
+
       </div>
 
 
       <div class="summary-item">
+
         <span>
           SHORT
         </span>
@@ -2865,12 +3329,17 @@ function renderSummary() {
         <strong class="short-text">
           ${state.short.length}
         </strong>
+
       </div>
 
     `;
 
 }
 
+
+/* ==================================================
+   CANDIDATE UI
+   ================================================== */
 
 function candidateCardHtml(
   stock,
@@ -2924,20 +3393,31 @@ function candidateCardHtml(
 
         <div class="stock-meta">
 
-          ${escapeHtml(stock.Industry || "未分類")}
+          ${escapeHtml(
+            stock.Industry
+            ||
+            "未分類"
+          )}
 
           ·
 
-          ${formatPercent(change)}
+          ${formatPercent(
+            change
+          )}
 
           ·
 
-          ${formatLots(getTradeVolume(stock))}
+          ${formatLots(
+            getTradeVolume(
+              stock
+            )
+          )}
           張
 
           ·
 
-          流動性 #${stock.__liquidityRank}
+          流動性
+          #${stock.__liquidityRank}
 
         </div>
 
@@ -2949,13 +3429,16 @@ function candidateCardHtml(
         <div
           class="
             observation
-            ${side === "long"
-              ? "long-text"
-              : "short-text"
+            ${
+              side === "long"
+                ? "long-text"
+                : "short-text"
             }
           "
         >
-          ${formatPrice(observation)}
+          ${formatPrice(
+            observation
+          )}
         </div>
 
         <div class="score">
@@ -3030,9 +3513,11 @@ function renderPanel(
                 .join("")
 
             : `
+
                 <div class="empty">
                   沒有符合條件的候選
                 </div>
+
               `
         }
 
@@ -3052,18 +3537,55 @@ function renderCandidates() {
       "candidateRoot"
     );
 
+
   if (
     !state.synchronized
   ) {
+
+    const twseHasData =
+      Boolean(
+        state.twse?.tradeDateISO
+        &&
+        Number(
+          state.twse?.count
+          ||
+          0
+        ) > 0
+      );
+
+    const tpexHasData =
+      Boolean(
+        state.tpex?.tradeDateISO
+        &&
+        Number(
+          state.tpex?.count
+          ||
+          0
+        ) > 0
+      );
+
+
+    const message =
+      (
+        !twseHasData
+        ||
+        !tpexHasData
+      )
+
+        ? "等待 TWSE / TPEx 正式市場資料。"
+
+        : "TWSE / TPEx 尚未同步，暫停建立跨市場候選池。";
+
 
     root.innerHTML =
       `
 
         <div class="candidate-panel">
+
           <div class="empty">
-            TWSE / TPEx 尚未同步，
-            暫停建立跨市場候選池。
+            ${message}
           </div>
+
         </div>
 
       `;
@@ -3071,6 +3593,7 @@ function renderCandidates() {
     return;
 
   }
+
 
   root.innerHTML =
     renderPanel(
@@ -3085,6 +3608,10 @@ function renderCandidates() {
 
 }
 
+
+/* ==================================================
+   FIND CANDIDATE
+   ================================================== */
 
 function findCandidate(
   code,
@@ -3110,6 +3637,10 @@ function findCandidate(
 }
 
 
+/* ==================================================
+   TRADE PLAN MODAL
+   ================================================== */
+
 function openTradePlan(
   stock,
   side
@@ -3132,11 +3663,6 @@ function openTradePlan(
       side
     );
 
-  const sideLabel =
-    side === "long"
-      ? "LONG"
-      : "SHORT";
-
   const sideTextClass =
     side === "long"
       ? "long-text"
@@ -3147,6 +3673,14 @@ function openTradePlan(
       ? "做多"
       : "做空";
 
+  const dataDate =
+    stock.Market === "TPEX"
+
+      ? state.tpex?.tradeDateISO
+
+      : state.twse?.tradeDateISO;
+
+
   dialog.innerHTML =
     `
 
@@ -3156,10 +3690,14 @@ function openTradePlan(
 
           <h2 class="modal-title">
 
-            ${escapeHtml(stock.Name)}
+            ${escapeHtml(
+              stock.Name
+            )}
 
             <span class="modal-code">
-              ${escapeHtml(stock.Code)}
+              ${escapeHtml(
+                stock.Code
+              )}
             </span>
 
           </h2>
@@ -3167,20 +3705,33 @@ function openTradePlan(
 
           <div class="modal-sub">
 
-            ${escapeHtml(stock.MarketName)}
+            ${escapeHtml(
+              stock.MarketName
+            )}
 
             ·
 
-            ${escapeHtml(stock.Industry || "未分類")}
+            ${escapeHtml(
+              stock.Industry
+              ||
+              "未分類"
+            )}
 
             ·
 
-            ${escapeHtml(eligibilityLabel(stock))}
+            ${escapeHtml(
+              eligibilityLabel(
+                stock
+              )
+            )}
 
             ·
 
-            資料 ${escapeHtml(
-              state.twse.tradeDateISO
+            資料
+            ${escapeHtml(
+              dataDate
+              ||
+              "-"
             )}
 
           </div>
@@ -3192,6 +3743,7 @@ function openTradePlan(
           id="closeDialog"
           class="close-btn"
           type="button"
+          aria-label="關閉"
         >
           ×
         </button>
@@ -3375,7 +3927,9 @@ function openTradePlan(
 
           ${
             side === "long"
+
               ? "價格需先有效突破 Observation，再觀察回踩與方向確認。"
+
               : "價格需先有效跌破 Observation，再觀察回踩與方向確認。"
           }
 
@@ -3433,7 +3987,9 @@ function openTradePlan(
 
     `;
 
+
   dialog.showModal();
+
 
   document
   .getElementById(
@@ -3447,6 +4003,10 @@ function openTradePlan(
 
 }
 
+
+/* ==================================================
+   SYNC STATE
+   ================================================== */
 
 function updateSyncState() {
 
@@ -3465,6 +4025,7 @@ function updateSyncState() {
       "syncWarning"
     );
 
+
   if (
     !state.twse
     ||
@@ -3478,25 +4039,124 @@ function updateSyncState() {
       "NOT READY";
 
     status.className =
-      "status-value status-error";
+      "log-status status-error";
+
+    meta.textContent =
+      "TWSE / TPEx 尚未完成讀取";
+
+    warning.classList.remove(
+      "visible"
+    );
+
+    warning.textContent =
+      "";
 
     return;
 
   }
 
+
+  const twseReady =
+    Boolean(
+
+      state.twse.tradeDateISO
+
+      &&
+
+      Number(
+        state.twse.count
+        ||
+        0
+      ) > 0
+
+      &&
+
+      Array.isArray(
+        state.twse.data
+      )
+
+      &&
+
+      state.twse.data.length > 0
+
+    );
+
+
+  const tpexReady =
+    Boolean(
+
+      state.tpex.tradeDateISO
+
+      &&
+
+      Number(
+        state.tpex.count
+        ||
+        0
+      ) > 0
+
+      &&
+
+      Array.isArray(
+        state.tpex.data
+      )
+
+      &&
+
+      state.tpex.data.length > 0
+
+    );
+
+
+  if (
+    !twseReady
+    ||
+    !tpexReady
+  ) {
+
+    state.synchronized =
+      false;
+
+    status.textContent =
+      "WAITING DATA";
+
+    status.className =
+      "log-status status-waiting";
+
+    meta.textContent =
+      "兩市場尚未都有正式資料";
+
+    warning.classList.remove(
+      "visible"
+    );
+
+    warning.textContent =
+      "";
+
+    return;
+
+  }
+
+
   const sameDate =
     state.twse.tradeDateISO
+
     &&
+
     state.twse.tradeDateISO
     ===
     state.tpex.tradeDateISO;
 
+
   const sameVolumeMode =
     state.twse.volumeMode
+
     &&
+
     state.twse.volumeMode
     ===
     state.tpex.volumeMode;
+
 
   state.synchronized =
     Boolean(
@@ -3504,6 +4164,7 @@ function updateSyncState() {
       &&
       sameVolumeMode
     );
+
 
   if (
     state.synchronized
@@ -3513,10 +4174,14 @@ function updateSyncState() {
       "SYNCED";
 
     status.className =
-      "status-value status-ready";
+      "log-status status-ready";
 
     meta.textContent =
-      `${state.twse.tradeDateISO} · ${state.twse.volumeMode}`;
+      `${state.twse.tradeDateISO}`
+      +
+      " · "
+      +
+      `${state.twse.volumeMode}`;
 
     warning.classList.remove(
       "visible"
@@ -3533,10 +4198,36 @@ function updateSyncState() {
       "MISMATCH";
 
     status.className =
-      "status-value status-error";
+      "log-status status-error";
 
-    meta.textContent =
-      "候選池已暫停";
+
+    if (
+      !sameDate
+      &&
+      !sameVolumeMode
+    ) {
+
+      meta.textContent =
+        "交易日期與 Volume Mode 皆不一致";
+
+    }
+
+    else if (
+      !sameDate
+    ) {
+
+      meta.textContent =
+        `日期不一致：TWSE ${state.twse.tradeDateISO} / TPEx ${state.tpex.tradeDateISO}`;
+
+    }
+
+    else {
+
+      meta.textContent =
+        "Volume Mode 不一致";
+
+    }
+
 
     warning.textContent =
       (
@@ -3555,6 +4246,10 @@ function updateSyncState() {
 
 }
 
+
+/* ==================================================
+   BUILD CANDIDATES
+   ================================================== */
 
 function buildCandidates() {
 
@@ -3575,6 +4270,7 @@ function buildCandidates() {
 
   }
 
+
   state.stocks = [
 
     ...state.twse.data,
@@ -3586,15 +4282,18 @@ function buildCandidates() {
     validStock
   );
 
+
   assignLiquidityRanks(
     state.stocks
   );
+
 
   state.long =
     selectCandidates(
       state.stocks,
       "long"
     );
+
 
   state.short =
     selectCandidates(
@@ -3605,6 +4304,10 @@ function buildCandidates() {
 }
 
 
+/* ==================================================
+   LOAD
+   ================================================== */
+
 async function load() {
 
   const root =
@@ -3612,12 +4315,28 @@ async function load() {
       "candidateRoot"
     );
 
+  const reloadButton =
+    document.getElementById(
+      "reloadBtn"
+    );
+
+
   root.innerHTML =
     `
+
       <div class="loading">
         載入 TWSE / TPEx...
       </div>
+
     `;
+
+
+  reloadButton.disabled =
+    true;
+
+  reloadButton.textContent =
+    "讀取中...";
+
 
   state.twse =
     null;
@@ -3625,11 +4344,79 @@ async function load() {
   state.tpex =
     null;
 
+  state.stocks =
+    [];
+
   state.long =
     [];
 
   state.short =
     [];
+
+  state.synchronized =
+    false;
+
+
+  const twseStatus =
+    document.getElementById(
+      "twseStatus"
+    );
+
+  const twseMeta =
+    document.getElementById(
+      "twseMeta"
+    );
+
+  const tpexStatus =
+    document.getElementById(
+      "tpexStatus"
+    );
+
+  const tpexMeta =
+    document.getElementById(
+      "tpexMeta"
+    );
+
+  const syncStatus =
+    document.getElementById(
+      "syncStatus"
+    );
+
+  const syncMeta =
+    document.getElementById(
+      "syncMeta"
+    );
+
+
+  twseStatus.textContent =
+    "LOADING";
+
+  twseStatus.className =
+    "log-status status-checking";
+
+  twseMeta.textContent =
+    "讀取中...";
+
+
+  tpexStatus.textContent =
+    "LOADING";
+
+  tpexStatus.className =
+    "log-status status-checking";
+
+  tpexMeta.textContent =
+    "讀取中...";
+
+
+  syncStatus.textContent =
+    "CHECKING";
+
+  syncStatus.className =
+    "log-status status-checking";
+
+  syncMeta.textContent =
+    "等待市場資料...";
+
 
   let twseError =
     null;
@@ -3638,80 +4425,104 @@ async function load() {
     null;
 
 
-  const [
-    twseResult,
-    tpexResult
-  ] =
-    await Promise.allSettled([
+  try {
 
-      fetchMarket(
-        "./TWSE/stocks.json"
-      ),
+    const [
+      twseResult,
+      tpexResult
+    ] =
+      await Promise.allSettled([
 
-      fetchMarket(
-        "./TPEx/stocks.json"
-      )
+        fetchMarket(
+          "./TWSE/stocks.json"
+        ),
 
-    ]);
+        fetchMarket(
+          "./TPEx/stocks.json"
+        )
+
+      ]);
 
 
-  if (
-    twseResult.status ===
-    "fulfilled"
-  ) {
+    if (
+      twseResult.status ===
+      "fulfilled"
+    ) {
 
-    state.twse =
-      twseResult.value;
+      state.twse =
+        twseResult.value;
+
+    }
+
+    else {
+
+      twseError =
+        twseResult.reason;
+
+    }
+
+
+    if (
+      tpexResult.status ===
+      "fulfilled"
+    ) {
+
+      state.tpex =
+        tpexResult.value;
+
+    }
+
+    else {
+
+      tpexError =
+        tpexResult.reason;
+
+    }
+
+
+    setMarketStatus(
+      "TWSE",
+      state.twse,
+      twseError
+    );
+
+
+    setMarketStatus(
+      "TPEX",
+      state.tpex,
+      tpexError
+    );
+
+
+    updateSyncState();
+
+
+    buildCandidates();
+
+
+    renderSummary();
+
+
+    renderCandidates();
 
   }
-  else {
 
-    twseError =
-      twseResult.reason;
+  finally {
 
-  }
+    reloadButton.disabled =
+      false;
 
-
-  if (
-    tpexResult.status ===
-    "fulfilled"
-  ) {
-
-    state.tpex =
-      tpexResult.value;
+    reloadButton.textContent =
+      "重新讀取";
 
   }
-  else {
-
-    tpexError =
-      tpexResult.reason;
-
-  }
-
-
-  setMarketStatus(
-    "TWSE",
-    state.twse,
-    twseError
-  );
-
-  setMarketStatus(
-    "TPEX",
-    state.tpex,
-    tpexError
-  );
-
-
-  updateSyncState();
-
-  buildCandidates();
-
-  renderSummary();
-
-  renderCandidates();
 
 }
 
+
+/* ==================================================
+   EVENTS
+   ================================================== */
 
 document
 .getElementById(
@@ -3739,7 +4550,9 @@ document
     if (
       !card
     ) {
+
       return;
+
     }
 
     const stock =
@@ -3780,6 +4593,7 @@ document
 
     const inside =
       (
+
         event.clientX
         >=
         rect.left
@@ -3801,17 +4615,24 @@ document
         event.clientY
         <=
         rect.bottom
+
       );
 
     if (
       !inside
     ) {
+
       dialog.close();
+
     }
 
   }
 );
 
+
+/* ==================================================
+   START
+   ================================================== */
 
 load();
 
