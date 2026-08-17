@@ -106,19 +106,25 @@ class TradingCalendarTests(unittest.TestCase):
             is_incoming_trade_date_older("1150815", "1150814")
         )
 
+        root = Path(__file__).resolve().parents[1]
+        updater = (
+            root
+            / "scripts"
+            / "update_stock_data.py"
+        ).read_text(encoding="utf-8")
         workflow = (
-            Path(__file__).resolve().parents[1]
+            root
             / ".github"
             / "workflows"
             / "update-stock-data.yml"
         ).read_text(encoding="utf-8")
 
-        older_guard = workflow.index("SKIP UPDATE - FETCHED DATE IS OLDER")
-        skip_output = workflow.index(
+        older_guard = updater.index("SKIP UPDATE - FETCHED DATE IS OLDER")
+        skip_output = updater.index(
             'set_step_output("skip_update", "true")',
             older_guard,
         )
-        guard_exit = workflow.index("raise SystemExit(0)", skip_output)
+        guard_exit = updater.index("raise SystemExit(0)", skip_output)
 
         self.assertLess(older_guard, skip_output)
         self.assertLess(skip_output, guard_exit)

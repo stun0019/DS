@@ -25,6 +25,11 @@ import {
 } from "./core/router.js";
 
 import {
+  installMockBrowserApi,
+  installReplayBrowserApi
+} from "./core/publicApi.js";
+
+import {
   loadStockData,
   assignLiquidityRanks
 } from "./data/stockData.js";
@@ -308,101 +313,6 @@ function getReplaySessionDates() {
     Boolean
   )
   .sort();
-
-}
-
-
-function getWeekStart(
-  dateValue
-) {
-
-  const date =
-    new Date(
-      `${dateValue}T00:00:00Z`
-    );
-
-  const offset =
-    (
-      date.getUTCDay()
-      +
-      6
-    )
-    %
-    7;
-
-
-  date.setUTCDate(
-    date.getUTCDate()
-    -
-    offset
-  );
-
-
-  return date
-  .toISOString()
-  .slice(
-    0,
-    10
-  );
-
-}
-
-
-function getMonthRangeStart(
-  dateValue,
-  months
-) {
-
-  const date =
-    new Date(
-      `${dateValue}T00:00:00Z`
-    );
-
-  const originalDay =
-    date.getUTCDate();
-
-
-  date.setUTCDate(
-    1
-  );
-
-  date.setUTCMonth(
-    date.getUTCMonth()
-    -
-    months
-  );
-
-  const daysInTargetMonth =
-    new Date(
-      Date.UTC(
-        date.getUTCFullYear(),
-        date.getUTCMonth() + 1,
-        0
-      )
-    )
-    .getUTCDate();
-
-
-  date.setUTCDate(
-    Math.min(
-      originalDay,
-      daysInTargetMonth
-    )
-  );
-
-  date.setUTCDate(
-    date.getUTCDate()
-    +
-    1
-  );
-
-
-  return date
-  .toISOString()
-  .slice(
-    0,
-    10
-  );
 
 }
 
@@ -1310,108 +1220,25 @@ function initializeRiskSettings() {
 
 function initializeReplayApi() {
 
-  window.stockDaybydayReplay = {
-    run(
-      dataset,
-      options = {}
-    ) {
+  installReplayBrowserApi(
+    {
+      target:
+        window,
+      rerunReplay,
+      navigateTo,
+      renderCurrentView,
+      getHistoricalAutoPipeline:
+        () =>
+          historicalAutoPipeline,
+      setHistoricalAutoPipeline:
+        pipeline => {
 
-      if (
-        options.maxRiskAmount !==
-        undefined
-      ) {
+          historicalAutoPipeline =
+            pipeline;
 
-        setMaxRiskAmount(
-          options.maxRiskAmount
-        );
-
-      }
-
-
-      setReplayDataset(
-        normalizeReplayDataset(
-          dataset,
-          {
-            adapter:
-              "PROGRAMMATIC_IMPORT"
-          }
-        ),
-        options.name
-        ||
-        "程式載入"
-      );
-
-      const report =
-        rerunReplay(
-          options
-        );
-
-
-      navigateTo(
-        "replay"
-      );
-
-
-      return report;
-
-    },
-
-
-    getReport() {
-      return state.replay.report;
-    },
-
-
-    configureHistoricalAutoPipeline(
-      pipeline
-    ) {
-
-      if (
-        !pipeline
-        ||
-        typeof pipeline.run !==
-          "function"
-      ) {
-
-        throw new TypeError(
-          "Historical auto pipeline must expose run(options)"
-        );
-
-      }
-
-
-      historicalAutoPipeline =
-        pipeline;
-
-
-      return true;
-
-    },
-
-
-    hasHistoricalAutoPipeline() {
-      return Boolean(
-        historicalAutoPipeline
-      );
-    },
-
-
-    clear() {
-      setReplayDataset(null, "");
-      setReplayReport(null, null);
-      setReplayProgress(null, false);
-
-
-      if (
-        state.currentView ===
-        "replay"
-      ) {
-
-        renderCurrentView();
-
-      }
+        }
     }
-  };
+  );
 
 }
 
@@ -1455,58 +1282,20 @@ function initializeLiveProvider() {
     volume: 8000
   });
   */
-  window.stockDaybydayMock = {
+  installMockBrowserApi(
+    {
+      target:
+        window,
+      provider:
+        liveProvider,
+      reset() {
 
-    push(
-      quote
-    ) {
+        resetLiveStates();
+        renderCurrentView();
 
-      liveProvider.pushQuote(
-        quote
-      );
-
-    },
-
-
-    play(
-      quotes,
-      intervalMs = 1000
-    ) {
-
-      return liveProvider.play(
-        quotes,
-        {
-          intervalMs
-        }
-      );
-
-    },
-
-
-    reset() {
-
-      resetLiveStates();
-
-
-      renderCurrentView();
-
-    },
-
-
-    stop() {
-
-      liveProvider.stop();
-
-    },
-
-
-    start() {
-
-      liveProvider.start();
-
+      }
     }
-
-  };
+  );
 
 }
 
