@@ -1,1 +1,13 @@
-
+{
+  "market": "TPEX",
+  "marketName": "上櫃",
+  "tradeDate": "",
+  "tradeDateISO": "",
+  "updatedAt": "",
+  "source": "TPEx official data",
+  "type": "TPEX_STOCK_ONLY",
+  "volumeMode": "BROKER_COMPARABLE_V4",
+  "volumeFormula": "MainboardTradeVolume + AfterHoursFixedVolume",
+  "count": 0,
+  "data": []
+}
