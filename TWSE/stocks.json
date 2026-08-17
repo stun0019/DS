@@ -1,1 +1,13 @@
-
+{
+  "market": "TWSE",
+  "marketName": "上市",
+  "tradeDate": "",
+  "tradeDateISO": "",
+  "updatedAt": "",
+  "source": "TWSE official data",
+  "type": "TWSE_STOCK_ONLY",
+  "volumeMode": "BROKER_COMPARABLE_V4",
+  "volumeFormula": "TotalTradeVolume - OddLotVolume - BlockTradeVolume",
+  "count": 0,
+  "data": []
+}
