@@ -1,1 +1,94 @@
+name: Update TPEx Data
 
+on:
+  workflow_dispatch:
+
+  schedule:
+    # 台灣時間 08:20
+    - cron: "20 0 * * 1-5"
+
+    # 台灣時間 17:45
+    - cron: "45 9 * * 1-5"
+
+    # 台灣時間 18:05 / 18:25 / 18:45
+    - cron: "5,25,45 10 * * 1-5"
+
+    # 台灣時間 19:05 / 19:25 / 19:45
+    - cron: "5,25,45 11 * * 1-5"
+
+    # 台灣時間 20:05
+    - cron: "5 12 * * 1-5"
+
+
+permissions:
+  contents: write
+
+
+concurrency:
+  group: ds-market-data-write
+  cancel-in-progress: false
+
+
+jobs:
+
+  update-tpex:
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.x"
+
+
+      - name: Update TPEx
+        run: python TPEx/update.py
+
+
+      - name: Validate TPEx
+        run: python TPEx/validate.py
+
+
+      - name: Show TPEx data
+        run: |
+          ls -lh TPEx/stocks.json
+          head -n 30 TPEx/stocks.json
+
+
+      - name: Commit TPEx data
+        run: |
+
+          git config user.name "github-actions[bot]"
+
+          git config user.email \
+          "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add TPEx/stocks.json
+
+          if git diff --cached --quiet
+          then
+
+            echo "TPEx data unchanged."
+
+            exit 0
+
+          fi
+
+          git commit \
+            -m "chore: update TPEx data"
+
+          git pull \
+            --rebase \
+            origin main
+
+          git push
