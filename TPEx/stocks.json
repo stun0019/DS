@@ -3,14 +3,14 @@
   "marketName": "上櫃",
   "tradeDate": "1150821",
   "tradeDateISO": "2026-08-21",
-  "updatedAt": "2026-08-21 19:33:27",
+  "updatedAt": "2026-08-21 20:01:09",
   "source": "TPEx official data",
   "type": "TPEX_STOCK_ONLY",
   "volumeMode": "BROKER_COMPARABLE_V4",
   "volumeFormula": "MainboardTradeVolume + AfterHoursFixedVolume",
   "dateSources": {
     "fixed": "1150821",
-    "dailyClose": "",
+    "dailyClose": "1150821",
     "mainboardQuotes": "1150821"
   },
   "dayTradeEligibility": {
