@@ -3,7 +3,7 @@
   "marketName": "上櫃",
   "tradeDate": "1150820",
   "tradeDateISO": "2026-08-20",
-  "updatedAt": "2026-08-20 18:07:20",
+  "updatedAt": "2026-08-21 10:00:50",
   "source": "TPEx official data",
   "type": "TPEX_STOCK_ONLY",
   "volumeMode": "BROKER_COMPARABLE_V4",
@@ -17,11 +17,11 @@
     "source": "https://www.tpex.org.tw/openapi/v1/tpex_securities",
     "suspensionSource": "https://www.tpex.org.tw/openapi/v1/tpex_intraday_trading_pre",
     "referenceDate": "1150820",
-    "asOfDate": "1150820",
-    "activeSuspensions": 46,
+    "asOfDate": "1150821",
+    "activeSuspensions": 45,
     "counts": {
-      "eligible": 689,
-      "buyFirstOnly": 35,
+      "eligible": 683,
+      "buyFirstOnly": 41,
       "ineligible": 163
     }
   },
@@ -2563,8 +2563,12 @@
       "AdjustedTradeVolume": 77000,
       "RegularTradeVolume": 77000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "除權息",
+      "SellFirstSuspensionStartDate": "1150821",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150828"
     },
     {
       "Date": "1150820",
@@ -3756,8 +3760,12 @@
       "AdjustedTradeVolume": 417000,
       "RegularTradeVolume": 417000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "除息",
+      "SellFirstSuspensionStartDate": "1150821",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150828"
     },
     {
       "Date": "1150820",
@@ -12981,11 +12989,7 @@
       "RegularTradeVolume": 49000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除息",
-      "SellFirstSuspensionStartDate": "1150814",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150821"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150820",
@@ -15337,8 +15341,12 @@
       "AdjustedTradeVolume": 779000,
       "RegularTradeVolume": 779000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "現金增資",
+      "SellFirstSuspensionStartDate": "1150821",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150828"
     },
     {
       "Date": "1150820",
@@ -18535,8 +18543,12 @@
       "AdjustedTradeVolume": 42000,
       "RegularTradeVolume": 42000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "除權息",
+      "SellFirstSuspensionStartDate": "1150821",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150828"
     },
     {
       "Date": "1150820",
@@ -22748,11 +22760,7 @@
       "RegularTradeVolume": 2553000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除息",
-      "SellFirstSuspensionStartDate": "1150814",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150821"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150820",
@@ -23302,8 +23310,12 @@
       "AdjustedTradeVolume": 1033000,
       "RegularTradeVolume": 1033000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "現金增資",
+      "SellFirstSuspensionStartDate": "1150821",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150828"
     },
     {
       "Date": "1150820",
@@ -24553,8 +24565,12 @@
       "AdjustedTradeVolume": 65000,
       "RegularTradeVolume": 65000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "除息",
+      "SellFirstSuspensionStartDate": "1150821",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150828"
     },
     {
       "Date": "1150820",
