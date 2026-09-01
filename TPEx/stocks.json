@@ -3,7 +3,7 @@
   "marketName": "上櫃",
   "tradeDate": "1150901",
   "tradeDateISO": "2026-09-01",
-  "updatedAt": "2026-09-01 22:17:54",
+  "updatedAt": "2026-09-02 00:32:44",
   "source": "TPEx official data",
   "type": "TPEX_STOCK_ONLY",
   "volumeMode": "BROKER_COMPARABLE_V4",
@@ -17,11 +17,11 @@
     "source": "https://www.tpex.org.tw/openapi/v1/tpex_securities",
     "suspensionSource": "https://www.tpex.org.tw/openapi/v1/tpex_intraday_trading_pre",
     "referenceDate": "1150901",
-    "asOfDate": "1150901",
-    "activeSuspensions": 32,
+    "asOfDate": "1150902",
+    "activeSuspensions": 30,
     "counts": {
-      "eligible": 700,
-      "buyFirstOnly": 26,
+      "eligible": 696,
+      "buyFirstOnly": 30,
       "ineligible": 162
     }
   },
@@ -144,8 +144,12 @@
       "AdjustedTradeVolume": 31000,
       "RegularTradeVolume": 31000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "除息",
+      "SellFirstSuspensionStartDate": "1150902",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150909"
     },
     {
       "Date": "1150901",
@@ -1657,11 +1661,7 @@
       "RegularTradeVolume": 8000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除息",
-      "SellFirstSuspensionStartDate": "1150826",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150902"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150901",
@@ -9627,11 +9627,7 @@
       "RegularTradeVolume": 69000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除息",
-      "SellFirstSuspensionStartDate": "1150826",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150902"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150901",
@@ -10041,11 +10037,7 @@
       "RegularTradeVolume": 60000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除息",
-      "SellFirstSuspensionStartDate": "1150826",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150902"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150901",
@@ -10741,11 +10733,7 @@
       "RegularTradeVolume": 7000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除息",
-      "SellFirstSuspensionStartDate": "1150826",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150902"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150901",
@@ -12224,11 +12212,7 @@
       "RegularTradeVolume": 1663000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除權息",
-      "SellFirstSuspensionStartDate": "1150826",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150902"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150901",
@@ -15860,8 +15844,12 @@
       "AdjustedTradeVolume": 19000,
       "RegularTradeVolume": 19000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "臨時會",
+      "SellFirstSuspensionStartDate": "1150902",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150909"
     },
     {
       "Date": "1150901",
@@ -21391,11 +21379,7 @@
       "RegularTradeVolume": 2000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除權息",
-      "SellFirstSuspensionStartDate": "1150826",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150902"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150901",
@@ -21858,8 +21842,12 @@
       "AdjustedTradeVolume": 36000,
       "RegularTradeVolume": 36000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "除息",
+      "SellFirstSuspensionStartDate": "1150902",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150909"
     },
     {
       "Date": "1150901",
@@ -23606,8 +23594,12 @@
       "AdjustedTradeVolume": 126000,
       "RegularTradeVolume": 126000,
       "DayTradeEligible": true,
-      "SellFirstDayTradeAllowed": true,
-      "SellFirstSuspended": false
+      "SellFirstDayTradeAllowed": false,
+      "SellFirstSuspended": true,
+      "SellFirstSuspensionReason": "除息",
+      "SellFirstSuspensionStartDate": "1150902",
+      "SellFirstSuspensionEndDate": "",
+      "SellFirstResumeDate": "1150909"
     },
     {
       "Date": "1150901",
