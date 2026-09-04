@@ -3,7 +3,7 @@
   "marketName": "上櫃",
   "tradeDate": "1150904",
   "tradeDateISO": "2026-09-04",
-  "updatedAt": "2026-09-04 21:46:56",
+  "updatedAt": "2026-09-05 00:16:09",
   "source": "TPEx official data",
   "type": "TPEX_STOCK_ONLY",
   "volumeMode": "BROKER_COMPARABLE_V4",
@@ -17,8 +17,8 @@
     "source": "https://www.tpex.org.tw/openapi/v1/tpex_securities",
     "suspensionSource": "https://www.tpex.org.tw/openapi/v1/tpex_intraday_trading_pre",
     "referenceDate": "1150904",
-    "asOfDate": "1150904",
-    "activeSuspensions": 24,
+    "asOfDate": "1150905",
+    "activeSuspensions": 20,
     "counts": {
       "eligible": 699,
       "buyFirstOnly": 24,
@@ -2452,11 +2452,7 @@
       "RegularTradeVolume": 249000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除權息",
-      "SellFirstSuspensionStartDate": "1150831",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150905"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150904",
@@ -4979,11 +4975,7 @@
       "RegularTradeVolume": 280000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除息",
-      "SellFirstSuspensionStartDate": "1150831",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150905"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150904",
@@ -14652,11 +14644,7 @@
       "RegularTradeVolume": 575000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除息",
-      "SellFirstSuspensionStartDate": "1150831",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150905"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150904",
@@ -20480,11 +20468,7 @@
       "RegularTradeVolume": 54000,
       "DayTradeEligible": true,
       "SellFirstDayTradeAllowed": false,
-      "SellFirstSuspended": true,
-      "SellFirstSuspensionReason": "除權息",
-      "SellFirstSuspensionStartDate": "1150831",
-      "SellFirstSuspensionEndDate": "",
-      "SellFirstResumeDate": "1150905"
+      "SellFirstSuspended": true
     },
     {
       "Date": "1150904",
